@@ -1,0 +1,18 @@
+[color]
+    ui=auto
+	status = auto
+	branch = auto
+	interactive = auto
+	diff = auto
+    
+[user]
+	name = dwanderson
+	email = anderson.dan.w@gmail.com
+[core]
+	editor = vim
+	excludesfile = /home/dwanderson/.gitignore
+[alias]
+	bitpush = push -u origin master
+	ls = log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate
+	ll = log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate --numstat
+	lg = log --graph --pretty=oneline --decorate --abbrev-commit
