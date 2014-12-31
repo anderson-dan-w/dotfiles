@@ -10,7 +10,7 @@ esac
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
-HISTCONTROL=ignoreboth
+HISTCONTROL=ignoredups:ignorespace
 
 # append to the history file, don't overwrite it
 shopt -s histappend
@@ -122,17 +122,19 @@ alias src='source $HOME/.bashrc'
 alias emacs='/usr/bin/emacs -fn "DejaVu Sans Mono-8" -bg grey20 -fg grey80'
 export PAGER=less
 
+## intelligent history traversal
+bind '"\e[A":history-search-backward'
+bind '"\e[B":history-search-forward'
+
 # python-related things
 export PYTHONPATH="${PYTHONPATH}":$HOME/playground/python
 export PYTHONSTARTUP=$HOME/.pythonstartup
+export WORKON_HOME=$HOME/pyenvs
+source /usr/local/bin/virtualenvwrapper.sh
 alias ipynb="ipython notebook --pylab=inline &"
-
 
 # R-related things
 export R_HISTFILE=$HOME/.Rhistory
-
-#java/netbeans related things
-alias netbeans='/home/dwanderson/netbeans-7.4/bin/netbeans &'
 
 #LaTeX related things
 function pdflatex () {
@@ -142,10 +144,6 @@ function pdflatex () {
       /usr/bin/pdflatex $1 && rm -rf *toc *aux *log ;
   fi ;
 }
-
-#jhu related stuff
-export jhu="dander73@web7.apl.jhu.edu:~/public_html"
-alias sshjhu='ssh dander73@web7.apl.jhu.edu'
 
 ## AWS-related
 export AWSPEM="$HOME/aws/dwanderson-keypair-virginia.pem"
