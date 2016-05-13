@@ -151,6 +151,8 @@ export AWSINST="ec2-user@ec2-54-84-3-52.compute-1.amazonaws.com"
 export AWSINST2="ubuntu@54.84.110.135"
 alias sshaws="ssh -i $AWSPEM $AWSINST2" 
 
+## resize a terminal to be @a n screens wide (meaning 80 characters * n)
+## @note Doesn't work inside tmux
 function res () { 
     if [ -z "$1" ]; then 
         n=1;
@@ -159,3 +161,18 @@ function res () {
     export LINES=${LINES};
     export COLUMNS=${COLUMNS};
 }
+
+## Set prompt to be green if last call was successful (returned 0) else red
+function error_test {
+	if [[ $? = "0" ]]; then
+		echo -e "\[\033[1;32m\]"
+	else
+		echo -e "\[\033[1;31m\]"
+	fi
+}
+
+function set_prompt() {
+	PS1="$(error_test)\t:\[\\033[00m\]$(basename PWD)\$"
+}
+
+PROMPT_COMMAND=set_prompt
