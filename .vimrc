@@ -5,6 +5,9 @@ set history=500
 """""""""""""""""""""""""""
 syntax on
 filetype indent plugin on
+"" show matching brackets, and for how many deciseconds
+set showmatch
+set mat=2
 
 """""""""""""""""""""""""""
 "" spaces and tabs
@@ -18,6 +21,12 @@ set wrap "wrap lines
 """""""""""""""""""""""""""
 "" search and display
 """""""""""""""""""""""""""
+"" show line, position
+set ruler
+"" helpful when looking for commands
+set wildmenu
+set wildmode=list:full
+"" search in text
 set incsearch ignorecase hlsearch
 "" for regular expressions
 set magic
@@ -39,6 +48,9 @@ noremap <Home> ^
 "" backspace works like normal
 set backspace=eol,start,indent
 set whichwrap=<,>,h,l
+"" more natural splits: below/to the right, rather than above/to the left
+set splitbelow
+set splitright
 "" windows:
 map <C-j> <C-W>j
 map <C-k> <C-W>k
@@ -49,7 +61,8 @@ map <C-h> <C-W>h
 "" no annooying noises, or files
 """""""""""""""""""""""""""
 "" noises
-set noerrorbells novisualbell
+set noerrorbells
+set novisualbell
 set t_vb=
 set tm=500
 "" files - everything should be in a gitrepo anyway....
