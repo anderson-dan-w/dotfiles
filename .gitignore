@@ -1,6 +1,13 @@
+## python-specifc
+*__pycache__*
+.ipynb_checkpoints*
+*pyc
+
+## bundled/archived
 *gz
 *tar
-*pyc
+
+## backups
 *~
 *so
 *#
