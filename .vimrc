@@ -3,15 +3,10 @@ set history=500
 """""""""""""""""""""""""""
 "" use vim for programming, like a normal person
 """""""""""""""""""""""""""
-"" get rid of bold text inside vim; it annoys me
-"" copied from https://groups.google.com/forum/#!topic/vim_use/cI7ritLRH8Q
-if !has('gui_running')
-    set t_Co=8 t_md=
-endif
-
 syntax on
 filetype indent plugin on
 au BufRead,BufNewFile *.go set filetype=go
+au BufRead,BufNewFile *pythonstartup set filetype=python
 "" show matching brackets, and for how many deciseconds
 set showmatch
 set mat=2
@@ -87,26 +82,41 @@ if has ("unix")
     let s:uname = system("uname")
     if s:uname == "Darwin\n"
         colorscheme murphy
+    else
+        "" get rid of bold text inside vim; it annoys me on Unix but not Mac.
+        "" from https://groups.google.com/forum/#!topic/vim_use/cI7ritLRH8Q
+        if !has('gui_running')
+            set t_Co=8 t_md=
+        endif
     endif
 endif
 
-"""""""""""""""""""""""""""
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" vim modules: pathogen, etc
-"""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
 execute pathogen#infect()
 
+"""""""""""""""""""""""""""
 "" syntastic goodness
+"""""""""""""""""""""""""""
+"" recommended settings
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
-"let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
-"" get python3 syntax accepted
-let g:syntastic_python_python_exec="/usr/bin/python3"
-let g:syntastic_python_flake8_args = "--ignore W391,E302 --max-lin-length=80"
+"" (on mac, at least) no errors populate unless quiet_messages is set
+let g:syntastic_quiet_messages = {'level': 'warnings'}
+
+"" for python
+let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_python_flake8_args = '--ignore W391 --max-line-length=80'
+
+"" for haskell
 let g:syntastic_haskell_ghc_mod_checker = 1
 
 "" SS will first turn Syntastic off; next time it will turn it on
