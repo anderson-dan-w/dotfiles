@@ -172,7 +172,9 @@ function error_test {
 }
 
 function set_prompt() {
-	PS1="$(error_test)\t:\[\\033[00m\]$(basename PWD)\$"
+    ## deals w spaces in dirnames
+    MYBASENAME=$(basename "$PWD")
+	PS1="$(error_test)\t:\[\\033[00m\]$MYBASENAME\$ "
 }
 
 PROMPT_COMMAND=set_prompt
