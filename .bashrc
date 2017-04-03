@@ -119,37 +119,44 @@ alias cp='cp -i'
 alias l='/usr/bin/less'
 alias src='source $HOME/.bashrc'
 
-alias emacs='/usr/bin/emacs -fn "DejaVu Sans Mono-8" -bg grey20 -fg grey80'
 export PAGER=less
 
 ## intelligent history traversal
 bind '"\e[A":history-search-backward'
 bind '"\e[B":history-search-forward'
 
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+    . $(brew --prefix)/etc/bash_completion
+fi
+
+alias ggrep="ggrep --color=auto"
+export GREP_COLORS="ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se=36"
+
+##############################################################################
 # python-related things
-export PYTHONPATH="${PYTHONPATH}":$HOME/playground/python
 export PYTHONSTARTUP=$HOME/.pythonstartup
-export WORKON_HOME=$HOME/pyenvs
-source /usr/local/bin/virtualenvwrapper.sh
-alias ipynb="ipython notebook --pylab=inline &"
+alias pyclean='find . -name "*.pyc" -exec rm {} \;'
+alias p80x="python -c \"print('x'*80)\""
 
 # R-related things
 export R_HISTFILE=$HOME/.Rhistory
 
-#LaTeX related things
-function pdflatex () {
-  if [ -z "$1" ] ; then
-      echo Need a .tex document... ;
-  else
-      /usr/bin/pdflatex $1 && rm -rf *toc *aux *log ;
-  fi ;
+# icake-related things
+icake() {
+    ICAKE_PATH="$HOME/icake/icake-git/"
+    cd $ICAKE_PATH
+    source scripts/init.sh
 }
 
-## AWS-related
-export AWSPEM="$HOME/aws/dwanderson-keypair-virginia.pem"
-export AWSINST="ec2-user@ec2-54-84-3-52.compute-1.amazonaws.com"
-export AWSINST2="ubuntu@54.84.110.135"
-alias sshaws="ssh -i $AWSPEM $AWSINST2" 
+##############################################################################
+## easy open on mac
+function fopen () {
+    /usr/bin/open -a TextEdit $1 ;
+}
+
+function diff {
+    colordiff -u "$@" | less -RF
+}
 
 ## resize a terminal to be @a n screens wide (meaning 80 characters * n)
 ## @note Doesn't work inside tmux
