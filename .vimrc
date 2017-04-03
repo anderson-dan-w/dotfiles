@@ -19,6 +19,8 @@ set tabstop=4 expandtab
 set ai "" autoindent
 set si "smart indent
 set wrap "wrap lines
+"" python screws up smartindent, so dont use it
+au! FileType python setl nosmartindent
 
 """""""""""""""""""""""""""
 "" search and display
@@ -40,6 +42,13 @@ set mouse=ar mousemodel=extend
 set lazyredraw
 "" open file at previous close location
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+set clipboard=unnamed
+
+"" highlight TODO and FIXME regardless of filetype
+augroup HighlightBuzzwords
+    autocmd!
+    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'TODO\|FIXME\|NOTE', -1)
+augroup end
 
 """""""""""""""""""""""""""
 "" Navigate
@@ -60,7 +69,7 @@ map <C-l> <C-W>l
 map <C-h> <C-W>h
 
 """""""""""""""""""""""""""
-"" no annooying noises, or files
+"" no annoying noises, or files
 """""""""""""""""""""""""""
 "" noises
 set noerrorbells
@@ -91,6 +100,9 @@ if has ("unix")
     endif
 endif
 
+"" highlight Python strings so they stand out better
+syn region pythonstring matchgroup=pythonstring start=/["']/ end=/["']/
+hi pythonstring ctermfg=7265
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 "" vim modules: pathogen, etc
@@ -113,8 +125,16 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_quiet_messages = {'level': 'warnings'}
 
 "" for python
-let g:syntastic_python_checkers = ['flake8']
-let g:syntastic_python_flake8_args = '--ignore W391 --max-line-length=80'
+let g:syntastic_python_checkers = ['flake8', 'pylint']
+"" ignore flake8 warnings I don't care about:
+"" W391 = blank line at end of file [vim will add if necessary]
+"" E127 = under-indented [too many edge cases]
+"" E128 = over-indented [same as E127]
+"" E262 = inline comments '# ' [I prefer '## ']
+"" E266 = block commentes '# ' [same as E262]
+let g:syntastic_python_flake8_args = '--ignore W391,E127,E128,E262,E266 --max-line-length=80'
+"" ignore pylint warnings, just give me the big errors
+let g:syntastic_python_pylint_args = '-E'
 
 "" for haskell
 let g:syntastic_haskell_ghc_mod_checker = 1
