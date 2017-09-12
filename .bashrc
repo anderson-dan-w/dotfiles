@@ -147,6 +147,10 @@ alias p80x="python -c \"print('x'*80)\""
 # R-related things
 export R_HISTFILE=$HOME/.Rhistory
 
+##############################################################################
+# git-related auto-completion
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+[ -f $HOME/.git-completion.bash ] && . $HOME/.git-completion.bash
 
 ##############################################################################
 ## easy open on mac
