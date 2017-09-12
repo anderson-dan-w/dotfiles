@@ -147,12 +147,6 @@ alias p80x="python -c \"print('x'*80)\""
 # R-related things
 export R_HISTFILE=$HOME/.Rhistory
 
-# icake-related things
-icake() {
-    ICAKE_PATH="$HOME/icake/icake-git/"
-    cd $ICAKE_PATH
-    source scripts/init.sh
-}
 
 ##############################################################################
 ## easy open on mac
