@@ -152,6 +152,13 @@ export R_HISTFILE=$HOME/.Rhistory
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 [ -f $HOME/.git-completion.bash ] && . $HOME/.git-completion.bash
 
+[ -f $HOME/.git-prompt.sh ] && . $HOME/.git-prompt.sh
+PS1='\W\[\e[0;32m\]$(__git_ps1 " (%s)")\[\e[m\]\$ '
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWSTASHSTATE=1
+export GIT_PS1_SHOWUNTRACKEDFILES=1
+export GIT_PS1_SHOWUPSTREAM="auto"
+
 ##############################################################################
 ## easy open on mac
 function fopen () {
@@ -173,6 +180,11 @@ function res () {
     export COLUMNS=${COLUMNS};
 }
 
+##############################################################################
+## personalized prompt-setting; i'd rather use git-prompt above though
+## but i'm leaving these functions so it's easier to see/find/remember how
+## to toy with it if I want
+
 ## Set prompt to be green if last call was successful (returned 0) else red
 function error_test {
 	if [[ $? = "0" ]]; then
@@ -188,4 +200,4 @@ function set_prompt() {
 	PS1="$(error_test)\t:\[\\033[00m\]$MYBASENAME\$ "
 }
 
-PROMPT_COMMAND=set_prompt
+#PROMPT_COMMAND=set_prompt
