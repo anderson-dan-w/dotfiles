@@ -111,7 +111,13 @@ fi
 alias ll='ls -lF'
 alias lla='ls -alF'
 alias la='ls -A'
-alias lt='ls -lrt --color=auto'
+
+_myos="$(uname)"
+if [ "$_myos" = "Darwin" ]; then
+    alias lt='ls -lrtG'
+else
+    alias lt='ls -lrt --color=auto'
+fi
 
 alias rm='rm -i'
 alias mv='mv -i'
