@@ -153,7 +153,7 @@ export R_HISTFILE=$HOME/.Rhistory
 [ -f $HOME/.git-completion.bash ] && . $HOME/.git-completion.bash
 
 [ -f $HOME/.git-prompt.sh ] && . $HOME/.git-prompt.sh
-PS1='\W\[\e[0;32m\]$(__git_ps1 " (%s)")\[\e[m\]\$ '
+PS1='\[\e[0;94m\]\W\[\e[m\]\[\e[0;32m\]$(__git_ps1 " (%s)")\[\e[m\]\$ '
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
