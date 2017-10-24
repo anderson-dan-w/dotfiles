@@ -6,21 +6,27 @@ set history=500
 syntax on
 filetype indent plugin on
 au BufRead,BufNewFile *.go set filetype=go
+au BufRead,BufNewFile *.ms set filetype=mustache
 au BufRead,BufNewFile *pythonstartup set filetype=python
+au Filetype html,xml,xsl,js source ~/.vim/scripts/closetag.vim
 "" show matching brackets, and for how many deciseconds
 set showmatch
 set mat=2
+set number
 
 """""""""""""""""""""""""""
 "" spaces and tabs
 """""""""""""""""""""""""""
-set shiftwidth=4 softtabstop=4
-set tabstop=4 expandtab
 set ai "" autoindent
 set si "smart indent
 set wrap "wrap lines
+"" sigopt uses indent=2 for everything
+set shiftwidth=2 softtabstop=2
+set tabstop=2 expandtab
 "" python screws up smartindent, so dont use it
-au! FileType python setl nosmartindent
+""au! FileType python setlocal nosmartindent
+"" python wants to use 4 spaces; sigopt wants 2
+au FileType python setlocal shiftwidth=2 softtabstop=2 expandtab
 
 """""""""""""""""""""""""""
 "" search and display
@@ -48,6 +54,12 @@ set clipboard=unnamed
 augroup HighlightBuzzwords
     autocmd!
     autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'TODO\|FIXME\|NOTE', -1)
+augroup end
+
+"" highlight common typos that aren't always caught by linters
+augroup HighlightTypos
+    autocmd!
+    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'langauge\|flase\|Flase\|jsut\|tempalte', -1)
 augroup end
 
 """""""""""""""""""""""""""
@@ -103,43 +115,61 @@ endif
 "" highlight Python strings so they stand out better
 syn region pythonstring matchgroup=pythonstring start=/["']/ end=/["']/
 hi pythonstring ctermfg=7265
+"" line numbers shouldn't stand out
+highlight LineNr ctermfg=grey ctermbg=235 "" 235 is a dark dark grey
+"" first tell vim-gitgutter to leave the ctermbg alone
+let g:gitgutter_override_sign_column_highlight = 0
+highlight SignColumn ctermbg=235
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 "" vim modules: pathogen, etc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 execute pathogen#infect()
 
-"""""""""""""""""""""""""""
-"" syntastic goodness
-"""""""""""""""""""""""""""
-"" recommended settings
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+"""""""""""""""""""""""""
+"" fzf
+"""""""""""""""""""""""""
+set rtp+=/usr/local/opt/fzf
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-"" (on mac, at least) no errors populate unless quiet_messages is set
-let g:syntastic_quiet_messages = {'level': 'warnings'}
+"""""""""""""""""""""""""
+"" show git diff markers in gutter
+"""""""""""""""""""""""""
+let g:gitgutter_realtime = 1
+set updatetime=250
 
-"" for python
-let g:syntastic_python_checkers = ['flake8', 'pylint']
+"""""""""""""""""""""""""""
+"" mustache autocomplete
+"""""""""""""""""""""""""""
+let g:mustache_abbreviations = 1
+
+"""""""""""""""""""""""""""
+"" syntax and style-checking
+"""""""""""""""""""""""""""
+"" use quickfix instead (not sure why? learning)
+let g:ale_set_loclist = 0
+let g:ale_set_quickfix = 1
+
+"" make it open the list, at the desired height
+let g:ale_open_list = 1
+call ale#Set('list_window_size', 5)
+
+"" leave the error window open even when empty. Less resizing, but
+"" can be more annoying to close out of files (manually close list_window)
+"let g:ale_keep_list_window_open = 1
+
 "" ignore flake8 warnings I don't care about:
 "" W391 = blank line at end of file [vim will add if necessary]
+""        sigopt has this warning on, so I'll turn it on as well
+"" E111 = indentation is not a multiple of four: I like this rule, but
+""        sigopt uses indent of 2, and it's untenable to leave this on
+"" E114 = indention is not a multiple of four (for comments): see E111
+"" E121 = continuation line under-indented - consequence of 2-space indents
 "" E127 = under-indented [too many edge cases]
 "" E128 = over-indented [same as E127]
 "" E262 = inline comments '# ' [I prefer '## ']
 "" E266 = block commentes '# ' [same as E262]
-let g:syntastic_python_flake8_args = '--ignore W391,E127,E128,E262,E266 --max-line-length=80'
-"" ignore pylint warnings, just give me the big errors
-let g:syntastic_python_pylint_args = '-E'
+"" max-line-length used by sigopt is 120 rather than 80
+let g:ale_python_flake8_args = '--ignore E111,E114,E121,E127,E128,E262,E266 --max-line-length=120'
 
-"" for haskell
-let g:syntastic_haskell_ghc_mod_checker = 1
-
-"" SS will first turn Syntastic off; next time it will turn it on
-"" but it won't actually re-run the check (until say :w), so :SC now checks
-cnoreabbrev SS SyntasticToggleMode
-cnoreabbrev SC SyntasticCheck
+cnoreabbrev SS cclose
+cnoreabbrev SC copen
