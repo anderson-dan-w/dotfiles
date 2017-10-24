@@ -1,20 +1,42 @@
 [color]
-    ui=auto
+  ui=auto
 	status = auto
 	branch = auto
 	interactive = auto
 	diff = auto
+
+[color "branch"]
+  current = cyan
+  local = yellow
+  remote = green
+
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan
+
+[color "grep"]
+  linenumber = cyan
+  filename = green
     
 [user]
-	name = dwanderson
+	name = Dan W Anderson
 	email = anderson.dan.w@gmail.com
+
 [core]
 	editor = vim
-	excludesfile = /home/dwanderson/.gitignore
+	excludesfile = /Users/dwanderson/.gitignore
+
+[grep]
+  lineNumber = True
+	patternType = perl
+
 [alias]
-	bitpush = push -u origin master
 	ls = log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cgreen\\\\ [%cn]\" --decorate
-	ll = log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cgreen\\\\ [%cn]\" --decorate --numstat
-	lg = log --graph --pretty=oneline --decorate --abbrev-commit
+	ll = log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cgreen\\\\ [%cn](%an)\" --decorate --numstat
+  lg = log --pretty=format:'%C(yellow)%h %Cred%d %Creset%s (%Cgreen%an)' --graph
+	git = !exec git
+  dh = diff origin/master HEAD
+
 [credential]
     helper = osxkeychain
