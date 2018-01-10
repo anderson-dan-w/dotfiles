@@ -155,11 +155,19 @@ function gf () {
 }
 
 ##############################################################################
+# sigopt-related things
+source ~/.certs/sigopt-tokens.bash
 
 export SIGOPT_DIR="${HOME}/sigopt/sigopt-api"
+export PAGERDUTY_SIGOPT_DIR="${HOME}/sigopt/pagerduty-sigopt-api"
 alias sig="cd ${SIGOPT_DIR} && source activate sigopt-api"
+alias pgr="cd ${PAGERDUTY_SIGOPT_DIR} && source activate sigopt-api && git fetch --all"
 alias api="cd ${SIGOPT_DIR} && ./build config/development.json"
 alias web="cd ${SIGOPT_DIR} && ./web/web_serve_dev.sh"
+
+function update_local_token() {
+  python ~/sigopt/personal-sigopt-testing/src/python/update_local_token.py "$@" && src
+}
 
 ## open chrome tab with travis build for current branch name
 alias seetravis="$HOME/sigopt/personal-sigopt-testing/src/bash/open_travis.bash"
