@@ -204,9 +204,17 @@ export PATH=$PATH:/usr/local/sbin
 ##############################################################################
 # git-related
 
+# lazy
+alias g="git"
+
 # auto-completion
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
-[ -f $HOME/.git-completion.bash ] && . $HOME/.git-completion.bash
+if [ -f $HOME/.git-completion.bash ]; then
+  source $HOME/.git-completion.bash
+
+  # add completion for alias(es) above
+  __git_complete g __git_main
+fi
 
 # prompt tells repo status
 [ -f $HOME/.git-prompt.sh ] && . $HOME/.git-prompt.sh
