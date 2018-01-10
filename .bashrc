@@ -233,7 +233,7 @@ export GIT_PS1_SHOWUPSTREAM="auto"
 
 ##############################################################################
 ## fzf helpers
-export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+export FZF_DEFAULT_COMMAND='ag --nocolor --hidden --ignore .git -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS='
