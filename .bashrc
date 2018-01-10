@@ -193,6 +193,13 @@ export PATH=$PATH:$M2
 
 #######################
 # node/JS related things
+export PATH="/usr/local/opt/node@8/bin:$PATH"
+## not actually sure what this does?
+export PATH="$HOME/.rbenv/shims:$PATH"
+
+######################
+# rabbitmq
+export PATH=$PATH:/usr/local/sbin
 
 ##############################################################################
 # git-related
@@ -207,7 +214,7 @@ export PATH=$PATH:$M2
 _LIGHT_BLUE='\[\e[0;94m\]'
 _GREEN='\[\e[0;32m\]'
 _NO_COLOR='\[\e[m\]'
-PS1="${_LIGHT_BLUE}\W${_NO_COLOR}${_GREEN}"'$(__git_ps1 " (%s)")'"${_NO_COLOR}\n${_LIGHT_BLUE}\A${_NO_COLOR} \$ "
+PS1="${_LIGHT_BLUE}\W${_NO_COLOR}${_GREEN}"'$(__git_ps1 " (%s)")'"${_NO_COLOR}\n${_LIGHT_BLUE}\t${_NO_COLOR} \$ "
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
@@ -231,7 +238,7 @@ export FZF_DEFAULT_OPTS='
 
 # case-insensitive gitgrep
 alias gg='git grep -i'
-# use silver-searcher, case-insensitive, and override atrocious default highlight
+# use silver-surfer, case-insensitive, and override atrocious default highlight
 alias ag="ag -i --pager='less -RXF' --color-match '1;35'"
 alias agnt="ag --ignore *test --pager='less -RXF' -i --color-match '1;35'"
 
@@ -263,5 +270,25 @@ function res () {
 }
 
 ##############################################################################
-# last thing, run fzf.bash so nothing gets overwritten by any of the above
+## personalized prompt-setting; i'd rather use git-prompt above though
+## but i'm leaving these functions so it's easier to see/find/remember how
+## to toy with it if I want
+
+## Set prompt to be green if last call was successful (returned 0) else red
+function error_test {
+	if [[ $? = "0" ]]; then
+		echo -e "\[\033[1;32m\]"
+	else
+		echo -e "\[\033[1;31m\]"
+	fi
+}
+
+function set_prompt() {
+    ## deals w spaces in dirnames
+    MYBASENAME=$(basename "$PWD")
+	PS1="$(error_test)\t:\[\\033[00m\]$MYBASENAME\$ "
+}
+
+#PROMPT_COMMAND=set_prompt
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
