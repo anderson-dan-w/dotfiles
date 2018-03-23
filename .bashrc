@@ -43,16 +43,16 @@ esac
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
-#force_color_prompt=yes
+force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
+  # We have color support; assume it's compliant with Ecma-48
+  # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+  # a case would tend to support setf rather than setaf.)
+  color_prompt=yes
     else
-	color_prompt=
+  color_prompt=
     fi
 fi
 
@@ -64,17 +64,21 @@ fi
 unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
+# case "$TERM" in
+# xterm*|rxvt*)
+#     PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+#    ;;
+#*)
+#    ;;
+# esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  if test -r ~/.dircolors; then
+    eval "$(dircolors -b ~/.dircolors)"
+  else 
+    eval "$(dircolors -b)"
+  fi
     alias ls='ls --color=auto'
     #alias dir='dir --color=auto'
     #alias vdir='vdir --color=auto'
@@ -84,16 +88,13 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
 if [ -f ~/.bash_aliases ]; then
+    # shellcheck source=/dev/null
     . ~/.bash_aliases
 fi
 
@@ -102,8 +103,10 @@ fi
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
+    # shellcheck source=/dev/null
     . /usr/share/bash-completion/bash_completion
   elif [ -f /etc/bash_completion ]; then
+    # shellcheck source=/dev/null
     . /etc/bash_completion
   fi
 fi
@@ -128,25 +131,21 @@ alias mv='mv -i'
 alias cp='cp -i'
 alias l='/usr/bin/less'
 alias src='source $HOME/.bashrc'
+alias v='vim'
+## vi-mode for bash
+set -o vi
 
 export PAGER=less
-
-## lazy cd
-#alias ...='cd ../../'
-alias .3='cd ../../../'
-alias .4='cd ../../../../'
 
 ## intelligent history traversal
 bind '"\e[A":history-search-backward'
 bind '"\e[B":history-search-forward'
 bind Space:magic-space
 
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
+if [ -f "$(brew --prefix)"/etc/bash_completion ]; then
+    # shellcheck source=/dev/null
     . $(brew --prefix)/etc/bash_completion
 fi
-
-alias ggrep="ggrep --color=auto"
-export GREP_COLORS="ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se=36"
 
 ## assumes on mac, with brew install findutils so it's in gfind;
 ## TODO: normalize
@@ -154,23 +153,40 @@ function gf () {
   gfind -iregex ".*""$1"".*" ;
 }
 
+function pathmunge () {
+  if ! echo "$PATH" | $( which grep ) -Eq "(^|:)$1($|:)" ; then
+     if [ "$2" = "after" ] ; then
+        PATH="$PATH:$1"
+     else
+        PATH="$1:$PATH"
+     fi
+  fi
+}
+
 ##############################################################################
 # sigopt-related things
+# shellcheck source=/dev/null
 source ~/.certs/sigopt-tokens.bash
+
+export SIGOPT_CONDA_ENV="sigopt-api"
+export EVAL_DIR="${HOME}/sigopt/eval-framework"
+export SIG2_DIR="${HOME}/sigopt/sigopt-api-2"
+export EVAL_PP="$EVAL_DIR:$SIG2_DIR/test:$SIG2_DIR/prod:$SIG2_DIR/src/python"
 
 export SIGOPT_DIR="${HOME}/sigopt/sigopt-api"
 export PAGERDUTY_SIGOPT_DIR="${HOME}/sigopt/pagerduty-sigopt-api"
-alias sig="cd ${SIGOPT_DIR} && source activate sigopt-api"
-alias pgr="cd ${PAGERDUTY_SIGOPT_DIR} && source activate sigopt-api && git fetch --all"
-alias api="cd ${SIGOPT_DIR} && ./build config/development.json"
-alias web="cd ${SIGOPT_DIR} && ./web/web_serve_dev.sh"
+alias sig='cd ${SIGOPT_DIR} && source activate ${SIGOPT_CONDA_ENV}'
+alias pgr='cd ${PAGERDUTY_SIGOPT_DIR} && source activate ${SIGOPT_CONDA_ENV} && git fetch --all --prune'
+alias api='cd ${SIGOPT_DIR} && ./build config/development.json'
+alias quiet-api='cd ${SIGOPT_DIR} && ./build scratch/quiet.json,config/development.json'
+alias web='cd ${SIGOPT_DIR} && ./web/web_serve_dev.sh'
 
 function update_local_token() {
   python ~/sigopt/personal-sigopt-testing/src/python/update_local_token.py "$@" && src
 }
 
 ## open chrome tab with travis build for current branch name
-alias seetravis="$HOME/sigopt/personal-sigopt-testing/src/bash/open_travis.bash"
+alias seetravis='$HOME/sigopt/personal-sigopt-testing/src/bash/open_travis.bash'
 
 ##############################################################################
 ## programming language related things
@@ -189,17 +205,15 @@ export R_HISTFILE=$HOME/.Rhistory
 # Java-related things
 export M2_HOME=/usr/local/Cellar/maven/3.5.0/libexec
 export M2=$M2_HOME/bin
-export PATH=$PATH:$M2
+pathmunge $M2 after
 
-#######################
-# node/JS related things
-export PATH="/usr/local/opt/node@8/bin:$PATH"
-## not actually sure what this does?
-export PATH="$HOME/.rbenv/shims:$PATH"
+#########################
+# additional executables:
+# symbolic links for things like redis, node, rabbitmq-(server,env)
+pathmunge "$HOME/bin"
+PATH="$HOME/bin:$PATH"
 
-######################
-# rabbitmq
-export PATH=$PATH:/usr/local/sbin
+pathmunge "$HOME/.rbenv/shims" after
 
 ##############################################################################
 # git-related
@@ -208,28 +222,36 @@ export PATH=$PATH:/usr/local/sbin
 alias g="git"
 
 # auto-completion
+# shellcheck source=/dev/null
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
-if [ -f $HOME/.git-completion.bash ]; then
-  source $HOME/.git-completion.bash
+if [ -f "$HOME/.git-completion.bash" ]; then
+  # shellcheck source=/dev/null
+  source "$HOME/.git-completion.bash"
 
   # add completion for alias(es) above
   __git_complete g __git_main
 fi
 
 # prompt tells repo status
-[ -f $HOME/.git-prompt.sh ] && . $HOME/.git-prompt.sh
+# shellcheck source=/dev/null
+[ -f "$HOME/.git-prompt.sh" ] && . $HOME/.git-prompt.sh
 
 _LIGHT_BLUE='\[\e[0;94m\]'
 _GREEN='\[\e[0;32m\]'
 _NO_COLOR='\[\e[m\]'
-PS1="${_LIGHT_BLUE}\W${_NO_COLOR}${_GREEN}"'$(__git_ps1 " (%s)")'"${_NO_COLOR}\n${_LIGHT_BLUE}\t${_NO_COLOR} \$ "
+PS1="${_LIGHT_BLUE}\\W${_NO_COLOR}${_GREEN}"'$(__git_ps1 " (%s)")'"${_NO_COLOR}\\n${_LIGHT_BLUE}\\t${_NO_COLOR} \$ "
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 export GIT_PS1_SHOWUPSTREAM="auto"
 
 ## along with conda/virtualenv package-preface, prompt now looks like:
-## (env-name) dirname (branch-name status) \n HH:MM $
+## (env-name) dirname (branch-name status) \n HH:MM:SS $
+
+## list files changed from origin/master
+## removes lines with space (' ') to remove commit messages, so:
+## don't have filenames with spaces; i.e. be a Good Person
+alias gfc="git log --oneline --name-only origin..HEAD | grep -Pv ' ' | sort -u "
 
 ##############################################################################
 ## fzf helpers
@@ -246,9 +268,14 @@ export FZF_DEFAULT_OPTS='
 
 # case-insensitive gitgrep
 alias gg='git grep -i'
-# use silver-surfer, case-insensitive, and override atrocious default highlight
-alias ag="ag -i --pager='less -RXF' --color-match '1;35'"
-alias agnt="ag --ignore *test --pager='less -RXF' -i --color-match '1;35'"
+_AG_ARGS="--hidden --ignore .git --color-match '1;35' --pager='less -RXF'"
+# shellcheck disable=SC2139
+alias ag="ag -i $_AG_ARGS"
+# occasionally i DO want case-sensitivity
+# shellcheck disable=SC2139
+alias AG="/usr/local/bin/ag $_AG_ARGS"
+# shellcheck disable=SC2139
+alias agnt="ag --ignore *test -i $_AG_ARGS"
 
 # move to base of git repo (when inside repo, or $HOME otherwise, like 'cd ')
 alias gcd='cd $( dirname $( git rev-parse --git-dir 2>/dev/null ) 2>/dev/null  ) || ~'
@@ -257,11 +284,14 @@ alias gcd='cd $( dirname $( git rev-parse --git-dir 2>/dev/null ) 2>/dev/null  )
 alias githead="git lg | sed '/origin.*master/q'"
 
 ##############################################################################
+## random tidbits
+
 ## easy open on mac
 function fopen () {
-    /usr/bin/open -a TextEdit $1 ;
+    /usr/bin/open -a TextEdit "$1" ;
 }
 
+## make diff suck less
 function diff {
     colordiff -u "$@" | less -RXF
 }
@@ -272,31 +302,17 @@ function res () {
     if [ -z "$1" ]; then 
         n=1;
     else n=$1; fi ;
-    resize -s 50 $(( $n * 80 + $n - 1 )) ;
+    resize -s 50 $(( "$n" * 80 + "$n" - 1 )) ;
     export LINES=${LINES};
     export COLUMNS=${COLUMNS};
 }
 
-##############################################################################
-## personalized prompt-setting; i'd rather use git-prompt above though
-## but i'm leaving these functions so it's easier to see/find/remember how
-## to toy with it if I want
-
-## Set prompt to be green if last call was successful (returned 0) else red
-function error_test {
-	if [[ $? = "0" ]]; then
-		echo -e "\[\033[1;32m\]"
-	else
-		echo -e "\[\033[1;31m\]"
-	fi
-}
-
-function set_prompt() {
-    ## deals w spaces in dirnames
-    MYBASENAME=$(basename "$PWD")
-	PS1="$(error_test)\t:\[\\033[00m\]$MYBASENAME\$ "
-}
-
-#PROMPT_COMMAND=set_prompt
-
+## source fuzzy file search (cmd+t)
+# shellcheck source=/dev/null
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+##############################################################################
+# silly fun
+
+# generate coverterms
+alias ct="echo ; echo ; look . | gshuf | head -2 | tr '\\n' ' ' | tr '[:lower:]' '[:upper:]' ; echo ; echo; echo"
