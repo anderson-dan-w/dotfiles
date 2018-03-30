@@ -244,14 +244,11 @@ export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 export GIT_PS1_SHOWUPSTREAM="auto"
-
 ## along with conda/virtualenv package-preface, prompt now looks like:
 ## (env-name) dirname (branch-name status) \n HH:MM:SS $
 
-## list files changed from origin/master
-## removes lines with space (' ') to remove commit messages, so:
-## don't have filenames with spaces; i.e. be a Good Person
-alias gfc="git log --oneline --name-only origin..HEAD | grep -Pv ' ' | sort -u "
+# move to base of git repo (when inside repo, or $HOME otherwise, like 'cd ')
+alias gcd='cd $( dirname $( git rev-parse --git-dir 2>/dev/null ) 2>/dev/null  ) || ~'
 
 ##############################################################################
 ## fzf helpers
@@ -263,25 +260,23 @@ export FZF_DEFAULT_OPTS='
 --color info:108,prompt:109,spinner:108,pointer:168,marker:168
 '
 
-##################################
-## very lazy git-related functions
+##############################################################################
+# better-grep (ag, Silver Searcher)
 
-# case-insensitive gitgrep
-alias gg='git grep -i'
+# default colors are atrocious
 _AG_ARGS="--hidden --ignore .git --color-match '1;35' --pager='less -RXF'"
+
+# case-insensitive by default...
 # shellcheck disable=SC2139
 alias ag="ag -i $_AG_ARGS"
-# occasionally i DO want case-sensitivity
+
+# ... but occasionally i DO want case-sensitivity
 # shellcheck disable=SC2139
 alias AG="/usr/local/bin/ag $_AG_ARGS"
+
+# ignore test folders when searching (nt = Not Tests)
 # shellcheck disable=SC2139
 alias agnt="ag --ignore *test -i $_AG_ARGS"
-
-# move to base of git repo (when inside repo, or $HOME otherwise, like 'cd ')
-alias gcd='cd $( dirname $( git rev-parse --git-dir 2>/dev/null ) 2>/dev/null  ) || ~'
-
-# pretty-print all git commits since origin/master (assumes git lg alias)
-alias githead="git lg | sed '/origin.*master/q'"
 
 ##############################################################################
 ## random tidbits

@@ -32,11 +32,24 @@
 	patternType = perl
 
 [alias]
-	ls = log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cgreen\\\\ [%cn]\" --decorate
-	ll = log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cgreen\\\\ [%cn](%an)\" --decorate --numstat
+	ls = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen [%an]' --decorate
+	ll = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen (%an)' --decorate --numstat
   lg = log --pretty=format:'%C(yellow)%h %Cred%d %Creset%s (%Cgreen%an)' --graph
+
 	git = !exec git
+	g = !exec git
+
+  dc = diff --cached
   dh = diff origin/master HEAD
+  co = checkout
+  a = add
+  ap = add -p
+  f = fetch --all --prune
+  b = branch
+  com = !git checkout master && git fetch --all --prune
+  sm = !git submodule sync && git submodule update
+  head = log --oneline origin..HEAD
+  fc = !git log --oneline --name-only origin..HEAD | grep -Pv ' ' | sort -u
 
 [credential]
-    helper = osxkeychain
+  helper = osxkeychain
