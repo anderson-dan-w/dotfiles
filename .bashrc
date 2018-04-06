@@ -142,9 +142,11 @@ bind '"\e[A":history-search-backward'
 bind '"\e[B":history-search-forward'
 bind Space:magic-space
 
-if [ -f "$(brew --prefix)"/etc/bash_completion ]; then
-    # shellcheck source=/dev/null
-    . $(brew --prefix)/etc/bash_completion
+if [ "$_myos" = "Darwin" ]; then
+  if [ -f "$(brew --prefix)"/etc/bash_completion ]; then
+      # shellcheck source=/dev/null
+      . $(brew --prefix)/etc/bash_completion
+  fi
 fi
 
 ## assumes on mac, with brew install findutils so it's in gfind;
@@ -165,8 +167,10 @@ function pathmunge () {
 
 ##############################################################################
 # sigopt-related things
-# shellcheck source=/dev/null
-source ~/.certs/sigopt-tokens.bash
+if [ -f "$HOME/.certs/sigopt-tokens.bash" ]; then
+  # shellcheck source=/dev/null
+  source "$HOME/.certs/sigopt-tokens.bash"
+fi
 
 export SIGOPT_CONDA_ENV="sigopt-api"
 export EVAL_DIR="${HOME}/sigopt/eval-framework"
@@ -184,9 +188,6 @@ alias web='cd ${SIGOPT_DIR} && ./web/web_serve_dev.sh'
 function update_local_token() {
   python ~/sigopt/personal-sigopt-testing/src/python/update_local_token.py "$@" && src
 }
-
-## open chrome tab with travis build for current branch name
-alias seetravis='$HOME/sigopt/personal-sigopt-testing/src/bash/open_travis.bash'
 
 ##############################################################################
 ## programming language related things
@@ -238,8 +239,9 @@ fi
 
 _LIGHT_BLUE='\[\e[0;94m\]'
 _GREEN='\[\e[0;32m\]'
+_YELLOW='\[\e[0;33m\]'
 _NO_COLOR='\[\e[m\]'
-PS1="${_LIGHT_BLUE}\\W${_NO_COLOR}${_GREEN}"'$(__git_ps1 " (%s)")'"${_NO_COLOR}\\n${_LIGHT_BLUE}\\t${_NO_COLOR} \$ "
+PS1="${_YELLOW}\\u@\\h ${_LIGHT_BLUE}\\w${_NO_COLOR}${_GREEN}"'$(__git_ps1 " (%s)")'"${_NO_COLOR}\\n${_LIGHT_BLUE}\\t${_NO_COLOR} \$ "
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
