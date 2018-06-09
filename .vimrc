@@ -12,6 +12,7 @@ au Filetype html,xml,xsl,js source ~/.vim/scripts/closetag.vim
 "" show matching brackets, and for how many deciseconds
 set showmatch
 set mat=2
+"" show line numbers in gutter
 set number
 
 """""""""""""""""""""""""""
@@ -59,26 +60,37 @@ augroup end
 "" highlight common typos that aren't always caught by linters
 augroup HighlightTypos
     autocmd!
-    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'langauge\|flase\|Flase\|jsut\|tempalte', -1)
+    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'langauge\|flase\|Flase\|jsut\|tempalte\|timestmap', -1)
 augroup end
 
 """""""""""""""""""""""""""
 "" Navigate
 """""""""""""""""""""""""""
-"" first non-blank character
+"" first non-blank character (smart BOL, not just BOL)
 map 0 ^
 noremap <Home> ^
 "" backspace works like normal
 set backspace=eol,start,indent
 set whichwrap=<,>,h,l
+"" keep the cursor as centered as possible (large scroll offset)
+"" turning off for now, it makes me dizzy...
+"" set scrolloff=999
+
 "" more natural splits: below/to the right, rather than above/to the left
 set splitbelow
 set splitright
+
 "" windows:
 map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-l> <C-W>l
 map <C-h> <C-W>h
+
+"" tabs
+map <C-t><up> :tabr<cr>
+map <C-t><down> :tabl<cr>
+map <C-t><left> :tabp<cr>
+map <C-t><right> :tabn<cr>
 
 """""""""""""""""""""""""""
 "" no annoying noises, or files
@@ -102,7 +114,11 @@ colorscheme evening
 if has ("unix")
     let s:uname = system("uname")
     if s:uname == "Darwin\n"
-        colorscheme murphy
+        "" http://www.deanbodenham.com/learn/tmux-pane-colours.html
+        "" NOTE: copied murphy into ~/.vim/colors/ and changed:
+        "" Normal: remove ctermbg; remove guibg; set gui=none
+        "" so background turns gray when other (tmux) pane is highlighted
+        colorscheme dwanderson-murphy
     else
         "" get rid of bold text inside vim; it annoys me on Unix but not Mac.
         "" from https://groups.google.com/forum/#!topic/vim_use/cI7ritLRH8Q
@@ -114,20 +130,25 @@ endif
 
 "" highlight Python strings so they stand out better
 syn region pythonstring matchgroup=pythonstring start=/["']/ end=/["']/
-hi pythonstring ctermfg=7265
+"" soft slate grey (http://vim.wikia.com/wiki/Xterm256_color_names_for_console_Vim)
+hi pythonstring ctermfg=103
 "" line numbers shouldn't stand out
 highlight LineNr ctermfg=grey ctermbg=235 "" 235 is a dark dark grey
-"" first tell vim-gitgutter to leave the ctermbg alone
-let g:gitgutter_override_sign_column_highlight = 0
-highlight SignColumn ctermbg=235
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 "" vim modules: pathogen, etc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 execute pathogen#infect()
 
+""""""""""""""""""""""""""""""
+"" git-gutter
+""""""""""""""""""""""""""""""
+"" first tell vim-gitgutter to leave the ctermbg alone
+let g:gitgutter_override_sign_column_highlight = 0
+highlight SignColumn ctermbg=235
+
 """""""""""""""""""""""""
-"" fzf
+"" fuzzy file search
 """""""""""""""""""""""""
 set rtp+=/usr/local/opt/fzf
 
@@ -143,6 +164,11 @@ set updatetime=250
 let g:mustache_abbreviations = 1
 
 """""""""""""""""""""""""""
+"" jedi-vim suppress inline popups (fights with ALE too much)
+"""""""""""""""""""""""""""
+let g:jedi#show_call_signatures = "2"
+
+"""""""""""""""""""""""""""
 "" syntax and style-checking
 """""""""""""""""""""""""""
 "" use quickfix instead (not sure why? learning)
@@ -152,6 +178,8 @@ let g:ale_set_quickfix = 1
 "" make it open the list, at the desired height
 let g:ale_open_list = 1
 call ale#Set('list_window_size', 5)
+"" small delay (in ms) when linting so it stops freaking out so much
+let g:ale_lint_delay = 2000
 
 "" leave the error window open even when empty. Less resizing, but
 "" can be more annoying to close out of files (manually close list_window)
@@ -164,12 +192,32 @@ call ale#Set('list_window_size', 5)
 ""        sigopt uses indent of 2, and it's untenable to leave this on
 "" E114 = indention is not a multiple of four (for comments): see E111
 "" E121 = continuation line under-indented - consequence of 2-space indents
+"" E123 = continuation line over-indented - [same as E121]
 "" E127 = under-indented [too many edge cases]
 "" E128 = over-indented [same as E127]
-"" E262 = inline comments '# ' [I prefer '## ']
-"" E266 = block commentes '# ' [same as E262]
+"" E131 - indent doesn't mach [same as E127]
+"" E302 = expected 2 blank lines, found 1 [sigopt inconsistency]
+"" E305 = expected 2 blank lines, found 1 [sigopt inconsistency]
+""        different from 302?
+"" F401 = import * unused [import zigopt.common.*]
+"" F403 = import * undetectable [import zigopt.common.*]
+"" F405 = {import} may be undefined or from star import
 "" max-line-length used by sigopt is 120 rather than 80
-let g:ale_python_flake8_args = '--ignore E111,E114,E121,E127,E128,E262,E266 --max-line-length=120'
+let g:ale_python_flake8_args = '--ignore E111,E114,E121,E123,E127,E128,E131,E302,E305,F401,F403,F405 --max-line-length=120'
 
+"" not sure why I only needed this once switching to Python3. hardcoded for sigopt-api
+let _sigopt_api = "/Users/dwanderson/sigopt/sigopt-api/"
+let _sigopt_paths = [
+  \ _sigopt_api."src/python",
+  \ _sigopt_api."prod",
+  \ _sigopt_api."test",
+  \ _sigopt_api."test/python",
+  \ _sigopt_api."moe",
+  \ _sigopt_api."scripts",
+  \ ".",
+  \ ]
+let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.extend(".join(_sigopt_paths).")'"
+
+"" convenience for toggling on/off linters
 cnoreabbrev SS cclose
-cnoreabbrev SC copen
+cnoreabbrev SC ALEToggle
