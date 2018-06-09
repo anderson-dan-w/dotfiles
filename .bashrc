@@ -172,15 +172,15 @@ if [ -f "$HOME/.certs/sigopt-tokens.bash" ]; then
   source "$HOME/.certs/sigopt-tokens.bash"
 fi
 
-export SIGOPT_CONDA_ENV="sigopt-api"
 export EVAL_DIR="${HOME}/sigopt/eval-framework"
 export SIG2_DIR="${HOME}/sigopt/sigopt-api-2"
 export EVAL_PP="$EVAL_DIR:$SIG2_DIR/test:$SIG2_DIR/prod:$SIG2_DIR/src/python"
 
 export SIGOPT_DIR="${HOME}/sigopt/sigopt-api"
 export PAGERDUTY_SIGOPT_DIR="${HOME}/sigopt/pagerduty-sigopt-api"
-alias sig='cd ${SIGOPT_DIR} && source activate ${SIGOPT_CONDA_ENV}'
-alias pgr='cd ${PAGERDUTY_SIGOPT_DIR} && source activate ${SIGOPT_CONDA_ENV} && git fetch --all --prune'
+alias src-sigopt-api='source ${HOME}/venv/sigopt-api/bin/activate'
+alias sig='cd ${SIGOPT_DIR} && src-sigopt-api'
+alias pgr='cd ${PAGERDUTY_SIGOPT_DIR} && src-sigopt-api && git fetch --all --prune'
 alias api='cd ${SIGOPT_DIR} && ./build config/development.json'
 alias quiet-api='cd ${SIGOPT_DIR} && ./build scratch/quiet.json,config/development.json'
 alias web='cd ${SIGOPT_DIR} && ./web/web_serve_dev.sh'
@@ -191,6 +191,10 @@ function update_local_token() {
 
 ##############################################################################
 ## programming language related things
+
+#######################
+# brew-related things
+alias bottomsup="brew update && brew upgrade && brew doctor"
 
 #######################
 # python-related things
@@ -241,13 +245,13 @@ _LIGHT_BLUE='\[\e[0;94m\]'
 _GREEN='\[\e[0;32m\]'
 _YELLOW='\[\e[0;33m\]'
 _NO_COLOR='\[\e[m\]'
-PS1="${_YELLOW}\\u@\\h ${_LIGHT_BLUE}\\w${_NO_COLOR}${_GREEN}"'$(__git_ps1 " (%s)")'"${_NO_COLOR}\\n${_LIGHT_BLUE}\\t${_NO_COLOR} \$ "
+PS1="${_YELLOW}\\u@\\h ${_LIGHT_BLUE}\\W${_NO_COLOR}${_GREEN}"'$(__git_ps1 " (%s)")'"${_NO_COLOR}\\n${_LIGHT_BLUE}\\t${_NO_COLOR} \$ "
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 export GIT_PS1_SHOWUPSTREAM="auto"
-## along with conda/virtualenv package-preface, prompt now looks like:
-## (env-name) dirname (branch-name status) \n HH:MM:SS $
+## along with virtualenv package-preface, prompt now looks like:
+## (env-name) user@host dirname (branch-name status) \n HH:MM:SS $
 
 # move to base of git repo (when inside repo, or $HOME otherwise, like 'cd ')
 alias gcd='cd $( dirname $( git rev-parse --git-dir 2>/dev/null ) 2>/dev/null  ) || ~'
@@ -266,7 +270,8 @@ export FZF_DEFAULT_OPTS='
 # better-grep (ag, Silver Searcher)
 
 # default colors are atrocious
-_AG_ARGS="--hidden --ignore .git --color-match '1;35' --pager='less -RXF'"
+# also, grepping minified bootstrap style files sucks
+_AG_ARGS="--hidden --ignore .git --ignore web/styles/bootstrap --color-match '1;35' --pager='less -RXF'"
 
 # case-insensitive by default...
 # shellcheck disable=SC2139
@@ -276,9 +281,18 @@ alias ag="ag -i $_AG_ARGS"
 # shellcheck disable=SC2139
 alias AG="/usr/local/bin/ag $_AG_ARGS"
 
+# get only unique usages of exact regex
+# not sure why I can't put _ago inside the function but it fails
+# shellcheck disable=SC2139
+alias _ago="/usr/local/bin/ag $_AG_ARGS --nofilename --nonumbers -o"
+ago () {
+  _ago "$1" | sort -u
+}
+
 # ignore test folders when searching (nt = Not Tests)
 # shellcheck disable=SC2139
-alias agnt="ag --ignore *test -i $_AG_ARGS"
+alias .agnt="ag --ignore *test -i $_AG_ARGS"
+alias agnt="fc -s 'ag =.agnt '"
 
 ##############################################################################
 ## random tidbits
