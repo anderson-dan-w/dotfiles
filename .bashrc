@@ -76,7 +76,7 @@ unset color_prompt force_color_prompt
 if [ -x /usr/bin/dircolors ]; then
   if test -r ~/.dircolors; then
     eval "$(dircolors -b ~/.dircolors)"
-  else 
+  else
     eval "$(dircolors -b)"
   fi
     alias ls='ls --color=auto'
@@ -136,6 +136,7 @@ alias v='vim'
 set -o vi
 
 export PAGER=less
+export EDITOR=vim
 
 ## intelligent history traversal
 bind '"\e[A":history-search-backward'
@@ -145,7 +146,7 @@ bind Space:magic-space
 if [ "$_myos" = "Darwin" ]; then
   if [ -f "$(brew --prefix)"/etc/bash_completion ]; then
       # shellcheck source=/dev/null
-      . $(brew --prefix)/etc/bash_completion
+      . "$(brew --prefix)/etc/bash_completion"
   fi
 fi
 
@@ -155,39 +156,65 @@ function gf () {
   gfind -iregex ".*""$1"".*" ;
 }
 
-function pathmunge () {
-  if ! echo "$PATH" | $( which grep ) -Eq "(^|:)$1($|:)" ; then
-     if [ "$2" = "after" ] ; then
-        PATH="$PATH:$1"
-     else
-        PATH="$1:$PATH"
-     fi
-  fi
-}
+##############################################################################
+## python
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
 
 ##############################################################################
 # sigopt-related things
+
+export EVAL_DIR="${HOME}/sigopt/eval-framework"
+export EVALSET_DIR="${HOME}/sigopt/evalset"
+
+export SIGOPT_DIR="${HOME}/sigopt/sigopt-api"
+export PAGERDUTY_SIGOPT_DIR="${HOME}/sigopt/pagerduty-sigopt-api"
+export TERRAFORM_DIR="${HOME}/sigopt/sigopt-terraform"
+export MARKETING_DIR="${HOME}/sigopt/marketing-site"
+export PLATFORM_TOOLS_DIR="${HOME}/sigopt/platform-tools"
+export ENABLE_SIGOPT_BLACK_PRECOMMIT=true
+export ENABLE_SIGOPT_BLACK_POSTCOMMIT=true
+#unset ENABLE_SIGOPT_BLACK_PRECOMMIT
+
 if [ -f "$HOME/.certs/sigopt-tokens.bash" ]; then
   # shellcheck source=/dev/null
   source "$HOME/.certs/sigopt-tokens.bash"
 fi
+if [ -f "$HOME/.certs/github-tokens.bash" ]; then
+  # shellcheck source=/dev/null
+  source "$HOME/.certs/github-tokens.bash"
+fi
 
-export EVAL_DIR="${HOME}/sigopt/eval-framework"
-export SIG2_DIR="${HOME}/sigopt/sigopt-api-2"
-export EVAL_PP="$EVAL_DIR:$SIG2_DIR/test:$SIG2_DIR/prod:$SIG2_DIR/src/python"
-
-export SIGOPT_DIR="${HOME}/sigopt/sigopt-api"
-export PAGERDUTY_SIGOPT_DIR="${HOME}/sigopt/pagerduty-sigopt-api"
+# dir-switching and env setup
 alias src-sigopt-api='source ${HOME}/venv/sigopt-api/bin/activate'
-alias sig='cd ${SIGOPT_DIR} && src-sigopt-api'
+alias sig='cd ${SIGOPT_DIR} && src-sigopt-api && nvm use'
+alias src-eval-framework='source ${HOME}/venv/eval-framework/bin/activate'
+alias ef='cd ${EVAL_DIR} && src-eval-framework'
+alias efw='cd ${EVAL_DIR}/web && source ${HOME}/venv/eval-interactive/bin/activate && nvm use'
 alias pgr='cd ${PAGERDUTY_SIGOPT_DIR} && src-sigopt-api && git fetch --all --prune'
-alias api='cd ${SIGOPT_DIR} && ./build config/development.json'
-alias quiet-api='cd ${SIGOPT_DIR} && ./build scratch/quiet.json,config/development.json'
-alias web='cd ${SIGOPT_DIR} && ./web/web_serve_dev.sh'
+alias mrk='cd ${MARKETING_DIR} && nvm use'
+alias pt='sig && cd ${PLATFORM_TOOLS_DIR} && ipython'
+alias pt='sig && cd ${TERRAFORM_DIR}'
+
+# sigopt command running
+alias apiweb='cd ${SIGOPT_DIR} && ./scripts/launch/all_live scratch/quiet.json,scratch/my-container-dev.json'
+alias eweb='cd ${EVAL_DIR}/web && ./node_modules/watchify/bin/cmd.js js/app.js -o static/bundle.js -v ; ./run_buckets config/development.py'
+alias siglocal='cd ${SIGOPT_DIR} && ./scripts/launch/all_live'
+alias repllocal='cd ${SIGOPT_DIR} && ./scripts/launch/repl'
+
+export AUTH_CONFS='scratch/external-authorization.json,config/external-authorization.json'
+alias authsig='siglocal ${AUTH_CONFS}'
+alias authrepl='repllocal ${AUTH_CONFS}'
+
+# forces web to restart (eg I changed a config and want website to reflect it)
+alias tapp='cd ${SIGOPT_DIR} && touch web/js/server/express/app.js'
 
 function update_local_token() {
   python ~/sigopt/personal-sigopt-testing/src/python/update_local_token.py "$@" && src
 }
+
+## jfc will this never end
+unset REQUESTS_CA_BUNDLE
 
 ##############################################################################
 ## programming language related things
@@ -206,19 +233,12 @@ alias p80x="python -c \"print('x'*80)\""
 # R-related things
 export R_HISTFILE=$HOME/.Rhistory
 
-#######################
-# Java-related things
-export M2_HOME=/usr/local/Cellar/maven/3.5.0/libexec
-export M2=$M2_HOME/bin
-pathmunge $M2 after
-
 #########################
 # additional executables:
 # symbolic links for things like redis, node, rabbitmq-(server,env)
-pathmunge "$HOME/bin"
 PATH="$HOME/bin:$PATH"
-
-pathmunge "$HOME/.rbenv/shims" after
+export NEO4J_HOME="$HOME/sigopt/neo4j-community-3.3.9"
+export NEO4J_USER=neo4j
 
 ##############################################################################
 # git-related
@@ -239,13 +259,15 @@ fi
 
 # prompt tells repo status
 # shellcheck source=/dev/null
-[ -f "$HOME/.git-prompt.sh" ] && . $HOME/.git-prompt.sh
+[ -f "$HOME/.git-prompt.sh" ] && . "$HOME/.git-prompt.sh"
 
 _LIGHT_BLUE='\[\e[0;94m\]'
 _GREEN='\[\e[0;32m\]'
 _YELLOW='\[\e[0;33m\]'
+# _RED='\[\e[0;31m\]'
 _NO_COLOR='\[\e[m\]'
 PS1="${_YELLOW}\\u@\\h ${_LIGHT_BLUE}\\W${_NO_COLOR}${_GREEN}"'$(__git_ps1 " (%s)")'"${_NO_COLOR}\\n${_LIGHT_BLUE}\\t${_NO_COLOR} \$ "
+ORIGINAL_PS1="${PS1}"
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
@@ -255,6 +277,32 @@ export GIT_PS1_SHOWUPSTREAM="auto"
 
 # move to base of git repo (when inside repo, or $HOME otherwise, like 'cd ')
 alias gcd='cd $( dirname $( git rev-parse --git-dir 2>/dev/null ) 2>/dev/null  ) || ~'
+# help espec. with sigopt-terraform tagging
+alias gtl="git tag --list | gsort -V"
+alias gpt="git push --tags"
+
+##############################################################################
+alias tf="terraform"
+alias tfr="terraform fmt -recursive"
+alias tfp="terraform plan -no-color -out tf.plan > human.out"
+alias tfclean="gfind -iregex '.*tf.plan$' -delete && gfind -iregex '.*human.out' -delete"
+alias d="docker"
+alias dps="docker ps --format='{{.Names}}' | sort"
+alias k="kubectl"
+alias mk="minikube"
+function mk-set () {
+  # shellcheck disable=SC2046,SC2086
+  eval $(minikube docker-env $1)
+  if [ "${DOCKER_HOST}" ]; then
+    PS1="${_GREEN}{minikube}${_NO_COLOR} ${PS1}"
+  else
+    PS1=${ORIGINAL_PS1}
+  fi
+}
+
+# shellcheck disable=SC1090
+source <(kubectl completion bash)
+complete -F __start_kubectl k
 
 ##############################################################################
 ## fzf helpers
@@ -271,7 +319,19 @@ export FZF_DEFAULT_OPTS='
 
 # default colors are atrocious
 # also, grepping minified bootstrap style files sucks
-_AG_ARGS="--hidden --ignore .git --ignore web/styles/bootstrap --color-match '1;35' --pager='less -RXF'"
+_AG_ARGS="--hidden \
+  --ignore .git \
+  --ignore .terraform \
+  --ignore src/python/zigopt/gen \
+  --ignore terraform.tfstate* \
+  --ignore web/styles/bootstrap \
+  --ignore web/static/js \
+  --ignore web/static/bundle.js \
+  --ignore web/static/css \
+  --ignore web/nodebuild \
+  --color-match '1;35' \
+  --pager='less -RXF' \
+"
 
 # case-insensitive by default...
 # shellcheck disable=SC2139
@@ -297,33 +357,36 @@ alias agnt="fc -s 'ag =.agnt '"
 ##############################################################################
 ## random tidbits
 
-## easy open on mac
-function fopen () {
-    /usr/bin/open -a TextEdit "$1" ;
-}
-
 ## make diff suck less
 function diff {
     colordiff -u "$@" | less -RXF
-}
-
-## resize a terminal to be @a n screens wide (meaning 80 characters * n)
-## @note Doesn't work inside tmux
-function res () { 
-    if [ -z "$1" ]; then 
-        n=1;
-    else n=$1; fi ;
-    resize -s 50 $(( "$n" * 80 + "$n" - 1 )) ;
-    export LINES=${LINES};
-    export COLUMNS=${COLUMNS};
 }
 
 ## source fuzzy file search (cmd+t)
 # shellcheck source=/dev/null
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-##############################################################################
-# silly fun
-
 # generate coverterms
 alias ct="echo ; echo ; look . | gshuf | head -2 | tr '\\n' ' ' | tr '[:lower:]' '[:upper:]' ; echo ; echo; echo"
+
+# added by travis gem
+[ -f /Users/dwanderson/.travis/travis.sh ] && source /Users/dwanderson/.travis/travis.sh
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+eval "$(rbenv init -)"
+
+export NVM_DIR="$HOME/.nvm"
+# shellcheck disable=SC1090
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# shellcheck disable=SC1090
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# shellcheck disable=SC1090
+source "$HOME/bin/tmuxinator.bash"
+
+# colorize virtualenv prefix: inside bin.activate, ~l60
+# _RED="\[\033[0;31m\]"
+# _NO_COLOR="\[\e[0m\]"
+# PS1="${_RED}(`basename \"$VIRTUAL_ENV\"`)${_NO_COLOR} $PS1"
+if command -v pyenv &>/dev/null; then eval "$(pyenv init -)"; fi

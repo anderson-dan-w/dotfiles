@@ -8,11 +8,13 @@ filetype indent plugin on
 au BufRead,BufNewFile *.go set filetype=go
 au BufRead,BufNewFile *.ms set filetype=mustache
 au BufRead,BufNewFile *pythonstartup set filetype=python
+au BufRead,BufNewFile *json set filetype=json
 au Filetype html,xml,xsl,js source ~/.vim/scripts/closetag.vim
 "" show matching brackets, and for how many deciseconds
 set showmatch
 set mat=2
 "" show line numbers in gutter
+set relativenumber
 set number
 
 """""""""""""""""""""""""""
@@ -39,6 +41,9 @@ set wildmenu
 set wildmode=list:full
 "" search in text
 set incsearch ignorecase hlsearch
+"" always center searches
+map n nzz
+map N Nzz
 "" for regular expressions
 set magic
 "" un-highlight with spacebar after search
@@ -60,7 +65,13 @@ augroup end
 "" highlight common typos that aren't always caught by linters
 augroup HighlightTypos
     autocmd!
-    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'langauge\|flase\|Flase\|jsut\|tempalte\|timestmap', -1)
+    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'langauge\|flase\|Flase\|jsut\|tempalte\|timestmap\|isntall', -1)
+augroup end
+
+"" highlight literal tabs
+augroup LiteralTabs
+    autocmd!
+    "" autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', '\t')
 augroup end
 
 """""""""""""""""""""""""""
@@ -164,11 +175,6 @@ set updatetime=250
 let g:mustache_abbreviations = 1
 
 """""""""""""""""""""""""""
-"" jedi-vim suppress inline popups (fights with ALE too much)
-"""""""""""""""""""""""""""
-let g:jedi#show_call_signatures = "2"
-
-"""""""""""""""""""""""""""
 "" syntax and style-checking
 """""""""""""""""""""""""""
 "" use quickfix instead (not sure why? learning)
@@ -202,22 +208,26 @@ let g:ale_lint_delay = 2000
 "" F401 = import * unused [import zigopt.common.*]
 "" F403 = import * undetectable [import zigopt.common.*]
 "" F405 = {import} may be undefined or from star import
+"" W503 = line break before binary operator (black prefers this)
 "" max-line-length used by sigopt is 120 rather than 80
-let g:ale_python_flake8_args = '--ignore E111,E114,E121,E123,E127,E128,E131,E302,E305,F401,F403,F405 --max-line-length=120'
+let g:ale_python_flake8_options = '--ignore E111,E114,E121,E123,E127,E128,E131,E302,E305,F401,F403,F405,W503,T001 --max-line-length=120'
 
-"" not sure why I only needed this once switching to Python3. hardcoded for sigopt-api
-let _sigopt_api = "/Users/dwanderson/sigopt/sigopt-api/"
-let _sigopt_paths = [
-  \ _sigopt_api."src/python",
-  \ _sigopt_api."prod",
-  \ _sigopt_api."test",
-  \ _sigopt_api."test/python",
-  \ _sigopt_api."moe",
-  \ _sigopt_api."scripts",
-  \ ".",
-  \ ]
-let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.extend(".join(_sigopt_paths).")'"
+let _all_fixers = ['remove_trailing_lines', 'trim_whitespace']
+let g:ale_fixers = {
+\   '*': _all_fixers,
+\   'javascript': ['eslint', 'prettier'] + _all_fixers,
+\   'python': ['isort'] + _all_fixers,
+\   'terraform': ['terraform'] + _all_fixers,
+\}
+" Set this variable to 1 to fix files when you save them.
+let g:ale_fix_on_save = 1
 
 "" convenience for toggling on/off linters
 cnoreabbrev SS cclose
 cnoreabbrev SC ALEToggle
+
+"""""""""""""""""""""""""""
+"" jedi-vim suppress inline popups (fights with ALE too much)
+"""""""""""""""""""""""""""
+let g:jedi#show_call_signatures = "2"
+set completeopt=longest,menuone
