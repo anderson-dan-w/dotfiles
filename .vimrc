@@ -1,4 +1,4 @@
-set history=500
+set history=5000
 
 """""""""""""""""""""""""""
 "" use vim for programming, like a normal person
