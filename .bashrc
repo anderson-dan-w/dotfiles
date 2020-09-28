@@ -16,8 +16,8 @@ HISTCONTROL=ignoredups:ignorespace
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=10000
+HISTFILESIZE=20000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -150,31 +150,13 @@ if [ "$_myos" = "Darwin" ]; then
   fi
 fi
 
-## assumes on mac, with brew install findutils so it's in gfind;
-## TODO: normalize
-function gf () {
-  gfind -iregex ".*""$1"".*" ;
-}
-
-##############################################################################
-## python
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-
 ##############################################################################
 # sigopt-related things
 
-export EVAL_DIR="${HOME}/sigopt/eval-framework"
-export EVALSET_DIR="${HOME}/sigopt/evalset"
-
 export SIGOPT_DIR="${HOME}/sigopt/sigopt-api"
-export PAGERDUTY_SIGOPT_DIR="${HOME}/sigopt/pagerduty-sigopt-api"
 export TERRAFORM_DIR="${HOME}/sigopt/sigopt-terraform"
 export MARKETING_DIR="${HOME}/sigopt/marketing-site"
 export PLATFORM_TOOLS_DIR="${HOME}/sigopt/platform-tools"
-export ENABLE_SIGOPT_BLACK_PRECOMMIT=true
-export ENABLE_SIGOPT_BLACK_POSTCOMMIT=true
-#unset ENABLE_SIGOPT_BLACK_PRECOMMIT
 
 if [ -f "$HOME/.certs/sigopt-tokens.bash" ]; then
   # shellcheck source=/dev/null
@@ -188,33 +170,6 @@ fi
 # dir-switching and env setup
 alias src-sigopt-api='source ${HOME}/venv/sigopt-api/bin/activate'
 alias sig='cd ${SIGOPT_DIR} && src-sigopt-api && nvm use'
-alias src-eval-framework='source ${HOME}/venv/eval-framework/bin/activate'
-alias ef='cd ${EVAL_DIR} && src-eval-framework'
-alias efw='cd ${EVAL_DIR}/web && source ${HOME}/venv/eval-interactive/bin/activate && nvm use'
-alias pgr='cd ${PAGERDUTY_SIGOPT_DIR} && src-sigopt-api && git fetch --all --prune'
-alias mrk='cd ${MARKETING_DIR} && nvm use'
-alias pt='sig && cd ${PLATFORM_TOOLS_DIR} && ipython'
-alias pt='sig && cd ${TERRAFORM_DIR}'
-
-# sigopt command running
-alias apiweb='cd ${SIGOPT_DIR} && ./scripts/launch/all_live scratch/quiet.json,scratch/my-container-dev.json'
-alias eweb='cd ${EVAL_DIR}/web && ./node_modules/watchify/bin/cmd.js js/app.js -o static/bundle.js -v ; ./run_buckets config/development.py'
-alias siglocal='cd ${SIGOPT_DIR} && ./scripts/launch/all_live'
-alias repllocal='cd ${SIGOPT_DIR} && ./scripts/launch/repl'
-
-export AUTH_CONFS='scratch/external-authorization.json,config/external-authorization.json'
-alias authsig='siglocal ${AUTH_CONFS}'
-alias authrepl='repllocal ${AUTH_CONFS}'
-
-# forces web to restart (eg I changed a config and want website to reflect it)
-alias tapp='cd ${SIGOPT_DIR} && touch web/js/server/express/app.js'
-
-function update_local_token() {
-  python ~/sigopt/personal-sigopt-testing/src/python/update_local_token.py "$@" && src
-}
-
-## jfc will this never end
-unset REQUESTS_CA_BUNDLE
 
 ##############################################################################
 ## programming language related things
@@ -226,6 +181,9 @@ alias bottomsup="brew update && brew upgrade && brew doctor"
 #######################
 # python-related things
 export PYTHONSTARTUP=$HOME/.pythonstartup
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+
 alias pyclean="gfind -iregex '.*pyc' -delete && gfind -iregex '.*__pycache__.*' -delete"
 alias p80x="python -c \"print('x'*80)\""
 
@@ -237,8 +195,6 @@ export R_HISTFILE=$HOME/.Rhistory
 # additional executables:
 # symbolic links for things like redis, node, rabbitmq-(server,env)
 PATH="$HOME/bin:$PATH"
-export NEO4J_HOME="$HOME/sigopt/neo4j-community-3.3.9"
-export NEO4J_USER=neo4j
 
 ##############################################################################
 # git-related
@@ -282,10 +238,15 @@ alias gtl="git tag --list | gsort -V"
 alias gpt="git push --tags"
 
 ##############################################################################
+# terraform
 alias tf="terraform"
 alias tfr="terraform fmt -recursive"
 alias tfp="terraform plan -no-color -out tf.plan > human.out"
+alias tfi="terraform init"
 alias tfclean="gfind -iregex '.*tf.plan$' -delete && gfind -iregex '.*human.out' -delete"
+
+##############################################################################
+# containers - docker, k8s
 alias d="docker"
 alias dps="docker ps --format='{{.Names}}' | sort"
 alias k="kubectl"
@@ -322,13 +283,7 @@ export FZF_DEFAULT_OPTS='
 _AG_ARGS="--hidden \
   --ignore .git \
   --ignore .terraform \
-  --ignore src/python/zigopt/gen \
   --ignore terraform.tfstate* \
-  --ignore web/styles/bootstrap \
-  --ignore web/static/js \
-  --ignore web/static/bundle.js \
-  --ignore web/static/css \
-  --ignore web/nodebuild \
   --color-match '1;35' \
   --pager='less -RXF' \
 "
@@ -365,22 +320,6 @@ function diff {
 ## source fuzzy file search (cmd+t)
 # shellcheck source=/dev/null
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
-# generate coverterms
-alias ct="echo ; echo ; look . | gshuf | head -2 | tr '\\n' ' ' | tr '[:lower:]' '[:upper:]' ; echo ; echo; echo"
-
-# added by travis gem
-[ -f /Users/dwanderson/.travis/travis.sh ] && source /Users/dwanderson/.travis/travis.sh
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-eval "$(rbenv init -)"
-
-export NVM_DIR="$HOME/.nvm"
-# shellcheck disable=SC1090
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-# shellcheck disable=SC1090
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # shellcheck disable=SC1090
 source "$HOME/bin/tmuxinator.bash"
