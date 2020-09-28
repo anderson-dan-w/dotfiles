@@ -1,42 +1,35 @@
 from __future__ import print_function
 import atexit
-import rlcompleter
-import readline
 import sys
 import os
 import subprocess
 
+import rlcompleter
+import math
+
+# newer ipython has case-insensitive tab complete, which actually sucks
+try:
+  import jedi
+  jedi.settings.case_insensitive_completion = False
+except Exception:
+  pass
+
 history = os.path.expanduser("~/.pyhistory")
-def save_history(history=history):
-    readline.write_history_file(history)
-
-if os.path.exists(history):
-    readline.read_history_file(history)
-
 
 def display_matches(substitutions, matches, longest_match_length):
-    m = '\n'.join(matches) + '\n'
-    proc = subprocess.Popen('column | less', shell=True, stdin=subprocess.PIPE)
-    # python2:
-    if sys.version[0] == "2":
-        proc.communicate(m)
-    # python3:
-    elif sys.version[0] == "3":
-        proc.communicate(m.encode('utf-8'))
+  m = '\n'.join(matches) + '\n'
+  proc = subprocess.Popen('column | less', shell=True, stdin=subprocess.PIPE)
+  # python2:
+  if sys.version[0] == "2":
+    proc.communicate(m)
+  # python3:
+  elif sys.version[0] == "3":
+    proc.communicate(m.encode('utf-8'))
 
-
-readline.set_completion_display_matches_hook(display_matches)
-readline.parse_and_bind("tab: complete")
-
-#sys.path.append("/home/dwanderson/Python/lib")
-#sys.path.append("/home/dwanderson/Python")
 sys.ps1 = '\001\033[96m\002>>> \001\033[0m\002'
 sys.ps2 = '\001\033[96m\002... \001\033[0m\002'
 
-#make reload like python2
+# make reload like python2
 if sys.version[0] == "3":
-  import imp
-  reload = imp.reload
-
-
-atexit.register(save_history)
+  import importlib
+  reload = importlib.reload
