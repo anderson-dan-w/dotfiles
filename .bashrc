@@ -170,7 +170,6 @@ fi
 # dir-switching and env setup
 alias src-sigopt-api='source ${HOME}/venv/sigopt-api/bin/activate'
 alias sig='cd ${SIGOPT_DIR} && src-sigopt-api && nvm use'
-alias pgr='cd ${PAGERDUTY_SIGOPT_DIR} && src-sigopt-api && git fetch --all --prune'
 
 ##############################################################################
 ## programming language related things
