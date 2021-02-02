@@ -14,13 +14,13 @@ export MPM_DIR="${HOME}/sigopt/mpm"
 export ORCHESTRATE_DIR="${HOME}/sigopt/orchestrate"
 export ORCHESTRATE_RUNS_DIR="${HOME}/sigopt/orchestrate-runs"
 
-if [ -f "$HOME/.certs/sigopt-tokens.sh" ]; then
+if [ -f "$HOME/.certs/sigopt-tokens" ]; then
   # shellcheck source=/dev/null
-  . "$HOME/.certs/sigopt-tokens.sh"
+  . "$HOME/.certs/sigopt-tokens"
 fi
-if [ -f "$HOME/.certs/github-tokens.sh" ]; then
+if [ -f "$HOME/.certs/github-tokens" ]; then
   # shellcheck source=/dev/null
-  . "$HOME/.certs/github-tokens.sh"
+  . "$HOME/.certs/github-tokens"
 fi
 
 alias rr='${PLATFORM_TOOLS_DIR}/circleci/circleci.py --rerun-failed'
