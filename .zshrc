@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/dwanderson/.oh-my-zsh"
+export ZSH="${HOME}/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -75,6 +75,7 @@ plugins=(
   virtualenv
 )
 
+ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -111,9 +112,12 @@ alias rm='rm -i'
 alias mv='mv -i'
 alias cp='cp -i'
 alias zs="source ${HOME}/.zshrc"
+alias vzs="vim ${HOME}/.zshrc"
 
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
+# a little annoying if history shares in real time across tabs
+setopt no_share_history
 
 alias ll='ls -lF'
 alias lla='ls -alF'
@@ -186,6 +190,13 @@ PATH="$HOME/bin:$PATH"
 
 alias v='vim'
 alias g="git"
+# move to base of git repo (when inside repo, or $HOME otherwise, like 'cd ')
+alias gcd='cd $( dirname $( git rev-parse --git-dir 2>/dev/null ) 2>/dev/null  ) || ~'
+# help espec. with sigopt-terraform tagging
+alias gtl="git tag --list | gsort -V"
+alias gtll="git tag --list | gsort -V | tail -1 "
+alias gpt="git push --tags"
+alias grom="git rebase origin/master"
 
 export PYTHONSTARTUP=$HOME/.pythonstartup
 alias pyclean="gfind -iregex '.*pyc' -delete && gfind -iregex '.*__pycache__.*' -delete"
@@ -194,12 +205,19 @@ alias tf="terraform"
 alias tfr="terraform fmt -recursive"
 alias tfp="terraform plan -no-color -out tf.plan > human.out"
 alias tfi="terraform init"
+alias tfg="ag '(created|destroyed|updated|replaced|no.changes)' human.out"
+alias tfpg="tfp && tfg"
 
 alias d="docker"
 alias dps="docker ps --format='{{.Names}}' | sort"
+alias dltf="docker logs --tail=0 --follow"
+alias dclean="docker image prune && docker system prune -a"
+
 alias k="kubectl"
 source <(kubectl completion zsh)
 complete -F __start_kubectl k
+
+alias myip="ipconfig getifaddr en0"
 
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
@@ -214,3 +232,5 @@ if [ -f "$HOME/.certs/github-tokens" ]; then
 fi
 
 if command -v pyenv &>/dev/null; then eval "$(pyenv init -)"; fi
+
+export PATH=~/bin:$PATH
