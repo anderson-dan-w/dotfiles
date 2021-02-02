@@ -53,7 +53,9 @@ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 # ORR
 #sudo cp /usr/local/bin/pip3 /usr/local/bin/pip
 # NOTE: what?? why do I need this here and not inside my virtual env??
+# TODO: and this version is broken / sucks anyway??
 pip3 install docker-compose==1.17.1
+pip3 install --upgrade docker-compose # >=1.26.0?
 
 # NOTE: or update for newest tf version, whatever
 wget https://releases.hashicorp.com/terraform/0.14.5/terraform_0.14.5_linux_amd64.zip
