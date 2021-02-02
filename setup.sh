@@ -35,6 +35,7 @@ mkdir ~/bin
 cd ~/bin || exit
 
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+npm install --global yarn
 sudo apt-get install silversearcher-ag
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install
 
