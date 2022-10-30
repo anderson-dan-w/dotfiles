@@ -134,12 +134,6 @@ export PAGER="less -XRF"
 _AG_ARGS="--hidden \
   --ignore .git \
   --ignore .terraform \
-  --ignore src/python/zigopt/gen \
-  --ignore web/styles/bootstrap \
-  --ignore web/static/js \
-  --ignore web/static/bundle.js \
-  --ignore web/static/css \
-  --ignore web/nodebuild \
   --color-match '1;35' \
   --pager='less -RXF' \
 "
