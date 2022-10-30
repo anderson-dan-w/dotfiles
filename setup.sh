@@ -1,23 +1,18 @@
 #!/bin/bash
+set -e
+set -o pipefail
 
 # ssh keys for github and other great good
 ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 # upload to github
-# upload to foxpass
-
-# dotfiles
-mkdir personal && cd personal || exit
-git clone git@github.com:anderson-dan-w/dotfiles
-cd dotfiles || exit
-cp -R ./.* ~
-cp -R ./* ~
 
 # shell and environment
 sudo apt-get install zsh
 sudo chsh -s /usr/bin/zsh root
-# NOTE: if can't change for current user (eg foxpass vs /etc/passwd)
-# edit .bash_profile to just set $SHELL and call zsh itself...
+# NOTE: if can't change for current user, edit .bash_profile to i
+# set $SHELL and call zsh itself...
 
+# zsh
 wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
 # oh-my-zsh overwrites your local .zshrc, so we repopulate it
 cp ~/personal/dotfiles/.zshrc ~
