@@ -207,16 +207,12 @@ alias dps="docker ps --format='{{.Names}}' | sort"
 alias dltf="docker logs --tail=0 --follow"
 alias dclean="docker image prune && docker system prune -a"
 
-alias k="kubectl"
-source <(kubectl completion zsh)
-complete -F __start_kubectl k
-
-alias myip="ipconfig getifaddr en0"
-
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 
-source "${HOME}/.alias/sigopt.sh"
+if [ -f "$HOME/.alias/sigopt.sh" ]; then
+  source "${HOME}/.alias/sigopt.sh"
+fi
 if [ -f "$HOME/.certs/sigopt-tokens" ]; then
   source "$HOME/.certs/sigopt-tokens"
 fi

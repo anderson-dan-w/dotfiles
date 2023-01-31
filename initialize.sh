@@ -16,9 +16,22 @@ fi
 
 initialize_zsh () {
   echo "setting up zsh and oh-my-zsh"
-  wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
-  # oh-my-zsh overwrite, so we re-overwrite
-  ln -fs ./rcs/shell/zshrc "${HOME}/.zshrc"
+  if [[ $PLATFORM == $MAC ]]; then
+    brew install zsh
+  else
+    if [ ! -d "${HOME}/.zsh" ]; then
+      sudo apt-get install zsh
+      chsh -s $(which zsh)
+     fi
+  fi
+  if [ ! -d "${HOME}/.oh-my-zsh" ]; then
+    wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
+    # oh-my-zsh overwrite, so we re-overwrite
+    ln -fs "$( pwd )/rcs/shell/zshrc" "${HOME}/.zshrc"
+  fi
+  if [ ! -f "${HOME}/.git-prompt.sh" ]; then
+    curl -LsSo "${HOME}/.git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
+  fi
 }
 
 initialize_shell_programs () {
@@ -33,46 +46,62 @@ initialize_shell_programs () {
   # set $SHELL and call zsh itself...
 
   # fzf
-  git clone --depth 1 https://github.com/junegunn/fzf.git "${HOME}/.fzf"
-  "${HOME}/.fzf/install"
+  if [ ! -d "${HOME}/.fzf" ]; then
+    git clone --depth 1 https://github.com/junegunn/fzf.git "${HOME}/.fzf"
+    "${HOME}/.fzf/install"
+  fi
 }
 
 initialize_ssh () {
   echo "setting up ssh key in .ssh"
   mkdir -p "${HOME}/.ssh"
-  ssh-keygen -t ed25519 -C "${EMAIL_ADDRESS}"
+  if [ ! -f "${HOME}/.ssh/id_ed25519" ]; then
+    ssh-keygen -t ed25519 -C "${EMAIL_ADDRESS}"
+  fi
 }
 
 initialize_vim () {
   echo "setting up vim-pathogen + modules"
+
   mkdir -p "${HOME}/.vim/autoload"
+  pathogen_path="${HOME}/.vim/autoload/pathogen.vim"
+  curl -LSso "${pathogen_path}" https://tpo.pe/pathogen.vim
+
   mkdir -p "${HOME}/.vim/bundle"
-  curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
   VIM_PACKAGES=(
     "dense-analysis/ale"
     "airblade/vim-gitgutter"
     "hashivim/vim-terraform"
   )
-  # TODO: need to install git first?
   for VIM_PACKAGE in ${VIM_PACKAGES[@]}; do
     pkg_name=$(basename "${VIM_PACKAGE}")
-    git clone "git@github.com:${VIM_PACKAGE}.git" "${HOME}/.vim/bundle/${pkg}"
+    pkg_path="${HOME}/.vim/bundle/${pkg}"
+    if [ ! -d "${pkg_path}" ]; then
+      git clone "https:/github.com/${VIM_PACKAGE}.git" "${pkg_path}"
+    fi
   done
 }
 
 initialize_node () {
   echo "installing node-related things"
+  mkdir -p "${HOME}/.nvm"
   if [[ $PLATFORM == $MAC ]]; then
     brew install nvm
   else
-    echo "install NVM"
+    if [ ! -d "${HOME}/.nvm" ]; then
+      curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+    fi
   fi
-  mkdir -p "${HOME}/.nvm"
   # copied from brew install output
   export NVM_DIR="$HOME/.nvm"
-  source "/usr/local/opt/nvm/nvm.sh"
-  source "/usr/local/opt/nvm/etc/bash_completion.d/nvm"
-  npm install --global yarn
+  source "${NVM_DIR}/nvm.sh"
+  source "${NVM_DIR}/bash_completion"
+
+  if [ ! -d "${NVM_DIR}/versions/node" ]; then
+    nvm install node
+    nvm alias default node
+    npm install --global yarn
+  fi
 }
 
 initialize_docker () {
@@ -81,6 +110,7 @@ initialize_docker () {
     brew install docker
     brew install docker-compose
   else
+    # optionally install
     curl -fsSL https://get.docker.com -o get-docker.sh
     sudo sh get-docker.sh
     sudo usermod -aG docker "${USER}"
@@ -89,12 +119,16 @@ initialize_docker () {
 }
 
 initialize_python () {
-  "echo installing python"
+  echo "installing python"
   if [[ $PLATFORM == $MAC ]]; then
     brew install pyenv
   else
-    echo TODO pyenv install
+    sudo apt-get install build-essential zlib1g-dev
+    if [ ! -d "${HOME}/.pyenv" ]; then
+      curl https://pyenv.run | bash
+    fi
   fi
+  export PATH="$HOME/.pyenv/bin:$PATH"
   # grabs most recent stable python 3.x.y version
   PY_VERSION=$(pyenv install --list | ag ' 3[.]\d+[.]\d+$' | tail -1 | tr -d '[:space:]')
   pyenv install "${PY_VERSION}"
@@ -103,11 +137,13 @@ initialize_python () {
 
   pip install virtualenv
   mkdir -p "${HOME}/.venv"
-  virtualenv -p $(which python) "${HOME}/.venv/default-venv"
-  source "${HOME}/.venv/default-venv/bin/activate"
+  if [ ! -d "${HOME}/.venv/default-venv" ]; then
+    virtualenv -p $(which python) "${HOME}/.venv/default-venv"
+    source "${HOME}/.venv/default-venv/bin/activate"
 
-  pip install ipython
-  hash -r
+    pip install ipython
+    hash -r
+  fi
 }
 
 initialize_terraform () {
@@ -115,7 +151,11 @@ initialize_terraform () {
   if [[ $PLATFORM == $MAC ]]; then
     brew install terraform
   else
-    echo TODO terraform install
+    if [ ! -f /usr/bin/terraform ]; then
+      wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+      sudo apt update && sudo apt install terraform
+    fi
   fi
   hash -r
 }
@@ -125,7 +165,12 @@ initialize_aws () {
   if [[ $PLATFORM == $MAC ]]; then
     brew install awscli
   else
-    echo TODO awscli install
+      if [ ! -f /usr/local/bin/aws ]; then
+      curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      unzip awscliv2.zip
+      sudo ./aws/install
+      rm awscliv2.zip
+    fi
   fi
   hash -r
   aws configure
@@ -135,7 +180,7 @@ initialize_zsh
 initialize_ssh
 initialize_vim
 initialize_node
-initialize_node
+initialize_shell_programs
 initialize_python
 initialize_terraform
 initialize_aws
