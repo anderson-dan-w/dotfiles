@@ -4,6 +4,12 @@ set -o pipefail
 
 : "${EMAIL_ADDRESS:?ERROR: set your email address}"
 
+initialize_git () {
+  echo "initializing git"
+  ln -fs "$( pwd )/rcs/git/gitconfig" "${HOME}/.gitconfig"
+  ln -fs "$( pwd )/rcs/git/gitignore" "${HOME}/.gitignore"
+}
+
 # TODO: specifying for MacOS now; will need ubuntu later
 MAC=mac
 UBUNTU=ubuntu
@@ -21,7 +27,7 @@ initialize_zsh () {
   else
     if [ ! -d "${HOME}/.zsh" ]; then
       sudo apt-get install zsh
-      chsh -s $(which zsh)
+      sudo chsh "${USER}" -s $(which zsh)
      fi
   fi
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
@@ -176,6 +182,7 @@ initialize_aws () {
   aws configure
 }
 
+initialize_git
 initialize_zsh
 initialize_ssh
 initialize_vim
