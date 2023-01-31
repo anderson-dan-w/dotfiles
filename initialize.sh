@@ -29,8 +29,8 @@ initialize_shell_programs () {
   else
     sudo apt-get install silversearcher-ag
   fi
-# NOTE: if can't change for current user, edit .bash_profile to i
-# set $SHELL and call zsh itself...
+  # NOTE: if can't change for current user, edit .bash_profile to
+  # set $SHELL and call zsh itself...
 
   # fzf
   git clone --depth 1 https://github.com/junegunn/fzf.git "${HOME}/.fzf"
@@ -62,7 +62,11 @@ initialize_vim () {
 
 initialize_node () {
   echo "installing node-related things"
-  brew install nvm
+  if [[ $PLATFORM == $MAC ]]; then
+    brew install nvm
+  else
+    echo "install NVM"
+  fi
   mkdir -p "${HOME}/.nvm"
   # copied from brew install output
   export NVM_DIR="$HOME/.nvm"
