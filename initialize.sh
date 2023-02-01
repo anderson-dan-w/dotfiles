@@ -116,7 +116,6 @@ initialize_docker () {
     brew install docker
     brew install docker-compose
   else
-    # optionally install
     curl -fsSL https://get.docker.com -o get-docker.sh
     sudo sh get-docker.sh
     sudo usermod -aG docker "${USER}"
