@@ -44,9 +44,9 @@ initialize_shell_programs () {
   echo "setting up shell program helpers"
   # ag, aka silver-searcher
   if [[ $PLATFORM == $MAC ]]; then
-    brew install the_silver_searcher
+    brew install the_silver_searcher tree
   else
-    sudo apt-get install silversearcher-ag
+    sudo apt-get install silversearcher-ag tree
   fi
   # NOTE: if can't change for current user, edit .bash_profile to
   # set $SHELL and call zsh itself...
