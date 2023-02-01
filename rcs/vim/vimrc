@@ -121,14 +121,7 @@ set noswapfile
 """""""""""""""""""""""""""
 set background=dark
 "" default colorscheme
-colorscheme evening
-if has ("unix")
-  "" http://www.deanbodenham.com/learn/tmux-pane-colours.html
-  "" NOTE: copied murphy into ~/.vim/colors/ and changed:
-  "" Normal: remove ctermbg; remove guibg; set gui=none
-  "" so background turns gray when other (tmux) pane is highlighted
-  colorscheme dwanderson-murphy
-endif
+colorscheme dwanderson-murphy
 
 "" highlight Python strings so they stand out better
 syn region pythonstring matchgroup=pythonstring start=/["']/ end=/["']/
