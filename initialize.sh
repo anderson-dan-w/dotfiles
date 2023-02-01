@@ -129,7 +129,7 @@ initialize_python () {
   if [[ $PLATFORM == $MAC ]]; then
     brew install pyenv
   else
-    sudo apt-get install build-essential zlib1g-dev
+    sudo apt-get install build-essential zlib1g-dev libffi-dev libssl-dev libsqlite3-dev liblzma-dev libreadline-dev
     if [ ! -d "${HOME}/.pyenv" ]; then
       curl https://pyenv.run | bash
     fi
