@@ -51,7 +51,7 @@
   ap = add -p
   co = checkout
   dc = diff --cached
-  dh = diff origin/master HEAD
+  dh = diff origin/main HEAD
   # files changed in this branch (will include changed-then-unchanged)
   fc = !git log --oneline --name-only origin/master..HEAD | ag -v ' ' | sort -u
   pl = pull
