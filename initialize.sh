@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e 
+set -e
 set -o pipefail
 
 : "${EMAIL_ADDRESS:?ERROR: set your email address}"
@@ -41,15 +41,18 @@ initialize_zsh () {
 }
 
 initialize_shell_programs () {
-  echo "setting up shell program helpers"
-  # ag, aka silver-searcher
+  echo "setting up shell programs and helpers"
+  # ag, aka silver-searcher, and others
   if [[ $PLATFORM == $MAC ]]; then
-    brew install the_silver_searcher
+    brew install the_silver_searcher tree tmux
   else
-    sudo apt-get install silversearcher-ag
+    # NOTE: seems like tmux is pre-installed (ubuntu22)?
+    sudo apt-get install silversearcher-ag tree
   fi
-  # NOTE: if can't change for current user, edit .bash_profile to
-  # set $SHELL and call zsh itself...
+  ln -fs "$(pwd)/rcs/vim/vimrc" "${HOME}/.vimrc"
+  mkdir -p "${HOME}/.vim/colors"
+  ln -fs "$(pwd)/rcs/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
+  ln -fs "$(pwd)/rcs/tmux/tmux.conf" "${HOME}/.tmux.conf"
 
   # fzf
   if [ ! -d "${HOME}/.fzf" ]; then

@@ -121,23 +121,7 @@ set noswapfile
 """""""""""""""""""""""""""
 set background=dark
 "" default colorscheme
-colorscheme evening
-if has ("unix")
-    let s:uname = system("uname")
-    if s:uname == "Darwin\n"
-        "" http://www.deanbodenham.com/learn/tmux-pane-colours.html
-        "" NOTE: copied murphy into ~/.vim/colors/ and changed:
-        "" Normal: remove ctermbg; remove guibg; set gui=none
-        "" so background turns gray when other (tmux) pane is highlighted
-        colorscheme dwanderson-murphy
-    else
-        "" get rid of bold text inside vim; it annoys me on Unix but not Mac.
-        "" from https://groups.google.com/forum/#!topic/vim_use/cI7ritLRH8Q
-        if !has('gui_running')
-            set t_Co=8 t_md=
-        endif
-    endif
-endif
+colorscheme dwanderson-murphy
 
 "" highlight Python strings so they stand out better
 syn region pythonstring matchgroup=pythonstring start=/["']/ end=/["']/
