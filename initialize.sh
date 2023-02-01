@@ -194,3 +194,5 @@ initialize_python
 initialize_terraform
 initialize_aws
 initialize_docker
+
+hash -r
