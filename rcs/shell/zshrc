@@ -72,7 +72,6 @@ plugins=(
 ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
 
-# TODO: source env.sh files, but after ln -s?
 _ENV_SOURCE_DIR="${HOME}/.env-sources"
 for FILE in $( ls "${_ENV_SOURCE_DIR}" ); do
   source "${_ENV_SOURCE_DIR}/${FILE}"

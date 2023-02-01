@@ -193,6 +193,8 @@ initialize_env_sources () {
     ln -sf "$(pwd)/rcs/shell/env.sh" "${ENV_DIR}/shell-env.sh"
     ln -sf "$(pwd)/rcs/git/env.sh" "${ENV_DIR}/git-env.sh"
     ln -sf "$(pwd)/rcs/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
+    ln -sf "$(pwd)/rcs/python/env.sh" "${ENV_DIR}/python-env.sh"
+    ln -sf "$(pwd)/rcs/docker/env.sh" "${ENV_DIR}/docker-env.sh"
   fi
 }
 

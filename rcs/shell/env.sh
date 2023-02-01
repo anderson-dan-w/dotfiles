@@ -38,14 +38,6 @@ $FG[134]%*$FG[255] \$ '
 
 PATH="$HOME/bin:$PATH"
 
-
-export PYTHONSTARTUP=$HOME/.pythonstartup
-alias pyclean="gfind -iregex '.*pyc' -delete && gfind -iregex '.*__pycache__.*' -delete"
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-
-if command -v pyenv &>/dev/null; then eval "$(pyenv init -)"; fi
-
 alias d="docker"
 alias dps="docker ps --format='{{.Names}}' | sort"
 alias dltf="docker logs --tail=0 --follow"
