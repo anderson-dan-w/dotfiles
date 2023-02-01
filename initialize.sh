@@ -186,6 +186,16 @@ initialize_aws () {
   aws configure
 }
 
+initialize_env_sources () {
+  ENV_DIR="${HOME}/.env-sources"
+  if [ ! -d "${ENV_DIR}" ]; then
+    mkdir -p "${ENV_DIR}"
+    ln -sf "$(pwd)/rcs/shell/env.sh" "${ENV_DIR}/shell-env.sh"
+    ln -sf "$(pwd)/rcs/git/env.sh" "${ENV_DIR}/git-env.sh"
+    ln -sf "$(pwd)/rcs/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
+  fi
+}
+
 initialize_git
 initialize_zsh
 initialize_ssh
@@ -196,5 +206,6 @@ initialize_python
 initialize_terraform
 initialize_aws
 initialize_docker
+initialize_env_sources
 
 hash -r

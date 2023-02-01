@@ -3,6 +3,9 @@
 .ipynb_checkpoints*
 *pyc
 
+# terraform ephemeral files
+*.plan
+
 ## bundled/archived
 *gz
 *tar
@@ -14,6 +17,3 @@
 *swp
 *swap
 *bak
-
-# common mistake files
-human.out
