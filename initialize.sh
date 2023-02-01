@@ -121,6 +121,7 @@ initialize_docker () {
     sudo sh get-docker.sh
     sudo usermod -aG docker "${USER}"
     sudo apt-get install docker-compose
+    rm -f get-docker.sh
   fi
 }
 
@@ -192,3 +193,4 @@ initialize_shell_programs
 initialize_python
 initialize_terraform
 initialize_aws
+initialize_docker
