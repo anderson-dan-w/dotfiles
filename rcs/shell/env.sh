@@ -42,7 +42,6 @@ PATH="$HOME/bin:$PATH"
 _AG_ARGS="--hidden \
   --ignore .git \
   --ignore .terraform \
-  --ignore terraform.tfstate* \
   --color-match '1;35' \
   --pager='less -RXF' \
 "

@@ -1,11 +1,10 @@
-
 if [[ $(uname) == Darwin ]]; then
   _FIND=gfind
 else
   _FIND=find
 fi
 
-alias pyclean="${FIND} -iregex '.*pyc' -delete && ${FIND} -iregex '.*__pycache__.*' -delete"
+alias pyclean="${_FIND} -iregex '.*pyc' -delete && ${_FIND} -iregex '.*__pycache__.*' -delete"
 
 export PYTHONSTARTUP=$HOME/.pythonstartup
 export PYENV_ROOT="$HOME/.pyenv"
