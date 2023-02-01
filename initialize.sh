@@ -218,3 +218,10 @@ initialize_docker
 initialize_env_sources
 
 hash -r
+
+echo "
+
+=========================
+You'll want to add your SSH Public key  in ~/.ssh to GitHub
+=========================
+"
