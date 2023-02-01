@@ -44,10 +44,14 @@ initialize_shell_programs () {
   echo "setting up shell program helpers"
   # ag, aka silver-searcher
   if [[ $PLATFORM == $MAC ]]; then
-    brew install the_silver_searcher tree
+    brew install the_silver_searcher tree tmux
   else
     sudo apt-get install silversearcher-ag tree
   fi
+  ln -fs "$(pwd)/rcs/vim/vimrc" "${HOME}/.vimrc"
+  mkdir -p "${HOME}/.vim/colors"
+  ln -fs "$(pwd)/rcs/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
+  ln -fs "$(pwd)/rcs/tmux/tmux.conf" "${HOME}/.tmux.conf"
   # NOTE: if can't change for current user, edit .bash_profile to
   # set $SHELL and call zsh itself...
 
