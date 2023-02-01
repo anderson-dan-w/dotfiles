@@ -4,21 +4,23 @@ set -o pipefail
 
 : "${EMAIL_ADDRESS:?ERROR: set your email address}"
 
-initialize_git () {
-  echo "initializing git"
-  ln -fs "$( pwd )/rcs/git/gitconfig" "${HOME}/.gitconfig"
-  ln -fs "$( pwd )/rcs/git/gitignore" "${HOME}/.gitignore"
-}
-
-# TODO: specifying for MacOS now; will need ubuntu later
 MAC=mac
 UBUNTU=ubuntu
 if [[ $(uname) == Darwin ]]; then
   PLATFORM="${MAC}"
 else
-  # TODO: surely not always true
+  # NOTE: surely not always true
   PLATFORM="${UBUNTU}"
 fi
+
+initialize_git () {
+  echo "initializing git"
+  ln -fs "$( pwd )/rcs/git/gitconfig" "${HOME}/.gitconfig"
+  ln -fs "$( pwd )/rcs/git/gitignore" "${HOME}/.gitignore"
+  if [ ! -f "${HOME}/.git-prompt.sh" ]; then
+    curl -LsSo "${HOME}/.git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
+  fi
+}
 
 initialize_zsh () {
   echo "setting up zsh and oh-my-zsh"
@@ -35,12 +37,10 @@ initialize_zsh () {
     # oh-my-zsh overwrite, so we re-overwrite
     ln -fs "$( pwd )/rcs/shell/zshrc" "${HOME}/.zshrc"
   fi
-  if [ ! -f "${HOME}/.git-prompt.sh" ]; then
-    curl -LsSo "${HOME}/.git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
-  fi
 }
 
 initialize_shell_programs () {
+  # NOTE: installs ag, fzf, tree, tmux
   echo "setting up shell programs and helpers"
   # ag, aka silver-searcher, and others
   if [[ $PLATFORM == $MAC ]]; then
@@ -49,9 +49,6 @@ initialize_shell_programs () {
     # NOTE: seems like tmux is pre-installed (ubuntu22)?
     sudo apt-get install silversearcher-ag tree
   fi
-  ln -fs "$(pwd)/rcs/vim/vimrc" "${HOME}/.vimrc"
-  mkdir -p "${HOME}/.vim/colors"
-  ln -fs "$(pwd)/rcs/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
   ln -fs "$(pwd)/rcs/tmux/tmux.conf" "${HOME}/.tmux.conf"
 
   # fzf
@@ -74,7 +71,9 @@ initialize_vim () {
 
   mkdir -p "${HOME}/.vim/autoload"
   pathogen_path="${HOME}/.vim/autoload/pathogen.vim"
-  curl -LSso "${pathogen_path}" https://tpo.pe/pathogen.vim
+  if [ ! -f "${pathogen_path}" ]; then
+    curl -LSso "${pathogen_path}" https://tpo.pe/pathogen.vim
+  fi
 
   mkdir -p "${HOME}/.vim/bundle"
   VIM_PACKAGES=(
@@ -89,6 +88,10 @@ initialize_vim () {
       git clone "https:/github.com/${VIM_PACKAGE}.git" "${pkg_path}"
     fi
   done
+
+  mkdir -p "${HOME}/.vim/colors"
+  ln -fs "$(pwd)/rcs/vim/vimrc" "${HOME}/.vimrc"
+  ln -fs "$(pwd)/rcs/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
 }
 
 initialize_node () {
@@ -101,7 +104,6 @@ initialize_node () {
       curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
     fi
   fi
-  # copied from brew install output
   export NVM_DIR="$HOME/.nvm"
   source "${NVM_DIR}/nvm.sh"
   source "${NVM_DIR}/bash_completion"
@@ -119,11 +121,13 @@ initialize_docker () {
     brew install docker
     brew install docker-compose
   else
-    curl -fsSL https://get.docker.com -o get-docker.sh
-    sudo sh get-docker.sh
-    sudo usermod -aG docker "${USER}"
-    sudo apt-get install docker-compose
-    rm -f get-docker.sh
+    if ! command -v docker; then
+      curl -fsSL https://get.docker.com -o get-docker.sh
+      sudo sh get-docker.sh
+      sudo usermod -aG docker "${USER}"
+      sudo apt-get install docker-compose
+      rm -f get-docker.sh
+    fi
   fi
 }
 
@@ -140,9 +144,12 @@ initialize_python () {
   export PATH="$HOME/.pyenv/bin:$PATH"
   # grabs most recent stable python 3.x.y version
   PY_VERSION=$(pyenv install --list | ag ' 3[.]\d+[.]\d+$' | tail -1 | tr -d '[:space:]')
-  pyenv install "${PY_VERSION}"
-  pyenv shell "${PY_VERSION}"
-  hash -r
+  if ! [[ $( pyenv version ) =~ "${PY_VERSION}" ]]; then
+    pyenv install "${PY_VERSION}"
+    pyenv shell "${PY_VERSION}"
+    pyenv global "${PY_VERSION}"
+    hash -r
+  fi
 
   pip install virtualenv
   mkdir -p "${HOME}/.venv"
