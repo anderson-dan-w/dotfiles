@@ -171,11 +171,12 @@ initialize_aws () {
   if [[ $PLATFORM == $MAC ]]; then
     brew install awscli
   else
-      if [ ! -f /usr/local/bin/aws ]; then
+    sudo apt-get install unzip
+    if [ ! -f /usr/local/bin/aws ]; then
       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
       unzip awscliv2.zip
       sudo ./aws/install
-      rm awscliv2.zip
+      rm -rf awscliv2.zip aws/
     fi
   fi
   hash -r
