@@ -10,7 +10,7 @@ export GIT_PS1_SHOWUPSTREAM="auto"
 alias gcd='cd $( dirname $( git rev-parse --git-dir 2>/dev/null ) 2>/dev/null  ) || ~'
 
 # help espec. with terraform tagging
-alias gtl="git tag --list | gsort -V"
-alias gtll="git tag --list | gsort -V | tail -1 "
+alias gtl="git tag --list | sort -V"
+alias gtll="git tag --list | sort -V | tail -1 "
 alias gpt="git push --tags"
 alias grom="git rebase origin/main"

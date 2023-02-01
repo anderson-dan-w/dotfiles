@@ -53,7 +53,7 @@
   dc = diff --cached
   dh = diff origin/main HEAD
   # files changed in this branch (will include changed-then-unchanged)
-  fc = !git log --oneline --name-only origin/master..HEAD | ag -v ' ' | sort -u
+  fc = !git log --oneline --name-only origin/main..HEAD | ag -v ' ' | sort -u
   pl = pull
   st = status
   sm = !git submodule sync && git submodule update
