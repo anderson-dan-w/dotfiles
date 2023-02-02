@@ -33,9 +33,6 @@
   patternType = perl
 
 [alias]
-  ls = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen [%an]' --decorate
-  ll = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen (%an)' --decorate --numstat
-  lg = log --pretty=format:'%C(yellow)%h %Cred%d %Creset%s (%Cgreen%an)' --graph
 
   git = !exec git
   g = !exec git
@@ -44,20 +41,28 @@
   b = branch
   c = commit
   d = diff
-  f = fetch --all --prune
   h = rev-parse HEAD
   p = push
   s = status
+  t = tag
+
   ap = add -p
   co = checkout
   dc = diff --cached
   dh = diff origin/main HEAD
   # files changed in this branch (will include changed-then-unchanged)
   fc = !git log --oneline --name-only origin/main..HEAD | ag -v ' ' | sort -u
+  ll = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen (%an)' --decorate --numstat
+  lg = log --pretty=format:'%C(yellow)%h %Cred%d %Creset%s (%Cgreen%an)' --graph
   pl = pull
+  pt = push --tags
   st = status
   sm = !git submodule sync && git submodule update
+  tl = !git tag --sort=-v:refname -l | head -1
+
   com = !git checkout main && git fetch --all --prune
+  rom = !git rebase origin/main
+
   head = log --oneline origin..HEAD
 
   # hub-related
