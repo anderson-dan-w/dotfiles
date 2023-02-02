@@ -160,6 +160,8 @@ initialize_python () {
     pip install ipython
     hash -r
   fi
+
+  ln -sf "$(pwd)/rcs/python/pythonstartup" "${HOME}/.pythonstartup"
 }
 
 initialize_terraform () {
