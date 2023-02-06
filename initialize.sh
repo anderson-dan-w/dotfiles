@@ -193,6 +193,7 @@ initialize_aws () {
   fi
   hash -r
   aws configure
+  touch "${HOME}/.aws/credentials"
 }
 
 initialize_env_sources () {
