@@ -44,10 +44,10 @@ initialize_shell_programs () {
   echo "setting up shell programs and helpers"
   # ag, aka silver-searcher, and others
   if [[ $PLATFORM == $MAC ]]; then
-    brew install the_silver_searcher tree tmux
+    brew install the_silver_searcher tree tmux jq
   else
     # NOTE: seems like tmux is pre-installed (ubuntu22)?
-    sudo apt-get install silversearcher-ag tree
+    sudo apt-get install silversearcher-ag tree jq
   fi
   ln -fs "$(pwd)/rcs/tmux/tmux.conf" "${HOME}/.tmux.conf"
 
@@ -204,6 +204,7 @@ initialize_env_sources () {
     ln -sf "$(pwd)/rcs/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
     ln -sf "$(pwd)/rcs/python/env.sh" "${ENV_DIR}/python-env.sh"
     ln -sf "$(pwd)/rcs/docker/env.sh" "${ENV_DIR}/docker-env.sh"
+    ln -sf "$(pwd)/rcs/aws/account-helper.sh" "${ENV_DIR}/aws-account-helper.sh"
   fi
 }
 
