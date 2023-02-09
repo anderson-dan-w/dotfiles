@@ -64,6 +64,7 @@ initialize_ssh () {
   if [ ! -f "${HOME}/.ssh/id_ed25519" ]; then
     ssh-keygen -t ed25519 -C "${EMAIL_ADDRESS}"
   fi
+  ln -sf "$(pwd)/rcs/ssh/config" "${HOME}/.ssh/config"
 }
 
 initialize_vim () {
@@ -206,6 +207,8 @@ initialize_env_sources () {
     ln -sf "$(pwd)/rcs/python/env.sh" "${ENV_DIR}/python-env.sh"
     ln -sf "$(pwd)/rcs/docker/env.sh" "${ENV_DIR}/docker-env.sh"
     ln -sf "$(pwd)/rcs/aws/account-helper.sh" "${ENV_DIR}/aws-account-helper.sh"
+    ln -sf "$(pwd)/rcs/aws/utils.sh" "${ENV_DIR}/aws-utils.sh"
+    ln -sf "$(pwd)/rcs/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
   fi
 }
 
@@ -227,5 +230,6 @@ echo "
 
 =========================
 You'll want to add your SSH Public key  in ~/.ssh to GitHub
+and update to some default username in ~/.ssh/config
 =========================
 "

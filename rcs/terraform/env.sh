@@ -11,6 +11,7 @@ alias tf="terraform"
 alias tf-fmt="tf fmt -recursive"
 alias tf-plan="tf plan -no-color -out ${DEFAULT_TF_PLAN_FILE} > ${DEFAULT_HUMAN_FILE}"
 alias tf-grep="ag '(created$|destroyed|updated|replaced|no.changes|changes to o)' ${DEFAULT_HUMAN_FILE}"
+alias tf-prep="tf-plan && tf-grep"
 alias tf-check="tf-plan && tf-grep"
 alias tf-apply="tf apply ${DEFAULT_TF_PLAN_FILE}"
 alias tf-clean="${_FIND} -iregex '.*tf[.]plan' -delete && gfind -iregex '.*human[.].*' -delete"
@@ -33,12 +34,12 @@ tf-set-ref() {
 }
 
 # NOTE: same as `g tl` but don't want to assume gitconfig loaded
-tf-last_tag() {
+tf-last-tag() {
   echo "$(git tag --sort=-v:refname -l | head -1 )"
 }
 
 # grabs most recent git tag to set ref
-tf-set_tag() {
+tf-set-tag() {
   GIT_TAG=$(tf-last-tag)
   tf-set-ref "${GIT_TAG}"
   tf-init

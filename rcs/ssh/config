@@ -1,0 +1,12 @@
+AddKeysToAgent yes
+User <enter-user-name>
+IdentityFile ~/.ssh/id_ed25519
+
+# Could expand to others; optionally goes through proxy if it is on
+Host github.com
+Match Exec "/usr/bin/nc -z <PROXY-HOST> <PROXY-PORT> 2>/dev/null"
+  ProxyCommand /usr/bin/nc -X 5 -x "<PROXY-HOST>:<PROXY-PORT>" %h %p
+
+# SSH over Session Manager
+host i-* mi-*
+    ProxyCommand sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'"
