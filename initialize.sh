@@ -112,8 +112,11 @@ initialize_node () {
   if [ ! -d "${NVM_DIR}/versions/node" ]; then
     nvm install node
     nvm alias default node
-    npm install --global yarn
   fi
+
+  # some standard / helper installs
+  nvm use node
+  npm install --global yarn aws-cost-cli
 }
 
 initialize_docker () {
@@ -210,6 +213,7 @@ initialize_env_sources () {
     ln -sf "$(pwd)/rcs/aws/utils.sh" "${ENV_DIR}/aws-utils.sh"
     ln -sf "$(pwd)/rcs/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
   fi
+  ln -sf "${HOME}/.nvm/nvm.sh" "${ENV_DIR}/nvm.sh"
 }
 
 initialize_git
