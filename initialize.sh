@@ -24,12 +24,12 @@ initialize_git () {
 
 initialize_zsh () {
   echo "setting up zsh and oh-my-zsh"
-  if [[ $PLATFORM == $MAC ]]; then
+  if [[ $PLATFORM == "${MAC}" ]]; then
     brew install zsh
   else
     if [ ! -d "${HOME}/.zsh" ]; then
       sudo apt-get install zsh
-      sudo chsh "${USER}" -s $(which zsh)
+      sudo chsh "${USER}" -s "$(which zsh)"
      fi
   fi
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
@@ -43,7 +43,7 @@ initialize_shell_programs () {
   # NOTE: installs ag, fzf, tree, tmux
   echo "setting up shell programs and helpers"
   # ag, aka silver-searcher, and others
-  if [[ $PLATFORM == $MAC ]]; then
+  if [[ $PLATFORM == "${MAC}" ]]; then
     brew install the_silver_searcher tree tmux jq
   else
     # NOTE: seems like tmux is pre-installed (ubuntu22)?
@@ -82,9 +82,9 @@ initialize_vim () {
     "airblade/vim-gitgutter"
     "hashivim/vim-terraform"
   )
-  for VIM_PACKAGE in ${VIM_PACKAGES[@]}; do
+  for VIM_PACKAGE in "${VIM_PACKAGES[@]}"; do
     pkg_name=$(basename "${VIM_PACKAGE}")
-    pkg_path="${HOME}/.vim/bundle/${pkg}"
+    pkg_path="${HOME}/.vim/bundle/${pkg_name}"
     if [ ! -d "${pkg_path}" ]; then
       git clone "https:/github.com/${VIM_PACKAGE}.git" "${pkg_path}"
     fi
@@ -98,7 +98,7 @@ initialize_vim () {
 initialize_node () {
   echo "installing node-related things"
   mkdir -p "${HOME}/.nvm"
-  if [[ $PLATFORM == $MAC ]]; then
+  if [[ $PLATFORM == "${MAC}" ]]; then
     brew install nvm
   else
     if [ ! -d "${HOME}/.nvm" ]; then
@@ -121,7 +121,7 @@ initialize_node () {
 
 initialize_docker () {
   echo "installing docker"
-  if [[ $PLATFORM == $MAC ]]; then
+  if [[ $PLATFORM == "${MAC}" ]]; then
     brew install docker
     brew install docker-compose
   else
@@ -137,7 +137,7 @@ initialize_docker () {
 
 initialize_python () {
   echo "installing python"
-  if [[ $PLATFORM == $MAC ]]; then
+  if [[ $PLATFORM == "${MAC}" ]]; then
     brew install pyenv
   else
     sudo apt-get install build-essential zlib1g-dev libffi-dev libssl-dev libsqlite3-dev liblzma-dev libreadline-dev
@@ -148,7 +148,7 @@ initialize_python () {
   export PATH="$HOME/.pyenv/bin:$PATH"
   # grabs most recent stable python 3.x.y version
   PY_VERSION=$(pyenv install --list | ag ' 3[.]\d+[.]\d+$' | tail -1 | tr -d '[:space:]')
-  if ! [[ $( pyenv version ) =~ "${PY_VERSION}" ]]; then
+  if ! [[ $( pyenv version ) =~ ${PY_VERSION} ]]; then
     pyenv install "${PY_VERSION}"
     pyenv shell "${PY_VERSION}"
     pyenv global "${PY_VERSION}"
@@ -158,7 +158,7 @@ initialize_python () {
   pip install virtualenv
   mkdir -p "${HOME}/.venv"
   if [ ! -d "${HOME}/.venv/default-venv" ]; then
-    virtualenv -p $(which python) "${HOME}/.venv/default-venv"
+    virtualenv -p "$(which python)" "${HOME}/.venv/default-venv"
     source "${HOME}/.venv/default-venv/bin/activate"
 
     pip install ipython
@@ -170,7 +170,7 @@ initialize_python () {
 
 initialize_terraform () {
   echo "installing terraform"
-  if [[ $PLATFORM == $MAC ]]; then
+  if [[ $PLATFORM == "${MAC}" ]]; then
     brew install terraform
   else
     if [ ! -f /usr/bin/terraform ]; then
@@ -184,7 +184,7 @@ initialize_terraform () {
 
 initialize_aws () {
   echo "installing awscli"
-  if [[ $PLATFORM == $MAC ]]; then
+  if [[ $PLATFORM == "${MAC}" ]]; then
     brew install awscli
   else
     sudo apt-get install unzip
