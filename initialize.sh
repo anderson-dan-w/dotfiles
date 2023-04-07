@@ -4,6 +4,9 @@ set -o pipefail
 
 : "${EMAIL_ADDRESS:?ERROR: set your email address}"
 
+SCRIPT_DIR=$( dirname "${BASH_SOURCE[0]}" )
+RC_DIR="${SCRIPT_DIR}/rcs"
+
 MAC=mac
 UBUNTU=ubuntu
 if [[ $(uname) == Darwin ]]; then
@@ -15,8 +18,8 @@ fi
 
 initialize_git () {
   echo "initializing git"
-  ln -fs "$( pwd )/rcs/git/gitconfig" "${HOME}/.gitconfig"
-  ln -fs "$( pwd )/rcs/git/gitignore" "${HOME}/.gitignore"
+  ln -fs "${RC_DIR}/git/gitconfig" "${HOME}/.gitconfig"
+  ln -fs "${RC_DIR}/git/gitignore" "${HOME}/.gitignore"
   if [ ! -f "${HOME}/.git-prompt.sh" ]; then
     curl -LsSo "${HOME}/.git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
   fi
@@ -37,7 +40,7 @@ initialize_zsh () {
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
     wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
   fi
-  ln -fs "$( pwd )/rcs/shell/zshrc" "${HOME}/.zshrc"
+  ln -fs "${RC_DIR}/shell/zshrc" "${HOME}/.zshrc"
 }
 
 initialize_shell_programs () {
@@ -50,7 +53,7 @@ initialize_shell_programs () {
   else
     sudo apt-get install silversearcher-ag tree jq
   fi
-  ln -fs "$(pwd)/rcs/tmux/tmux.conf" "${HOME}/.tmux.conf"
+  ln -fs "${RC_DIR}/tmux/tmux.conf" "${HOME}/.tmux.conf"
 
   # fzf
   if [ ! -d "${HOME}/.fzf" ]; then
@@ -67,7 +70,7 @@ initialize_ssh () {
   fi
   if [ ! -f "${HOME}/.ssh/config" ]; then
     # copy, since it needs to be changed with username, proxy
-    cp  "$(pwd)/rcs/ssh/config" "${HOME}/.ssh/config"
+    cp  "${RC_DIR}/ssh/config" "${HOME}/.ssh/config"
   fi
 }
 
@@ -94,9 +97,9 @@ initialize_vim () {
     fi
   done
 
-  ln -fs "$(pwd)/rcs/vim/vimrc" "${HOME}/.vimrc"
+  ln -fs "${RC_DIR}/vim/vimrc" "${HOME}/.vimrc"
   mkdir -p "${HOME}/.vim/colors"
-  ln -fs "$(pwd)/rcs/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
+  ln -fs "${RC_DIR}/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
 }
 
 initialize_node () {
@@ -171,7 +174,7 @@ initialize_python () {
     hash -r
   fi
 
-  ln -sf "$(pwd)/rcs/python/pythonstartup" "${HOME}/.pythonstartup"
+  ln -sf "${RC_DIR}/python/pythonstartup" "${HOME}/.pythonstartup"
 }
 
 initialize_terraform () {
@@ -214,15 +217,15 @@ initialize_env_sources () {
   ENV_DIR="${HOME}/.env-sources"
   if [ ! -d "${ENV_DIR}" ]; then
     mkdir -p "${ENV_DIR}"
-    ln -sf "$(pwd)/rcs/shell/env.sh" "${ENV_DIR}/shell-env.sh"
-    ln -sf "$(pwd)/rcs/git/env.sh" "${ENV_DIR}/git-env.sh"
-    ln -sf "$(pwd)/rcs/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
-    ln -sf "$(pwd)/rcs/python/env.sh" "${ENV_DIR}/python-env.sh"
-    ln -sf "$(pwd)/rcs/aws/account-helper.sh" "${ENV_DIR}/aws-account-helper.sh"
-    ln -sf "$(pwd)/rcs/aws/utils.sh" "${ENV_DIR}/aws-utils.sh"
+    ln -sf "${RC_DIR}/shell/env.sh" "${ENV_DIR}/shell-env.sh"
+    ln -sf "${RC_DIR}/git/env.sh" "${ENV_DIR}/git-env.sh"
+    ln -sf "${RC_DIR}/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
+    ln -sf "${RC_DIR}/python/env.sh" "${ENV_DIR}/python-env.sh"
+    ln -sf "${RC_DIR}/aws/account-helper.sh" "${ENV_DIR}/aws-account-helper.sh"
+    ln -sf "${RC_DIR}/aws/utils.sh" "${ENV_DIR}/aws-utils.sh"
     # copy since these require tweaking
-    cp "$(pwd)/rcs/docker/env.sh" "${ENV_DIR}/docker-env.sh"
-    cp "$(pwd)/rcs/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
+    cp "${RC_DIR}/docker/env.sh" "${ENV_DIR}/docker-env.sh"
+    cp "${RC_DIR}/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
   fi
   ln -sf "${HOME}/.nvm/nvm.sh" "${ENV_DIR}/nvm.sh"
 }
