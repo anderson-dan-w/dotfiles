@@ -36,9 +36,8 @@ initialize_zsh () {
   fi
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
     wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
-    # oh-my-zsh overwrite, so we re-overwrite
-    ln -fs "$( pwd )/rcs/shell/zshrc" "${HOME}/.zshrc"
   fi
+  ln -fs "$( pwd )/rcs/shell/zshrc" "${HOME}/.zshrc"
 }
 
 initialize_shell_programs () {
@@ -67,7 +66,8 @@ initialize_ssh () {
     ssh-keygen -t ed25519 -C "${EMAIL_ADDRESS}"
   fi
   if [ ! -f "${HOME}/.ssh/config" ]; then
-    ln -sf "$(pwd)/rcs/ssh/config" "${HOME}/.ssh/config"
+    # copy, since it needs to be changed with username, proxy
+    cp  "$(pwd)/rcs/ssh/config" "${HOME}/.ssh/config"
   fi
 }
 
@@ -94,8 +94,8 @@ initialize_vim () {
     fi
   done
 
-  mkdir -p "${HOME}/.vim/colors"
   ln -fs "$(pwd)/rcs/vim/vimrc" "${HOME}/.vimrc"
+  mkdir -p "${HOME}/.vim/colors"
   ln -fs "$(pwd)/rcs/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
 }
 
@@ -218,10 +218,11 @@ initialize_env_sources () {
     ln -sf "$(pwd)/rcs/git/env.sh" "${ENV_DIR}/git-env.sh"
     ln -sf "$(pwd)/rcs/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
     ln -sf "$(pwd)/rcs/python/env.sh" "${ENV_DIR}/python-env.sh"
-    ln -sf "$(pwd)/rcs/docker/env.sh" "${ENV_DIR}/docker-env.sh"
     ln -sf "$(pwd)/rcs/aws/account-helper.sh" "${ENV_DIR}/aws-account-helper.sh"
     ln -sf "$(pwd)/rcs/aws/utils.sh" "${ENV_DIR}/aws-utils.sh"
-    ln -sf "$(pwd)/rcs/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
+    # copy since these require tweaking
+    cp "$(pwd)/rcs/docker/env.sh" "${ENV_DIR}/docker-env.sh"
+    cp "$(pwd)/rcs/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
   fi
   ln -sf "${HOME}/.nvm/nvm.sh" "${ENV_DIR}/nvm.sh"
 }
