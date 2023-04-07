@@ -44,10 +44,10 @@ initialize_shell_programs () {
   # NOTE: installs ag, fzf, tree, tmux
   echo "setting up shell programs and helpers"
   # ag, aka silver-searcher, and others
+  # tmux already installed? or being weird?
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install the_silver_searcher tree tmux jq
+    brew install the_silver_searcher tree jq
   else
-    # NOTE: seems like tmux is pre-installed (ubuntu22)?
     sudo apt-get install silversearcher-ag tree jq
   fi
   ln -fs "$(pwd)/rcs/tmux/tmux.conf" "${HOME}/.tmux.conf"
