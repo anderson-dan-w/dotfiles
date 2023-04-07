@@ -31,7 +31,7 @@ aws-list-profile () {
   done
 }
 
-# NOTE: this is NOT safe on untrusted output
+# NOTE: this is NOT safe on untrusted input
 _make-aws-func () {
   for PROFILE in $(aws-list-profile); do
     eval "aws-${PROFILE}() { aws-env-var-setup ${PROFILE} \${1}} "

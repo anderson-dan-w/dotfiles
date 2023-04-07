@@ -25,7 +25,9 @@ initialize_git () {
 initialize_zsh () {
   echo "setting up zsh and oh-my-zsh"
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install zsh
+    if [ ! -d "${HOME}/.zsh" ]; then
+      brew install zsh
+    fi
   else
     if [ ! -d "${HOME}/.zsh" ]; then
       sudo apt-get install zsh
@@ -64,7 +66,9 @@ initialize_ssh () {
   if [ ! -f "${HOME}/.ssh/id_ed25519" ]; then
     ssh-keygen -t ed25519 -C "${EMAIL_ADDRESS}"
   fi
-  ln -sf "$(pwd)/rcs/ssh/config" "${HOME}/.ssh/config"
+  if [ ! -f "${HOME}/.ssh/config" ]; then
+    ln -sf "$(pwd)/rcs/ssh/config" "${HOME}/.ssh/config"
+  fi
 }
 
 initialize_vim () {
@@ -97,11 +101,14 @@ initialize_vim () {
 
 initialize_node () {
   echo "installing node-related things"
-  mkdir -p "${HOME}/.nvm"
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install nvm
+    if [ ! -d "${HOME}/.nvm" ]; then
+      mkdir -p "${HOME}/.nvm"
+      brew install nvm
+    fi
   else
     if [ ! -d "${HOME}/.nvm" ]; then
+      mkdir -p "${HOME}/.nvm"
       curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
     fi
   fi
@@ -122,8 +129,7 @@ initialize_node () {
 initialize_docker () {
   echo "installing docker"
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install docker
-    brew install docker-compose
+    brew install docker docker-compose
   else
     if ! command -v docker; then
       curl -fsSL https://get.docker.com -o get-docker.sh
@@ -171,7 +177,9 @@ initialize_python () {
 initialize_terraform () {
   echo "installing terraform"
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install terraform
+    if ! command -v terraform; then
+      brew install terraform
+    fi
   else
     if [ ! -f /usr/bin/terraform ]; then
       wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
@@ -196,8 +204,10 @@ initialize_aws () {
     fi
   fi
   hash -r
-  aws configure
-  touch "${HOME}/.aws/credentials"
+  if [ ! -d "${HOME}/.aws" ]; then
+    aws configure
+    touch "${HOME}/.aws/credentials"
+  fi
 }
 
 initialize_env_sources () {
@@ -235,5 +245,7 @@ echo "
 =========================
 You'll want to add your SSH Public key  in ~/.ssh to GitHub
 and update to some default username in ~/.ssh/config
+Also, dockerhub login credentials?
+Also, proxy URLs and references to proxy in ssh-config
 =========================
 "
