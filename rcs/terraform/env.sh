@@ -14,7 +14,7 @@ alias tf-grep="ag '(created$|destroyed|updated|replaced|no.changes|changes to o)
 alias tf-prep="tf-plan && tf-grep"
 alias tf-check="tf-plan && tf-grep"
 alias tf-apply="tf apply ${DEFAULT_TF_PLAN_FILE}"
-alias tf-clean="${_FIND} -iregex '.*tf[.]plan' -delete && gfind -iregex '.*human[.].*' -delete"
+alias tf-clean="${_FIND} -iregex '.*tf[.]plan' -delete && ${_FIND} -iregex '.*human[.].*' -delete"
 
 tf-init () {
   if [ -f s3.tfbackend ]; then
