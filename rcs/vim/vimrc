@@ -177,23 +177,21 @@ let g:ale_lint_delay = 2000
 
 "" ignore flake8 warnings I don't care about:
 "" W391 = blank line at end of file [vim will add if necessary]
-""        sigopt has this warning on, so I'll turn it on as well
-"" E111 = indentation is not a multiple of four: I like this rule, but
-""        sigopt uses indent of 2, and it's untenable to leave this on
+"" E111 = indentation is not a multiple of four (using 2)
 "" E114 = indention is not a multiple of four (for comments): see E111
 "" E121 = continuation line under-indented - consequence of 2-space indents
 "" E123 = continuation line over-indented - [same as E121]
 "" E127 = under-indented [too many edge cases]
 "" E128 = over-indented [same as E127]
 "" E131 - indent doesn't mach [same as E127]
-"" E302 = expected 2 blank lines, found 1 [sigopt inconsistency]
-"" E305 = expected 2 blank lines, found 1 [sigopt inconsistency]
+"" E302 = expected 2 blank lines, found 1
+"" E305 = expected 2 blank lines, found 1
 ""        different from 302?
-"" F401 = import * unused [import zigopt.common.*]
-"" F403 = import * undetectable [import zigopt.common.*]
+"" F401 = import * unused
+"" F403 = import * undetectable
 "" F405 = {import} may be undefined or from star import
 "" W503 = line break before binary operator (black prefers this)
-"" max-line-length used by sigopt is 120 rather than 80
+"" max-line-length: 120 rather than 80
 let g:ale_python_flake8_options = '--ignore E111,E114,E121,E123,E127,E128,E131,E302,E305,F401,F403,F405,W503,T001 --max-line-length=120'
 
 let _all_fixers = ['remove_trailing_lines', 'trim_whitespace']

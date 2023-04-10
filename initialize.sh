@@ -4,6 +4,9 @@ set -o pipefail
 
 : "${EMAIL_ADDRESS:?ERROR: set your email address}"
 
+SCRIPT_DIR=$( dirname "${BASH_SOURCE[0]}" )
+RC_DIR="${SCRIPT_DIR}/rcs"
+
 MAC=mac
 UBUNTU=ubuntu
 if [[ $(uname) == Darwin ]]; then
@@ -15,8 +18,8 @@ fi
 
 initialize_git () {
   echo "initializing git"
-  ln -fs "$( pwd )/rcs/git/gitconfig" "${HOME}/.gitconfig"
-  ln -fs "$( pwd )/rcs/git/gitignore" "${HOME}/.gitignore"
+  ln -fs "${RC_DIR}/git/gitconfig" "${HOME}/.gitconfig"
+  ln -fs "${RC_DIR}/git/gitignore" "${HOME}/.gitignore"
   if [ ! -f "${HOME}/.git-prompt.sh" ]; then
     curl -LsSo "${HOME}/.git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
   fi
@@ -24,32 +27,33 @@ initialize_git () {
 
 initialize_zsh () {
   echo "setting up zsh and oh-my-zsh"
-  if [[ $PLATFORM == $MAC ]]; then
-    brew install zsh
+  if [[ $PLATFORM == "${MAC}" ]]; then
+    if [ ! -d "${HOME}/.zsh" ]; then
+      brew install zsh
+    fi
   else
     if [ ! -d "${HOME}/.zsh" ]; then
       sudo apt-get install zsh
-      sudo chsh "${USER}" -s $(which zsh)
+      sudo chsh "${USER}" -s "$(which zsh)"
      fi
   fi
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
     wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
-    # oh-my-zsh overwrite, so we re-overwrite
-    ln -fs "$( pwd )/rcs/shell/zshrc" "${HOME}/.zshrc"
   fi
+  ln -fs "${RC_DIR}/shell/zshrc" "${HOME}/.zshrc"
 }
 
 initialize_shell_programs () {
   # NOTE: installs ag, fzf, tree, tmux
   echo "setting up shell programs and helpers"
   # ag, aka silver-searcher, and others
-  if [[ $PLATFORM == $MAC ]]; then
-    brew install the_silver_searcher tree tmux jq
+  # tmux already installed? or being weird?
+  if [[ $PLATFORM == "${MAC}" ]]; then
+    brew install the_silver_searcher tree jq
   else
-    # NOTE: seems like tmux is pre-installed (ubuntu22)?
     sudo apt-get install silversearcher-ag tree jq
   fi
-  ln -fs "$(pwd)/rcs/tmux/tmux.conf" "${HOME}/.tmux.conf"
+  ln -fs "${RC_DIR}/tmux/tmux.conf" "${HOME}/.tmux.conf"
 
   # fzf
   if [ ! -d "${HOME}/.fzf" ]; then
@@ -64,7 +68,10 @@ initialize_ssh () {
   if [ ! -f "${HOME}/.ssh/id_ed25519" ]; then
     ssh-keygen -t ed25519 -C "${EMAIL_ADDRESS}"
   fi
-  ln -sf "$(pwd)/rcs/ssh/config" "${HOME}/.ssh/config"
+  if [ ! -f "${HOME}/.ssh/config" ]; then
+    # copy, since it needs to be changed with username, proxy
+    cp  "${RC_DIR}/ssh/config" "${HOME}/.ssh/config"
+  fi
 }
 
 initialize_vim () {
@@ -82,26 +89,29 @@ initialize_vim () {
     "airblade/vim-gitgutter"
     "hashivim/vim-terraform"
   )
-  for VIM_PACKAGE in ${VIM_PACKAGES[@]}; do
+  for VIM_PACKAGE in "${VIM_PACKAGES[@]}"; do
     pkg_name=$(basename "${VIM_PACKAGE}")
-    pkg_path="${HOME}/.vim/bundle/${pkg}"
+    pkg_path="${HOME}/.vim/bundle/${pkg_name}"
     if [ ! -d "${pkg_path}" ]; then
       git clone "https:/github.com/${VIM_PACKAGE}.git" "${pkg_path}"
     fi
   done
 
+  ln -fs "${RC_DIR}/vim/vimrc" "${HOME}/.vimrc"
   mkdir -p "${HOME}/.vim/colors"
-  ln -fs "$(pwd)/rcs/vim/vimrc" "${HOME}/.vimrc"
-  ln -fs "$(pwd)/rcs/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
+  ln -fs "${RC_DIR}/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
 }
 
 initialize_node () {
   echo "installing node-related things"
-  mkdir -p "${HOME}/.nvm"
-  if [[ $PLATFORM == $MAC ]]; then
-    brew install nvm
+  if [[ $PLATFORM == "${MAC}" ]]; then
+    if [ ! -d "${HOME}/.nvm" ]; then
+      mkdir -p "${HOME}/.nvm"
+      brew install nvm
+    fi
   else
     if [ ! -d "${HOME}/.nvm" ]; then
+      mkdir -p "${HOME}/.nvm"
       curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
     fi
   fi
@@ -121,9 +131,8 @@ initialize_node () {
 
 initialize_docker () {
   echo "installing docker"
-  if [[ $PLATFORM == $MAC ]]; then
-    brew install docker
-    brew install docker-compose
+  if [[ $PLATFORM == "${MAC}" ]]; then
+    brew install docker docker-compose
   else
     if ! command -v docker; then
       curl -fsSL https://get.docker.com -o get-docker.sh
@@ -137,7 +146,7 @@ initialize_docker () {
 
 initialize_python () {
   echo "installing python"
-  if [[ $PLATFORM == $MAC ]]; then
+  if [[ $PLATFORM == "${MAC}" ]]; then
     brew install pyenv
   else
     sudo apt-get install build-essential zlib1g-dev libffi-dev libssl-dev libsqlite3-dev liblzma-dev libreadline-dev
@@ -148,7 +157,7 @@ initialize_python () {
   export PATH="$HOME/.pyenv/bin:$PATH"
   # grabs most recent stable python 3.x.y version
   PY_VERSION=$(pyenv install --list | ag ' 3[.]\d+[.]\d+$' | tail -1 | tr -d '[:space:]')
-  if ! [[ $( pyenv version ) =~ "${PY_VERSION}" ]]; then
+  if ! [[ $( pyenv version ) =~ ${PY_VERSION} ]]; then
     pyenv install "${PY_VERSION}"
     pyenv shell "${PY_VERSION}"
     pyenv global "${PY_VERSION}"
@@ -158,20 +167,22 @@ initialize_python () {
   pip install virtualenv
   mkdir -p "${HOME}/.venv"
   if [ ! -d "${HOME}/.venv/default-venv" ]; then
-    virtualenv -p $(which python) "${HOME}/.venv/default-venv"
+    virtualenv -p "$(which python)" "${HOME}/.venv/default-venv"
     source "${HOME}/.venv/default-venv/bin/activate"
 
     pip install ipython
     hash -r
   fi
 
-  ln -sf "$(pwd)/rcs/python/pythonstartup" "${HOME}/.pythonstartup"
+  ln -sf "${RC_DIR}/python/pythonstartup" "${HOME}/.pythonstartup"
 }
 
 initialize_terraform () {
   echo "installing terraform"
-  if [[ $PLATFORM == $MAC ]]; then
-    brew install terraform
+  if [[ $PLATFORM == "${MAC}" ]]; then
+    if ! command -v terraform; then
+      brew install terraform
+    fi
   else
     if [ ! -f /usr/bin/terraform ]; then
       wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
@@ -184,7 +195,7 @@ initialize_terraform () {
 
 initialize_aws () {
   echo "installing awscli"
-  if [[ $PLATFORM == $MAC ]]; then
+  if [[ $PLATFORM == "${MAC}" ]]; then
     brew install awscli
   else
     sudo apt-get install unzip
@@ -196,22 +207,25 @@ initialize_aws () {
     fi
   fi
   hash -r
-  aws configure
-  touch "${HOME}/.aws/credentials"
+  if [ ! -d "${HOME}/.aws" ]; then
+    aws configure
+    touch "${HOME}/.aws/credentials"
+  fi
 }
 
 initialize_env_sources () {
   ENV_DIR="${HOME}/.env-sources"
   if [ ! -d "${ENV_DIR}" ]; then
     mkdir -p "${ENV_DIR}"
-    ln -sf "$(pwd)/rcs/shell/env.sh" "${ENV_DIR}/shell-env.sh"
-    ln -sf "$(pwd)/rcs/git/env.sh" "${ENV_DIR}/git-env.sh"
-    ln -sf "$(pwd)/rcs/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
-    ln -sf "$(pwd)/rcs/python/env.sh" "${ENV_DIR}/python-env.sh"
-    ln -sf "$(pwd)/rcs/docker/env.sh" "${ENV_DIR}/docker-env.sh"
-    ln -sf "$(pwd)/rcs/aws/account-helper.sh" "${ENV_DIR}/aws-account-helper.sh"
-    ln -sf "$(pwd)/rcs/aws/utils.sh" "${ENV_DIR}/aws-utils.sh"
-    ln -sf "$(pwd)/rcs/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
+    ln -sf "${RC_DIR}/shell/env.sh" "${ENV_DIR}/shell-env.sh"
+    ln -sf "${RC_DIR}/git/env.sh" "${ENV_DIR}/git-env.sh"
+    ln -sf "${RC_DIR}/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
+    ln -sf "${RC_DIR}/python/env.sh" "${ENV_DIR}/python-env.sh"
+    ln -sf "${RC_DIR}/aws/account-helper.sh" "${ENV_DIR}/aws-account-helper.sh"
+    ln -sf "${RC_DIR}/aws/utils.sh" "${ENV_DIR}/aws-utils.sh"
+    # copy since these require tweaking
+    cp "${RC_DIR}/docker/env.sh" "${ENV_DIR}/docker-env.sh"
+    cp "${RC_DIR}/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
   fi
   ln -sf "${HOME}/.nvm/nvm.sh" "${ENV_DIR}/nvm.sh"
 }
@@ -235,5 +249,7 @@ echo "
 =========================
 You'll want to add your SSH Public key  in ~/.ssh to GitHub
 and update to some default username in ~/.ssh/config
+Also, dockerhub login credentials?
+Also, proxy URLs and references to proxy in ssh-config
 =========================
 "
