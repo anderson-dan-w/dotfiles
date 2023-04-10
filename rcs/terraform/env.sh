@@ -1,7 +1,7 @@
 if [[ $(uname) == Darwin ]]; then
-  _FIND=gfind
+  _FIND="gfind"
 else
-  _FIND=find
+  _FIND="find"
 fi
 
 DEFAULT_HUMAN_FILE=human-readable.plan
