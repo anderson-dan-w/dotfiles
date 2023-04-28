@@ -52,3 +52,13 @@ ssm () {
   instance_id="$( echo "${instance}" | cut -f1 )"
   aws ssm start-session --target "${instance_id}" --parameters "command=cd /home/${SSM_USER}; sudo su  ${SSM_USER}" --document-name "AWS-StartInteractiveCommand"
 }
+
+################################################################################
+# AWS ELBv2
+###########
+aws-lb-health () {
+  for ARN in $(aws elbv2 describe-target-groups | jq -r '.TargetGroups[].TargetGroupArn' | ag "${1}"); do
+    echo $(basename $(dirname "${ARN}" ) )
+    aws elbv2 describe-target-health --target-group-arn "${ARN}" | jq -r '.TargetHealthDescriptions[] | [.Target.Id, .TargetHealth.State, .TargetHealth.Description] | @tsv'
+  done
+}
