@@ -193,6 +193,8 @@ initialize_terraform () {
     fi
   fi
   hash -r
+
+  ln -sf "${RC_DIR}/terraform/terraformrc" "${HOME}/.terraformrc"
 }
 
 initialize_aws () {
