@@ -261,8 +261,10 @@ hash -r
 echo "
 
 ############################################################
-You'll want to add your SSH Public key  in ~/.ssh to GitHub
-and update to some default username in ~/.ssh/config
-Also, dockerhub login credentials?
-Also, proxy URLs and references to proxy in ssh-config
+You'll want to:
+- add your SSH Public key  in ~/.ssh to GitHub
+- update username (in ~/.ssh/config)
+- set references to proxy (in ~/.ssh/config)
+- store dockerhub login credentials (in ${ENV_DIR}/docker-env.sh)
+- set proxy URLs if needed (in ${ENV_DIR}/proxy-env.sh)
 "
