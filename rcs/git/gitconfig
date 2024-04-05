@@ -32,6 +32,12 @@
   lineNumber = True
   patternType = perl
 
+[init]
+  defaultBranch = main
+
+[pull]
+  ff = only
+
 [alias]
 
   git = !exec git
@@ -48,13 +54,16 @@
 
   ap = add -p
   co = checkout
+  d1 = diff HEAD~1
   dc = diff --cached
   dh = diff origin/main HEAD
+  fa = fetch --all
   # files changed in this branch (will include changed-then-unchanged)
   fc = !git log --oneline --name-only origin/main..HEAD | ag -v ' ' | sort -u
   ll = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen (%an)' --decorate --numstat
   lg = log --pretty=format:'%C(yellow)%h %Cred%d %Creset%s (%Cgreen%an)' --graph
   ls = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen [%an]' --decorate
+  mm = merge main
   pl = pull
   pt = push --tags
   pu = !git push -u origin $(git rev-parse --abbrev-ref HEAD)
@@ -70,12 +79,9 @@
   pr="!f() { \
     BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD); \
     git push -u origin $BRANCH_NAME; \
-    hub pull-request --no-edit; \
+    hub pull-request --no-edit -b main; \
     hub pr show; \
   };f "
   ci = "!hub ci-status"
   ci-status = "!hub ci-status -v"
   ci-fail = "!hub ci-status -v | grep ✖ | cut -d' ' -f2"
-
-[init]
-  defaultBranch = main

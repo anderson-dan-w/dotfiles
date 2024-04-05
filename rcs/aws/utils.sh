@@ -11,7 +11,7 @@ aws-bills() {
     --granularity MONTHLY \
     --metrics "BlendedCost" | jq -r '.ResultsByTime[0].Total.BlendedCost.Amount | tonumber | floor'
   )
-  echo "${AP}: ${SPEND}"
+  echo "${LAST_MONTH} :: ${AP}: ${SPEND}"
 }
 
 all-aws-bills () {
@@ -29,6 +29,17 @@ all-aws-bills () {
 # eg: `ec2 dan` would SSM onto the "first" box named dan*, such as dan-dev-box
 ec2 () {
   aws ec2 describe-instances --filters="Name=tag:Name,Values=${1}*" | jq -r ' .Reservations[] .Instances[] | select(.State.Name == "running") | [.InstanceId, .PrivateIpAddress, (.Tags[]|select(.Key=="Name")|.Value)] | @tsv'
+}
+
+################################################################################
+# AWS ELBv2
+#############
+
+aws-lb-health() {
+  for ARN in $(aws elbv2 describe-target-groups | jq -r '.TargetGroups[].TargetGroupArn' | ag "${1}"); do
+    echo "$(basename $(dirname "${ARN}"))"
+    aws elbv2 describe-target-health --target-group-arn "${ARN}" | jq -r '.TargetHealthDescriptions[] | [.Target.Id, .TargetHealth.State, .TargetHealth.Description] | @tsv'
+  done
 }
 
 ################################################################################
