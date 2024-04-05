@@ -25,11 +25,12 @@ tf-init () {
 }
 
 tf-set-ref() {
+  REFERENCE="${1}"
   for FH in $( "${_FIND}" . -regex '.*main.tf' -not -path '*/.terraform*' -print ); do
     echo updating "${FH}"
   # lines look like: source = "git@github.com:<ORG>/....modules/name?ref=v0.123.0
   # so this replaces `v0.123.0` with whatever reference we provide
-  sed -i '' "s/ref=.*/ref=${1}\"/" "${FH}"
+  sed -i '' "s/ref=.*/ref=${REFERENCE}\"/" "${FH}"
   done
 }
 
@@ -40,6 +41,10 @@ tf-last-tag() {
 
 # grabs most recent git tag to set ref
 tf-set-tag() {
+  if [[ "${1}" != "" ]]; then
+    echo "expected no arguments; did you mean 'tf-set-ref ${1}' instead?"
+    return 1
+  fi
   GIT_TAG=$(tf-last-tag)
   tf-set-ref "${GIT_TAG}"
   tf-init
@@ -50,6 +55,10 @@ tf-set-tag() {
 # uses current git hash to set ref; helpful for testing changes
 # requires that commit is pushed to github
 tf-set-hash() {
+  if [[ "${1}" != "" ]]; then
+    echo "expected no arguments; did you mean 'tf-set-ref ${1}' instead?"
+    return 1
+  fi
   GIT_HASH="$( git rev-parse HEAD )"
   tf-set-ref "${GIT_HASH}"
   tf-init

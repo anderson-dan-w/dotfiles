@@ -6,7 +6,9 @@ fi
 
 alias pyclean="${_FIND} -iregex '.*pyc' -delete && ${_FIND} -iregex '.*__pycache__.*' -delete"
 
+# NOTE: name would need to match that in initialize_python...
 DEFAULT_VENV="default-venv"
+
 PYTHONSTARTUP=$HOME/.pythonstartup
 PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PATH"
@@ -37,6 +39,10 @@ CODE_DIRS=(
   codecleanup
 )
 
+# creates some helper aliases to enable quick-smart-switching
+# eg `cd-dotfiles` will go to the right place,
+# and then source the venv if it exists
+# also, can subsequently be extended with other things (eg `nvm use`, etc)
 _src-setup() {
   DIR_NAME="${1}"
   BASE_DIR_NAME="${2}"
