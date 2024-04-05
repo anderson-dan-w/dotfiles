@@ -21,7 +21,7 @@ _announce() {
   echo -e "SETTING UP :: ${1}\n"
 }
 
-initialize_git () {
+initialize-git () {
   _announce git
   ln -fs "${RC_DIR}/git/gitconfig" "${HOME}/.gitconfig"
   ln -fs "${RC_DIR}/git/gitignore" "${HOME}/.gitignore"
@@ -30,7 +30,7 @@ initialize_git () {
   fi
 }
 
-initialize_zsh () {
+initialize-zsh () {
   _announce zsh
   if [[ $PLATFORM == "${MAC}" ]]; then
     if [ ! -d "${HOME}/.zsh" ]; then
@@ -48,7 +48,7 @@ initialize_zsh () {
   ln -fs "${RC_DIR}/shell/zshrc" "${HOME}/.zshrc"
 }
 
-initialize_shell_programs () {
+initialize-shell-programs () {
   _announce shell-programs
   # NOTE: installs ag, fzf, tree, tmux
   # ag, aka silver-searcher, and others
@@ -68,7 +68,7 @@ initialize_shell_programs () {
 
 }
 
-initialize_ssh () {
+initialize-ssh () {
   _announce ssh
   mkdir -p "${HOME}/.ssh"
   if [ ! -f "${HOME}/.ssh/id_ed25519" ]; then
@@ -80,7 +80,7 @@ initialize_ssh () {
   fi
 }
 
-initialize_vim () {
+initialize-vim () {
   _announce vim
 
   mkdir -p "${HOME}/.vim/autoload"
@@ -117,7 +117,7 @@ initialize_vim () {
   ln -fs "${RC_DIR}/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
 }
 
-initialize_node () {
+initialize-node () {
   _announce node
   if [ ! -f "${HOME}/.nvm/nvm.sh" ]; then
     mkdir -p "${HOME}/.nvm"
@@ -137,7 +137,7 @@ initialize_node () {
   npm install --global yarn aws-cost-cli
 }
 
-initialize_docker () {
+initialize-docker () {
   _announce docker
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install docker docker-compose
@@ -152,7 +152,7 @@ initialize_docker () {
   fi
 }
 
-initialize_python () {
+initialize-python () {
   _announce python
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install pyenv
@@ -186,7 +186,7 @@ initialize_python () {
   ln -sf "${RC_DIR}/python/pythonstartup" "${HOME}/.pythonstartup"
 }
 
-initialize_terraform () {
+initialize-terraform () {
   _announce terraform
   if [[ $PLATFORM == "${MAC}" ]]; then
     if ! command -v terraform; then
@@ -207,7 +207,7 @@ initialize_terraform () {
   # NOTE: rc needs to match this dir...
 }
 
-initialize_aws () {
+initialize-aws () {
   _announce awscli
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install awscli
@@ -227,7 +227,7 @@ initialize_aws () {
   fi
 }
 
-initialize_env_sources () {
+initialize-env-sources () {
   _announce env-source-links
   ENV_DIR="${HOME}/.env-sources"
   if [ ! -d "${ENV_DIR}" ]; then
@@ -244,17 +244,17 @@ initialize_env_sources () {
   fi
 }
 
-initialize_git
-initialize_zsh
-initialize_ssh
-initialize_vim
-initialize_node
-initialize_shell_programs
-initialize_python
-initialize_terraform
-initialize_aws
-initialize_docker
-initialize_env_sources
+initialize-git
+initialize-zsh
+initialize-ssh
+initialize-vim
+initialize-node
+initialize-shell-programs
+initialize-python
+initialize-terraform
+initialize-aws
+initialize-docker
+initialize-env-sources
 
 hash -r
 

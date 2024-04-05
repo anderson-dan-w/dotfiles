@@ -4,9 +4,9 @@ else
   _FIND=find
 fi
 
-alias pyclean="${_FIND} -iregex '.*pyc' -delete && ${_FIND} -iregex '.*__pycache__.*' -delete"
+alias py-clean="${_FIND} -iregex '.*pyc' -delete && ${_FIND} -iregex '.*__pycache__.*' -delete"
 
-# NOTE: name would need to match that in initialize_python...
+# NOTE: name would need to match that in initialize-python...
 DEFAULT_VENV="default-venv"
 
 PYTHONSTARTUP=$HOME/.pythonstartup
