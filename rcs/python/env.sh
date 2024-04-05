@@ -24,5 +24,35 @@ mk-venv() {
   VENV_PATH="${VENV_ROOT}/${DIR_NAME}"
   if [[ ! -d "${VENV_PATH}" ]]; then
     virtualenv -p "$(which python3.12)" "${VENV_PATH}"
+    echo "made venv '${DIR_NAME}' @ ${VENV_PATH}"
+  else
+    echo "venv '${DIR_NAME}' already exists @ ${VENV_PATH}"
   fi
 }
+
+# NOTE: could abstract a little more, but fine enough
+CODE_BASE_DIR="${HOME}/coding"
+CODE_DIRS=(
+  dotfiles
+  codecleanup
+)
+
+_src-setup() {
+  DIR_NAME="${1}"
+  BASE_DIR_NAME="${2}"
+  VAR_NAME=$(echo ${DIR_NAME}_DIR | tr '[:lower:]' '[:upper:]' | tr '-' '_')
+  FULL_PATH="${CODE_BASE_DIR}/${DIR_NAME}"
+  export "${VAR_NAME}"="${FULL_PATH}"
+
+  VENV_ACTIVATE="${VENV_ROOT}/${DIR_NAME}/bin/activate"
+  VENV_SOURCER="src-${DIR_NAME}-venv"
+  alias "${VENV_SOURCER}"="if [[ -f ${VENV_ACTIVATE} ]]; then source ${VENV_ACTIVATE}; fi"
+
+  CD_VENV="cd-${DIR_NAME}"
+  alias "${CD_VENV}"="cd ${FULL_PATH} && ${VENV_SOURCER}"
+  # TODO: previously, had to re-source fzf for some reason?
+}
+
+for DIR in "${CODE_DIRS[@]}"; do
+  _src-setup "${DIR}" "${CODE_BASE_DIR}"
+done
