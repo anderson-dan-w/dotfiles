@@ -4,8 +4,8 @@ set -o pipefail
 
 : "${EMAIL_ADDRESS:?ERROR: set your email address}"
 
-SCRIPT_DIR=$( dirname "${BASH_SOURCE[0]}" )
-RC_DIR="${SCRIPT_DIR}/rcs"
+REPO_BASE_DIR="$(dirname $(realpath $(git rev-parse --git-dir)))"
+RC_DIR="${REPO_BASE_DIR}/rcs"
 
 MAC=mac
 UBUNTU=ubuntu
@@ -16,8 +16,13 @@ else
   PLATFORM="${UBUNTU}"
 fi
 
+_announce() {
+  echo -e "\n############################################################"
+  echo -e "SETTING UP :: ${1}\n"
+}
+
 initialize_git () {
-  echo "initializing git"
+  _announce git
   ln -fs "${RC_DIR}/git/gitconfig" "${HOME}/.gitconfig"
   ln -fs "${RC_DIR}/git/gitignore" "${HOME}/.gitignore"
   if [ ! -f "${HOME}/.git-prompt.sh" ]; then
@@ -26,7 +31,7 @@ initialize_git () {
 }
 
 initialize_zsh () {
-  echo "setting up zsh and oh-my-zsh"
+  _announce zsh
   if [[ $PLATFORM == "${MAC}" ]]; then
     if [ ! -d "${HOME}/.zsh" ]; then
       brew install zsh
@@ -44,8 +49,8 @@ initialize_zsh () {
 }
 
 initialize_shell_programs () {
+  _announce shell-programs
   # NOTE: installs ag, fzf, tree, tmux
-  echo "setting up shell programs and helpers"
   # ag, aka silver-searcher, and others
   # tmux already installed? or being weird?
   if [[ $PLATFORM == "${MAC}" ]]; then
@@ -64,7 +69,7 @@ initialize_shell_programs () {
 }
 
 initialize_ssh () {
-  echo "setting up ssh key in .ssh"
+  _announce ssh
   mkdir -p "${HOME}/.ssh"
   if [ ! -f "${HOME}/.ssh/id_ed25519" ]; then
     ssh-keygen -t ed25519 -C "${EMAIL_ADDRESS}"
@@ -76,7 +81,7 @@ initialize_ssh () {
 }
 
 initialize_vim () {
-  echo "setting up vim-pathogen + modules"
+  _announce vim
 
   mkdir -p "${HOME}/.vim/autoload"
   pathogen_path="${HOME}/.vim/autoload/pathogen.vim"
@@ -94,7 +99,16 @@ initialize_vim () {
     pkg_name=$(basename "${VIM_PACKAGE}")
     pkg_path="${HOME}/.vim/bundle/${pkg_name}"
     if [ ! -d "${pkg_path}" ]; then
-      git clone "https:/github.com/${VIM_PACKAGE}.git" "${pkg_path}"
+      (
+        git clone "https://github.com/${VIM_PACKAGE}.git" "${pkg_path}"
+        cd "${pkg_path}"
+        git branch -m main
+      )
+    else
+      (
+        cd "${pkg_path}"
+        git fetch --all && git checkout main && git pull
+      )
     fi
   done
 
@@ -104,17 +118,10 @@ initialize_vim () {
 }
 
 initialize_node () {
-  echo "installing node-related things"
-  if [[ $PLATFORM == "${MAC}" ]]; then
-    if [ ! -d "${HOME}/.nvm" ]; then
-      mkdir -p "${HOME}/.nvm"
-      brew install nvm
-    fi
-  else
-    if [ ! -d "${HOME}/.nvm" ]; then
-      mkdir -p "${HOME}/.nvm"
-      curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-    fi
+  _announce node
+  if [ ! -f "${HOME}/.nvm/nvm.sh" ]; then
+    mkdir -p "${HOME}/.nvm"
+    curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
   fi
   export NVM_DIR="$HOME/.nvm"
   source "${NVM_DIR}/nvm.sh"
@@ -131,7 +138,7 @@ initialize_node () {
 }
 
 initialize_docker () {
-  echo "installing docker"
+  _announce docker
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install docker docker-compose
   else
@@ -146,7 +153,7 @@ initialize_docker () {
 }
 
 initialize_python () {
-  echo "installing python"
+  _announce python
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install pyenv
   else
@@ -180,7 +187,7 @@ initialize_python () {
 }
 
 initialize_terraform () {
-  echo "installing terraform"
+  _announce terraform
   if [[ $PLATFORM == "${MAC}" ]]; then
     if ! command -v terraform; then
       brew install terraform
@@ -194,11 +201,14 @@ initialize_terraform () {
   fi
   hash -r
 
+  PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
+  mkdir -p "${PLUGIN_CACHE_DIR}"
   ln -sf "${RC_DIR}/terraform/terraformrc" "${HOME}/.terraformrc"
+  # NOTE: rc needs to match this dir...
 }
 
 initialize_aws () {
-  echo "installing awscli"
+  _announce awscli
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install awscli
   else
@@ -218,6 +228,7 @@ initialize_aws () {
 }
 
 initialize_env_sources () {
+  _announce env-source-links
   ENV_DIR="${HOME}/.env-sources"
   if [ ! -d "${ENV_DIR}" ]; then
     mkdir -p "${ENV_DIR}"
@@ -231,7 +242,6 @@ initialize_env_sources () {
     cp "${RC_DIR}/docker/env.sh" "${ENV_DIR}/docker-env.sh"
     cp "${RC_DIR}/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
   fi
-  ln -sf "${HOME}/.nvm/nvm.sh" "${ENV_DIR}/nvm.sh"
 }
 
 initialize_git
@@ -250,10 +260,11 @@ hash -r
 
 echo "
 
-=========================
-You'll want to add your SSH Public key  in ~/.ssh to GitHub
-and update to some default username in ~/.ssh/config
-Also, dockerhub login credentials?
-Also, proxy URLs and references to proxy in ssh-config
-=========================
+############################################################
+You'll want to:
+- add your SSH Public key  in ~/.ssh to GitHub
+- update username (in ~/.ssh/config)
+- set references to proxy (in ~/.ssh/config)
+- store dockerhub login credentials (in ${ENV_DIR}/docker-env.sh)
+- set proxy URLs if needed (in ${ENV_DIR}/proxy-env.sh)
 "

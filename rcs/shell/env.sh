@@ -27,7 +27,7 @@ bindkey -v
 # This seems weird to mix-and-match $fg with $FG :shrug:. Looks like:
 # [venv] user@ip pwd (git) \
 # time $
-setopt PROMPT_SUBST ; PS1='$fg[red]${HTTP_PROXY:+[VPN] }$fg[cyan][${AWS_PROFILE}-${AWS_DEFAULT_REGION}] $fg[green]${SIGOPT_ENV_NAME:+{${SIGOPT_ENV_NAME}\} }%{$fg[red]$(virtualenv_prompt_info) $fg[yellow]%n@%m $FG[075]%c$fg[green]$(__git_ps1 " (%s)")$reset_color%}
+setopt PROMPT_SUBST ; PS1='$fg[red]${HTTP_PROXY:+[VPN] }$fg[cyan][${AWS_PROFILE}-${AWS_DEFAULT_REGION}] %{$fg[red]$(virtualenv_prompt_info) $fg[yellow]%n@%m $FG[075]%c$fg[green]$(__git_ps1 " (%s)")$reset_color%}
 $FG[134]%*$FG[255] \$ '
 
 PATH="$HOME/bin:$PATH"
@@ -59,3 +59,8 @@ export FZF_DEFAULT_OPTS='
 --color info:108,prompt:109,spinner:108,pointer:168,marker:168
 '
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# node / nvm - may get stubbed into zshrc too though
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
