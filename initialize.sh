@@ -164,11 +164,12 @@ initialize_python () {
     hash -r
   fi
 
+  DEFAULT_VENV="default-venv"
   pip install virtualenv
   mkdir -p "${HOME}/.venv"
-  if [ ! -d "${HOME}/.venv/default-venv" ]; then
-    virtualenv -p "$(which python)" "${HOME}/.venv/default-venv"
-    source "${HOME}/.venv/default-venv/bin/activate"
+  if [ ! -d "${HOME}/.venv/${DEFAULT_VENV}" ]; then
+    virtualenv -p "$(which python)" "${HOME}/.venv/${DEFAULT_VENV}"
+    source "${HOME}/.venv/${DEFAULT_VENV}/bin/activate"
 
     pip install ipython
     hash -r
