@@ -1,10 +1,4 @@
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='mvim'
-fi
-
+export EDITOR='vim'
 export PAGER="less -XRF"
 
 alias rm='rm -i'
@@ -42,6 +36,8 @@ PATH="$HOME/bin:$PATH"
 _AG_ARGS="--hidden \
   --ignore .git \
   --ignore .terraform \
+  --ignore bootstrap \
+  --ignore node_modules \
   --color-match '1;35' \
   --pager='less -RXF' \
 "
