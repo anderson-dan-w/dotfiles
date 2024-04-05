@@ -54,6 +54,7 @@
   fc = !git log --oneline --name-only origin/main..HEAD | ag -v ' ' | sort -u
   ll = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen (%an)' --decorate --numstat
   lg = log --pretty=format:'%C(yellow)%h %Cred%d %Creset%s (%Cgreen%an)' --graph
+  ls = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen [%an]' --decorate
   pl = pull
   pt = push --tags
   pu = !git push -u origin $(git rev-parse --abbrev-ref HEAD)
@@ -75,3 +76,6 @@
   ci = "!hub ci-status"
   ci-status = "!hub ci-status -v"
   ci-fail = "!hub ci-status -v | grep ✖ | cut -d' ' -f2"
+
+[init]
+  defaultBranch = main
