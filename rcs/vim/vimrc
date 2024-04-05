@@ -9,7 +9,7 @@ au BufRead,BufNewFile *.go set filetype=go
 au BufRead,BufNewFile *.ms set filetype=mustache
 au BufRead,BufNewFile *pythonstartup set filetype=python
 au BufRead,BufNewFile *json set filetype=json
-au Filetype html,xml,xsl,js source ~/.vim/scripts/closetag.vim
+au BufRead,BufNewFile *bashrc* set filetype=bash
 "" show matching brackets, and for how many deciseconds
 set showmatch
 set mat=2
@@ -193,6 +193,7 @@ let g:ale_lint_delay = 2000
 "" W503 = line break before binary operator (black prefers this)
 "" max-line-length: 120 rather than 80
 let g:ale_python_flake8_options = '--ignore E111,E114,E121,E123,E127,E128,E131,E302,E305,F401,F403,F405,W503,T001 --max-line-length=120'
+let g:ale_sh_shellcheck_options = '-e SC1091,SC3033'
 
 let _all_fixers = ['remove_trailing_lines', 'trim_whitespace']
 let g:ale_fixers = {

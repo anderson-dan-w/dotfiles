@@ -3,7 +3,6 @@
 set -o pipefail
 
 aws-env-var-setup() {
-  export AWS_PROFILE="${1}"
 
   # default is "w", which sets us-west-2; "e" sets us-east-1; anything else as-is
   REGION="${2:-w}"
@@ -21,6 +20,7 @@ aws-env-var-setup() {
   ACCOUNT_ID=$( aws sts get-caller-identity | jq .Account | tr -d '"' )
   export AWS_ACCOUNT_ID="${ACCOUNT_ID}"
   export AWS_ECR_URL="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+  export AWS_PROFILE="${1}"
 }
 
 # quick and dirty regex to pull out section-names from creds file
