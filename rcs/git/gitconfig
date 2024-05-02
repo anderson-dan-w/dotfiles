@@ -85,3 +85,10 @@
   ci = "!hub ci-status"
   ci-status = "!hub ci-status -v"
   ci-fail = "!hub ci-status -v | grep ✖ | cut -d' ' -f2"
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[credential]
+	helper = store

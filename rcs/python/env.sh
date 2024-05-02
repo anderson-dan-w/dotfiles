@@ -33,10 +33,9 @@ mk-venv() {
 }
 
 # NOTE: could abstract a little more, but fine enough
-CODE_BASE_DIR="${HOME}/coding"
+CODE_BASE_DIR="${HOME}/code"
 CODE_DIRS=(
-  dotfiles
-  codecleanup
+  dbnl-internal
 )
 
 # creates some helper aliases to enable quick-smart-switching
