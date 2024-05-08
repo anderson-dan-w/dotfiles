@@ -69,6 +69,9 @@ plugins=(
   virtualenv
 )
 
+# FPATH needs to happen before source oh-my-zsh
+FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+
 ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
 
@@ -76,3 +79,6 @@ _ENV_SOURCE_DIR="${HOME}/.env-sources"
 for FILE in $( ls "${_ENV_SOURCE_DIR}" ); do
   source "${_ENV_SOURCE_DIR}/${FILE}"
 done
+
+# bun completions
+[ -s "/Users/dan/.bun/_bun" ] && source "/Users/dan/.bun/_bun"

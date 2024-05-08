@@ -33,9 +33,11 @@ mk-venv() {
 }
 
 # NOTE: could abstract a little more, but fine enough
-CODE_BASE_DIR="${HOME}/code"
+CODE_BASE_DIR="${HOME}/coding"
 CODE_DIRS=(
   dbnl-internal
+  dbnl-ideas
+  dbnl-sandbox
 )
 
 # creates some helper aliases to enable quick-smart-switching
