@@ -152,6 +152,19 @@ initialize-docker () {
   fi
 }
 
+initialize-k8s () {
+  _announce k8s
+  if [[ $PLATFORM == "${MAC}" ]]; then
+    brew install kubectl kubectx
+  else
+    if ! command -v kubectl; then
+      echo "************************************************************"
+      echo "TODO - haven't bothered with this yet..."
+      echo "************************************************************"
+    fi
+  fi
+}
+
 initialize-python () {
   _announce python
   if [[ $PLATFORM == "${MAC}" ]]; then
@@ -166,18 +179,20 @@ initialize-python () {
   # grabs most recent stable python 3.x.y version
   PY_VERSION=$(pyenv install --list | ag ' 3[.]\d+[.]\d+$' | tail -1 | tr -d '[:space:]')
   if ! [[ $( pyenv version ) =~ ${PY_VERSION} ]]; then
-    pyenv install "${PY_VERSION}"
-    pyenv shell "${PY_VERSION}"
-    pyenv global "${PY_VERSION}"
-    hash -r
+    echo "skipping pyenv setup, seems to be erroring weirdly?"
+  #  pyenv install "${PY_VERSION}"
+  #  pyenv shell "${PY_VERSION}"
+  #  pyenv global "${PY_VERSION}"
+  #  hash -r
   fi
 
   DEFAULT_VENV="default-venv"
   pip install virtualenv
-  mkdir -p "${HOME}/.venv"
-  if [ ! -d "${HOME}/.venv/${DEFAULT_VENV}" ]; then
-    virtualenv -p "$(which python)" "${HOME}/.venv/${DEFAULT_VENV}"
-    source "${HOME}/.venv/${DEFAULT_VENV}/bin/activate"
+  VENV_BASE="${HOME}/.venv"
+  mkdir -p "${VENV_BASE}"
+  if [ ! -d "${VENV_BASE}/${DEFAULT_VENV}" ]; then
+    virtualenv -p "$(which python)" "${VENV_BASE}/${DEFAULT_VENV}"
+    source "${VENV_BASE}/${DEFAULT_VENV}/bin/activate"
 
     pip install ipython
     hash -r
@@ -232,16 +247,40 @@ initialize-env-sources () {
   ENV_DIR="${HOME}/.env-sources"
   if [ ! -d "${ENV_DIR}" ]; then
     mkdir -p "${ENV_DIR}"
-    ln -sf "${RC_DIR}/shell/env.sh" "${ENV_DIR}/shell-env.sh"
-    ln -sf "${RC_DIR}/git/env.sh" "${ENV_DIR}/git-env.sh"
-    ln -sf "${RC_DIR}/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
-    ln -sf "${RC_DIR}/python/env.sh" "${ENV_DIR}/python-env.sh"
-    ln -sf "${RC_DIR}/aws/account-helper.sh" "${ENV_DIR}/aws-account-helper.sh"
-    ln -sf "${RC_DIR}/aws/utils.sh" "${ENV_DIR}/aws-utils.sh"
-    # copy since these require tweaking
-    cp "${RC_DIR}/docker/env.sh" "${ENV_DIR}/docker-env.sh"
-    cp "${RC_DIR}/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
   fi
+  STATIC_SOURCES=(
+    "shell/env.sh"
+    "git/env.sh"
+    "terraform/env.sh"
+    "python/env.sh"
+    "aws/account-helper.sh"
+    "aws/utils.sh"
+    "k8s/env.sh"
+  )
+  for SOURCE in "${STATIC_SOURCES[@]}"; do
+    RENAMED="${SOURCE/\//-}"
+    ln -sf "${RC_DIR}/${SOURCE}" "${ENV_DIR}/${RENAMED}"
+    echo "(over)wrote ${RENAMED}"
+  done
+
+  DYNAMIC_SOURCES=(
+    "docker/env.sh"
+    "proxy-env.sh"
+  )
+  for SOURCE in "${DYNAMIC_SOURCES[@]}"; do
+    RENAMED="${SOURCE/\//-}"
+    if [ -f "${ENV_DIR}/${RENAMED}" ] ; then
+      echo "${RENAMED} already exists, so not overwriting"
+      echo "    if you want to update, manually run:"
+      echo "    cp ${RC_DIR}/${SOURCE} ${ENV_DIR}/${RENAMED}"
+      echo "    and update as needed"
+    else
+      # copy since these require tweaking
+      cp "${RC_DIR}/${SOURCE}" "${ENV_DIR}/${RENAMED}"
+      echo "installed ${RENAMED}, which requires updating"
+    fi
+  done
+
 }
 
 initialize-git
@@ -254,6 +293,7 @@ initialize-python
 initialize-terraform
 initialize-aws
 initialize-docker
+initialize-k8s
 initialize-env-sources
 
 hash -r
