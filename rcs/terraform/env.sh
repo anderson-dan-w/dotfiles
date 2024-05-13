@@ -1,45 +1,67 @@
-_GREP_TOOL="ag"  # could be grep, or maybe fgrep on some Macs?
-_FIND_TOOL="gfind"  # could be find, or maybe gfind on some Macs?
-
+########################################
+# override-able defaults
 DEFAULT_HUMAN_FILE=human-readable.plan
 DEFAULT_TF_PLAN_FILE=tf.plan
-DEFAULT_TF_BACKEND_FILE="IGNORE-backend.tf"
+DEFAULT_TF_BACKEND_FILE="s3.tfbackend"
 
-TERRAFORM=$(which terraform)
-TERRAFORM_ALIAS="tf"
-alias "${TERRAFORM_ALIAS}"="${TERRAFORM}"
-_make_tf_alias_name () { echo "${TERRAFORM_ALIAS}-${1}"; }
+VERBOSE=
+if [[ "${1}" == "-v" ]]; then
+  VERBOSE=1
+fi
+########################################
+# depend on other installed programs:
+_GREP_TOOL="grep"
+if command -v ag &>/dev/null; then
+  _GREP_TOOL="ag"
+elif command -v fgrep &>/dev/null; then
+  _GREP_TOOL="fgrep"
+fi
 
-TF_FMT_ALIAS=$(_make_tf_alias_name "fmt")
-alias "${TF_FMT_ALIAS}"="${TERRAFORM_ALIAS} fmt -recursive"
-TF_PLAN_ALIAS=$(_make_tf_alias_name "plan")
-alias "${TF_PLAN_ALIAS}"="${TERRAFORM_ALIAS} plan -no-color -out ${DEFAULT_TF_PLAN_FILE} | tee ${DEFAULT_HUMAN_FILE}"
-TF_GREP_ALIAS=$(_make_tf_alias_name "grep")
-alias "${TF_GREP_ALIAS}"="${_GREP_TOOL} '(created$|destroyed|updated|replaced|no.changes|changes to o)' ${DEFAULT_HUMAN_FILE}"
-TF_PREP_ALIAS=$(_make_tf_alias_name "prep")
-alias "${TF_PREP_ALIAS}"="${TF_PLAN_ALIAS} && ${TF_GREP_ALIAS}"
-TF_CHECK_ALIAS=$(_make_tf_alias_name "check")
-alias "${TF_CHECK_ALIAS}"="${TF_PLAN_ALIAS} && ${TF_GREP_ALIAS}"
-TF_APPLY_ALIAS=$(_make_tf_alias_name "apply")
- alias "${TF_APPLY_ALIAS}"="${TERRAFORM_ALIAS} apply ${DEFAULT_TF_PLAN_FILE}"
- TF_CLEAN_ALIAS=$(_make_tf_alias_name "clean")
- alias "${TF_CLEAN_ALIAS}"="rm -rf ${DEFAULT_TF_PLAN_FILE} ${DEFAULT_HUMAN_FILE}"
+_FIND_TOOL="find"
+if command -v gfind &>/dev/null; then
+  _FIND_TOOL="gfind"
+fi
+########################################
+
+_verb () { if [[ "${VERBOSE}" ]]; then echo "$@" ; fi }
+_make_tf_alias_name () { echo "${TF_ALIAS}-${1}"; }
+_set_tf_alias () { alias "${1}"="${2}" && _verb "${1}"; }
+
+TERRAFORM_CMD=$(which terraform)
+TF_ALIAS="tf"
+_set_tf_alias "${TF_ALIAS}" "${TERRAFORM_CMD}"
+
+TF_FMT=$(_make_tf_alias_name "fmt")
+_set_tf_alias "${TF_FMT}" "${TERRAFORM_CMD} fmt -recursive"
+TF_PLAN=$(_make_tf_alias_name "plan")
+_set_tf_alias "${TF_PLAN}" "${TERRAFORM_CMD} plan -no-color -out ${DEFAULT_TF_PLAN_FILE} | tee ${DEFAULT_HUMAN_FILE}"
+TF_GREP=$(_make_tf_alias_name "grep")
+_set_tf_alias "${TF_GREP}" "${_GREP_TOOL} '(created$|destroyed|updated|replaced|no.changes|changes to o)' ${DEFAULT_HUMAN_FILE}"
+TF_PREP=$(_make_tf_alias_name "prep")
+_set_tf_alias "${TF_PREP}" "${TF_PLAN} && ${TF_GREP}"
+TF_CHECK=$(_make_tf_alias_name "check")
+_set_tf_alias "${TF_CHECK}" "${TF_PLAN} && ${TF_GREP}"
+TF_APPLY=$(_make_tf_alias_name "apply")
+_set_tf_alias "${TF_APPLY}" "${TERRAFORM_CMD} apply ${DEFAULT_TF_PLAN_FILE}"
+TF_CLEAN=$(_make_tf_alias_name "clean")
+_set_tf_alias "${TF_CLEAN}" "${_FIND_TOOL} -iregex '.*tf[.]plan' -delete"
 
 TF_INIT=$(_make_tf_alias_name "init")
 "${TF_INIT}" () {
   if [ -f "${DEFAULT_TF_BACKEND_FILE}" ]; then
     BACKEND_ARG="-backend-config=${DEFAULT_TF_BACKEND_FILE}"
   fi
-  "${TERRAFORM}" init ${BACKEND_ARG:+"${BACKEND_ARG}"} "$@"
+  "${TERRAFORM_CMD}" init ${BACKEND_ARG:+"${BACKEND_ARG}"} "$@"
 }
+_verb "${TF_INIT}"
 
-############################################################
 # NOTE: not terraform-related, but helpful in some workflows
 # NOTE: assumes sortable (semver or similar?) tags
 TF_GET_LAST_TAG=$(_make_tf_alias_name "last-tag")
 "${TF_GET_LAST_TAG}" () {
   echo "$(git tag --sort=-v:refname -l | head -1 )"
 }
+_verb "${TF_GET_LAST_TAG}"
 
 TF_SET_REF=$(_make_tf_alias_name "set-ref")
 "${TF_SET_REF}" () {
@@ -55,6 +77,7 @@ TF_SET_REF=$(_make_tf_alias_name "set-ref")
   sed -i '' "s/ref=.*/ref=${REFERENCE}\"/" "${FH}"
   done
 }
+_verb "${TF_SET_REF}"
 
 # grabs most recent git tag to set ref
 TF_SET_TAG=$(_make_tf_alias_name "set-tag")
@@ -84,3 +107,17 @@ TF_SET_HASH=$(_make_tf_alias_name "set-hash")
   echo
   echo "set to git-hash ${GIT_HASH}"
 }
+_verb "${TF_SET_HASH}"
+
+_set_tf_rc () {
+  CACHE_DIR="${HOME}/.terraform.d"
+  mkdir -p "${CACHE_DIR}"
+
+  RC_FNAME="${HOME}/.terraformrc"
+  if ! [ -f "${RC_FNAME}" ]; then
+    echo "plugin_cache_dir = \"${CACHE_DIR}\"" > "${RC_FNAME}"
+    echo 'disable_ckeckpoint = true' >> "${RC_FNAME}"
+    _verb "wrote ${RC_FNAME}"
+  fi
+}
+_set_tf_rc
