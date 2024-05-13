@@ -65,7 +65,7 @@ augroup end
 "" highlight common typos that aren't always caught by linters
 augroup HighlightTypos
     autocmd!
-    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'langauge\|flase\|Flase\|jsut\|tempalte\|timestmap\|isntall', -1)
+    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'langauge\|flase\|Flase\|jsut\|tempalte\|timestmap\|isntall\heml', -1)
 augroup end
 
 "" highlight literal tabs
