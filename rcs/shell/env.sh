@@ -24,11 +24,11 @@ export LSCOLORS=gxGxbxDxCxEgEdxbxgxcxd
 alias v="vim"
 bindkey -v
 
-# This seems weird to mix-and-match $fg with $FG :shrug:. Looks like:
-# [venv] user@ip pwd (git) \
-# time $
-setopt PROMPT_SUBST ; PS1='$fg[red]${HTTP_PROXY:+[VPN] }$fg[cyan][${AWS_PROFILE}-${AWS_DEFAULT_REGION}] %{$fg[red]$(virtualenv_prompt_info) $fg[yellow]%n@%m $FG[075]%c$fg[green]$(__git_ps1 " (%s)")$reset_color%}
-$FG[134]%*$FG[255] \$ '
+# NOTE: zsh-specific codes in this
+# [VPN] [aws: ] <k8s: ::ns> venv:[] (git: )
+# time (pwd) resultstatus $
+setopt PROMPT_SUBST ; PS1='%F{red}${HTTP_PROXY:+[VPN] }%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] %F{green}<k8s:$(basename $(k-tx -c))::$(k-ns -c)> %F{magenta}venv:$(virtualenv_prompt_info) %F{red}$(__git_ps1 "(git:%s)")
+%F{135}%* %F{yellow}(%c) %(?.%F{green}√.%F{red}?%?)%f %(!.#ROOT#.$) '
 
 PATH="$HOME/bin:$PATH"
 
