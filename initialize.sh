@@ -242,6 +242,10 @@ initialize-aws () {
   fi
 }
 
+initialize-gcp () {
+  echo "TODO: install gcloud etc"
+}
+
 initialize-env-sources () {
   _announce env-source-links
   ENV_DIR="${HOME}/.env-sources"
@@ -255,6 +259,7 @@ initialize-env-sources () {
     "python/env.sh"
     "aws/account-helper.sh"
     "aws/utils.sh"
+    "gcp/account-helper.sh"
     "k8s/env.sh"
   )
   for SOURCE in "${STATIC_SOURCES[@]}"; do

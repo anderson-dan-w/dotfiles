@@ -64,15 +64,9 @@ _verb "${TF_PREP}"
 
 TF_CHECK=$(_make_tf_cmd_name "check")
 "${TF_CHECK}"() {
-  "${TF_PLAN}" && "${TF_GREP}"
+  "${TF_PLAN}" "$@" && "${TF_GREP}"
 }
 _verb "${TF_CHECK}"
-
-TF_APPLY=$(_make_tf_cmd_name "apply")
-"${TF_APPLY}"() {
-  "${TERRAFORM_CMD}" apply "${DEFAULT_TF_PLAN_FILE}"
-}
-_verb "${TF_APPLY}"
 
 TF_CLEAN=$(_make_tf_cmd_name "clean")
 "${TF_CLEAN}"() {
@@ -80,6 +74,13 @@ TF_CLEAN=$(_make_tf_cmd_name "clean")
   "${_FIND_TOOL}" -iregex '.*[.]'"${_TF_PLAN_EXTENSION}" -delete
 }
 _verb "${TF_CLEAN}"
+
+TF_APPLY=$(_make_tf_cmd_name "apply")
+"${TF_APPLY}"() {
+  "${TERRAFORM_CMD}" apply "${DEFAULT_TF_PLAN_FILE}"
+  "${TF_CLEAN}"
+}
+_verb "${TF_APPLY}"
 
 TF_INIT=$(_make_tf_cmd_name "init")
 "${TF_INIT}" () {

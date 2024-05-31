@@ -23,14 +23,15 @@ set number
 set ai "" autoindent
 set si "smart indent
 set wrap "wrap lines
-"" sigopt uses indent=2 for everything
-set shiftwidth=2 softtabstop=2
-set tabstop=2 expandtab
+"" default python spacing
+set shiftwidth=4 softtabstop=4
+set tabstop=4 expandtab
 "" python screws up smartindent, so dont use it
 ""au! FileType python setlocal nosmartindent
-"" python wants to use 4 spaces; sigopt wants 2
-au FileType python setlocal shiftwidth=2 softtabstop=2 expandtab
 au FileType sh syn clear shCommandSub
+"" no eol at eof; dbnl-specific?
+set nofixeol
+set nofixendofline
 
 """""""""""""""""""""""""""
 "" search and display

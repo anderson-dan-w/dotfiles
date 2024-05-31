@@ -48,7 +48,12 @@ alias ag="ag -i $_AG_ARGS"
 
 # ... but occasionally i DO want case-sensitivity
 # shellcheck disable=SC2139
-alias AG="/usr/local/bin/ag $_AG_ARGS"
+alias AG="/opt/homebrew/bin/ag $_AG_ARGS"
+
+todo() {
+  TICKET="${1}" && shift
+  ag "TODO.ENG.${TICKET}" "$@"
+}
 
 ## fzf helpers
 export FZF_DEFAULT_COMMAND='ag --nocolor --hidden --ignore .git -g ""'

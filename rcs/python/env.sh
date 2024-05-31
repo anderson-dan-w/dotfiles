@@ -36,8 +36,8 @@ mk-venv() {
 CODE_BASE_DIR="${HOME}/coding"
 CODE_DIRS=(
   dbnl-internal
-  dbnl-ideas
-  dbnl-sandbox
+  dbnl-demos
+  dbnl-sdk
 )
 
 # creates some helper aliases to enable quick-smart-switching
