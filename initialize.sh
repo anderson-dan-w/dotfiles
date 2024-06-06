@@ -259,7 +259,7 @@ initialize-env-sources () {
     "python/env.sh"
     "aws/account-helper.sh"
     "aws/utils.sh"
-    "gcp/account-helper.sh"
+    #"gcp/account-helper.sh"
     "k8s/env.sh"
   )
   for SOURCE in "${STATIC_SOURCES[@]}"; do

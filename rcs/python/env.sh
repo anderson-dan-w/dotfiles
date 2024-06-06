@@ -38,6 +38,9 @@ CODE_DIRS=(
   dbnl-internal
   dbnl-demos
   dbnl-sdk
+  helm-charts
+  terraform-google-dbnl
+  terraform-aws-dbnl
 )
 
 # creates some helper aliases to enable quick-smart-switching

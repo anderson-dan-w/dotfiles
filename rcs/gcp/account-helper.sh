@@ -1,30 +1,20 @@
-#!/usr/bin/env bash
-# no_set_e
-set -o pipefail
+GCP_SANDBOX_PROJECT="sandbox-dan-1a49"
 
-_gcp-env-var-setup() {
-  # TODO: eventually add options (profile / configuration?, project, region/zone)
-  GCP_DEFAULT_REGION="$(gcloud config get-value compute/region)"
-  GCP_PROJECT="$(gcloud config get-value project)"
+# NOTE: change this later?
+GCP_DEFAULT_PROJECT="${GCP_SANDBOX_PROJECT}"
 
-  if gcloud auth list --format json | jq -r '.[].status' == "ACTIVE" > /dev/null 2>&1; then
-    echo already logged in to "${GCP_PROJECT}" in "${GCP_DEFAULT_REGION}"
-  else
-    gcloud auth login
-    #gcloud config set project "${GCP_PROJECT}"
-    #gcloud config set compute/region "${GCP_DEFAULT_REGION}"
-  fi
-}
 
 _gcp-hardcoded-projects () {
-  echo sandbox-dan-1a49
+  echo "${GCP_SANDBOX_PROJECT}"
   # add more as needed
 }
 
-_load-gcp-funcs () {
-  for PROFILE in $(_gcp-hardcoded-projects); do
-    eval "gcp-${PROFILE}() { _gcp-env-var-setup; }"
-  done
+gc-login () {
+  gcloud config set project "${GCP_DEFAULT_PROJECT}"
+  gcloud auth login
 }
 
-_load-gcp-funcs
+gc-tool-login () {
+  gcloud config set project "${GCP_DEFAULT_PROJECT}"
+  gcloud auth application-default login
+}
