@@ -9,12 +9,17 @@ _gcp-hardcoded-projects () {
   # add more as needed
 }
 
-gc-login () {
-  gcloud config set project "${GCP_DEFAULT_PROJECT}"
+gcp-login () {
   gcloud auth login
+  gcloud config set project "${GCP_DEFAULT_PROJECT}"
 }
 
-gc-tool-login () {
-  gcloud config set project "${GCP_DEFAULT_PROJECT}"
+gcp-tool-login () {
   gcloud auth application-default login
+  gcloud config set project "${GCP_DEFAULT_PROJECT}"
+}
+
+gcp-both-login () {
+  gc-login
+  gc-tool-login
 }

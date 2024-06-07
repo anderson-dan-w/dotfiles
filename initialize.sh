@@ -259,7 +259,8 @@ initialize-env-sources () {
     "python/env.sh"
     "aws/account-helper.sh"
     "aws/utils.sh"
-    #"gcp/account-helper.sh"
+    "gcp/account-helper.sh"
+    "gcp/utils.sh"
     "k8s/env.sh"
   )
   for SOURCE in "${STATIC_SOURCES[@]}"; do
@@ -297,6 +298,7 @@ initialize-shell-programs
 initialize-python
 initialize-terraform
 initialize-aws
+initialize-gcp
 initialize-docker
 initialize-k8s
 initialize-env-sources

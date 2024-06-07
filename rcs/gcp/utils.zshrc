@@ -1,1 +1,1 @@
-alias gp="gcloud "
+alias gcp="gcloud"
