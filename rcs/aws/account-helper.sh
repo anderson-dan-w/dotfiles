@@ -4,7 +4,7 @@ set -o pipefail
 
 aws-env-var-setup() {
   export AWS_PROFILE="${1}"
-  # default is "e", which sets us-east-1; "e" sets us-west-2; anything else as-is
+  # default is "e", which sets us-east-1; "w" sets us-west-2; anything else as-is
   REGION="${2:-e}"
   case "${REGION}" in
     w)
