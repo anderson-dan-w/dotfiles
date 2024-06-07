@@ -12,6 +12,10 @@ k-store-registry-secret() {
     return 1
   fi
   SECRET_NAME="dbnl-registry"
+  if [[ "${1}" == "--force" ]] ; then
+      kubectl delete secret "${SECRET_NAME}"
+  fi
+
   echo "storing secret for registry ${SECRET_NAME}"
   kubectl create secret docker-registry "${SECRET_NAME}" \
     --docker-server="${GCR_URL}" \
