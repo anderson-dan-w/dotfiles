@@ -14,12 +14,12 @@ gcp-login () {
   gcloud config set project "${GCP_DEFAULT_PROJECT}"
 }
 
-gcp-tool-login () {
+gcp-login-tool () {
   gcloud auth application-default login
   gcloud config set project "${GCP_DEFAULT_PROJECT}"
 }
 
-gcp-both-login () {
+gcp-login-both () {
   gc-login
   gc-tool-login
 }
