@@ -10,6 +10,7 @@ au BufRead,BufNewFile *.ms set filetype=mustache
 au BufRead,BufNewFile *pythonstartup set filetype=python
 au BufRead,BufNewFile *json set filetype=json
 au BufRead,BufNewFile *bashrc* set filetype=bash
+au BufRead,BufNewFile *zshrc* set filetype=zsh
 "" show matching brackets, and for how many deciseconds
 set showmatch
 set mat=2
