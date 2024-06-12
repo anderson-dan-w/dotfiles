@@ -24,13 +24,12 @@ export LSCOLORS=gxGxbxDxCxEgEdxbxgxcxd
 alias v="vim"
 bindkey -v
 
+# TODO: this has gotten out of control
 # NOTE: zsh-specific codes in this
 # [VPN] [aws: ] [gcp: ] <k8s: ::ns> venv:[] (git: )
 # time (pwd) resultstatus $
 setopt PROMPT_SUBST ; PS1='%F{red}${HTTP_PROXY:+[VPN] }%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] %F{red}[gcp:${GCP_ACTOR}]  %F{green}<k8s:$(basename $(k-tx -c))::$(k-ns -c)> %F{magenta}venv:$(virtualenv_prompt_info) %F{red}$(__git_ps1 "(git:%s)")
 %F{135}%* %F{yellow}(%c) %(?.%F{green}√.%F{red}?%?)%f %(!.#ROOT#.$) '
-
-PATH="$HOME/bin:$PATH"
 
 ## ag helpers
 _AG_ARGS="--hidden \
@@ -69,3 +68,5 @@ export FZF_DEFAULT_OPTS='
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+PATH="$HOME/bin:$PATH"

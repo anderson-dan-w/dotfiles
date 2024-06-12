@@ -1,8 +1,4 @@
-#!/usr/bin/env bash
-# no_set_e
-set -o pipefail
-
-aws-env-var-setup() {
+aws::env-var-setup() {
   export AWS_PROFILE="${1}"
   # default is "e", which sets us-east-1; "w" sets us-west-2; anything else as-is
   REGION="${2:-e}"
@@ -26,7 +22,7 @@ aws-env-var-setup() {
   export AWS_ACCOUNT_ID="${ACCOUNT_ID}"
 }
 
-aws-hardcoded-profiles () {
+aws::profiles () {
   echo app-dev
   echo app-prod
   echo terraform
@@ -35,21 +31,10 @@ aws-hardcoded-profiles () {
   # add more as needed
 }
 
-# NOTE: currently unused, since we do SSO for login
-# quick and dirty regex to pull out section-names from creds file
-# where it finds "[staging]" and ignores the "[" "]" through "fancy" regex
-aws-list-profile () {
-  for PROFILE in $( ag -o '(?<=\[).*(?=\])' "${HOME}/.aws/credentials"); do
-    echo "${PROFILE}"
+aws::_::load-funcs () {
+  for PROFILE in $(aws::profiles); do
+    eval "aws::${PROFILE}() { aws::env-var-setup ${PROFILE} \${1}} "
   done
 }
 
-_load-aws-funcs () {
-  # NOTE: this is NOT safe on untrusted input
-  # for PROFILE in $(aws-list-profile); do
-  for PROFILE in $(aws-hardcoded-profiles); do
-    eval "aws-${PROFILE}() { aws-env-var-setup ${PROFILE} \${1}} "
-  done
-}
-
-_load-aws-funcs
+aws::_::load-funcs

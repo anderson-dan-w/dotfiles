@@ -26,7 +26,7 @@ if [[ "${1}" == "-v" ]]; then
 fi
 
 _verb () { if [[ "${VERBOSE}" ]]; then echo "$@" ; fi }
-_make_tf_cmd_name () { echo "${TF_ALIAS}-${1}"; }
+_make_tf_cmd_name () { echo "${TF_ALIAS}::${1}"; }
 
 TERRAFORM_CMD=$(which terraform)
 alias "${TF_ALIAS}"="${TERRAFORM_CMD}"
@@ -70,7 +70,6 @@ _verb "${TF_CHECK}"
 
 TF_CLEAN=$(_make_tf_cmd_name "clean")
 "${TF_CLEAN}"() {
-  # TODO: not working correctly...
   "${_FIND_TOOL}" -iregex '.*[.]'"${_TF_PLAN_EXTENSION}" -delete
 }
 _verb "${TF_CLEAN}"
