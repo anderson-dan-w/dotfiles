@@ -25,15 +25,15 @@ link::env_sources () {
     mkdir -p "${ENV_DIR}"
   fi
   STATIC_SOURCES=(
-    "shell/env.sh"
-    "git/env.sh"
-    "terraform/env.sh"
-    "python/env.sh"
-    "aws/account-helper.sh"
-    "aws/utils.sh"
-    "gcp/account-helper.sh"
-    "gcp/utils.sh"
-    "k8s/env.sh"
+    "shell/env.zshrc"
+    "git/env.zshrc"
+    "terraform/env.zshrc"
+    "python/env.zshrc"
+    "aws/account-helper.zshrc"
+    "aws/utils.zshrc"
+    "gcp/account-helper.zshrc"
+    "gcp/utils.zshrc"
+    "k8s/env.zshrc"
   )
   for SOURCE in "${STATIC_SOURCES[@]}"; do
     RENAMED="${SOURCE/\//-}"
@@ -42,8 +42,8 @@ link::env_sources () {
   done
 
   DYNAMIC_SOURCES=(
-    "docker/env.sh"
-    "proxy-env.sh"
+    "docker/env.zshrc"
+    "proxy-env.zshrc"
   )
   for SOURCE in "${DYNAMIC_SOURCES[@]}"; do
     RENAMED="${SOURCE/\//-}"
