@@ -5,7 +5,6 @@ set -o pipefail
 : "${EMAIL_ADDRESS:?ERROR: set your email address}"
 
 REPO_BASE_DIR="$(dirname $(realpath $(git rev-parse --git-dir)))"
-RC_DIR="${REPO_BASE_DIR}/rcs"
 
 MAC=mac
 UBUNTU=ubuntu
@@ -23,8 +22,8 @@ _announce() {
 
 initialize-git () {
   _announce git
-  ln -fs "${RC_DIR}/git/gitconfig" "${HOME}/.gitconfig"
-  ln -fs "${RC_DIR}/git/gitignore" "${HOME}/.gitignore"
+  ln -fs "${REPO_BASE_DIR}/git/gitconfig" "${HOME}/.gitconfig"
+  ln -fs "${REPO_BASE_DIR}/git/gitignore" "${HOME}/.gitignore"
   if [ ! -f "${HOME}/.git-prompt.sh" ]; then
     curl -LsSo "${HOME}/.git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
   fi
@@ -45,7 +44,7 @@ initialize-zsh () {
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
     wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
   fi
-  ln -fs "${RC_DIR}/shell/zshrc" "${HOME}/.zshrc"
+  ln -fs "${REPO_BASE_DIR}/shell/zshrc" "${HOME}/.zshrc"
 }
 
 initialize-shell-programs () {
@@ -58,7 +57,7 @@ initialize-shell-programs () {
   else
     sudo apt-get install silversearcher-ag tree jq
   fi
-  ln -fs "${RC_DIR}/tmux/tmux.conf" "${HOME}/.tmux.conf"
+  ln -fs "${REPO_BASE_DIR}/tmux/tmux.conf" "${HOME}/.tmux.conf"
 
   # fzf
   if [ ! -d "${HOME}/.fzf" ]; then
@@ -76,7 +75,7 @@ initialize-ssh () {
   fi
   if [ ! -f "${HOME}/.ssh/config" ]; then
     # copy, since it needs to be changed with username, proxy
-    cp  "${RC_DIR}/ssh/config" "${HOME}/.ssh/config"
+    cp  "${REPO_BASE_DIR}/ssh/config" "${HOME}/.ssh/config"
   fi
 }
 
@@ -112,9 +111,9 @@ initialize-vim () {
     fi
   done
 
-  ln -fs "${RC_DIR}/vim/vimrc" "${HOME}/.vimrc"
+  ln -fs "${REPO_BASE_DIR}/vim/vimrc" "${HOME}/.vimrc"
   mkdir -p "${HOME}/.vim/colors"
-  ln -fs "${RC_DIR}/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
+  ln -fs "${REPO_BASE_DIR}/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
 }
 
 initialize-node () {
@@ -198,7 +197,7 @@ initialize-python () {
     hash -r
   fi
 
-  ln -sf "${RC_DIR}/python/pythonstartup" "${HOME}/.pythonstartup"
+  ln -sf "${REPO_BASE_DIR}/python/pythonstartup" "${HOME}/.pythonstartup"
 }
 
 initialize-terraform () {
@@ -218,7 +217,7 @@ initialize-terraform () {
 
   PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
   mkdir -p "${PLUGIN_CACHE_DIR}"
-  ln -sf "${RC_DIR}/terraform/terraformrc" "${HOME}/.terraformrc"
+  ln -sf "${REPO_BASE_DIR}/terraform/terraformrc" "${HOME}/.terraformrc"
   # NOTE: rc needs to match this dir...
 }
 
@@ -265,7 +264,7 @@ initialize-env-sources () {
   )
   for SOURCE in "${STATIC_SOURCES[@]}"; do
     RENAMED="${SOURCE/\//-}"
-    ln -sf "${RC_DIR}/${SOURCE}" "${ENV_DIR}/${RENAMED}"
+    ln -sf "${REPO_BASE_DIR}/${SOURCE}" "${ENV_DIR}/${RENAMED}"
     echo "(over)wrote ${RENAMED}"
   done
 
@@ -278,11 +277,11 @@ initialize-env-sources () {
     if [ -f "${ENV_DIR}/${RENAMED}" ] ; then
       echo "${RENAMED} already exists, so not overwriting"
       echo "    if you want to update, manually run:"
-      echo "    cp ${RC_DIR}/${SOURCE} ${ENV_DIR}/${RENAMED}"
+      echo "    cp ${REPO_BASE_DIR}/${SOURCE} ${ENV_DIR}/${RENAMED}"
       echo "    and update as needed"
     else
       # copy since these require tweaking
-      cp "${RC_DIR}/${SOURCE}" "${ENV_DIR}/${RENAMED}"
+      cp "${REPO_BASE_DIR}/${SOURCE}" "${ENV_DIR}/${RENAMED}"
       echo "installed ${RENAMED}, which requires updating"
     fi
   done
