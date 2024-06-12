@@ -4,7 +4,7 @@ set -o pipefail
 
 : "${EMAIL_ADDRESS:?ERROR: set your email address}"
 
-REPO_BASE_DIR="$(dirname $(realpath $(git rev-parse --git-dir)))"
+REPO_BASE_DIR="$(dirname "$(realpath "$(git rev-parse --git-dir)")")"
 
 MAC=mac
 UBUNTU=ubuntu

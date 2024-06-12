@@ -1,7 +1,6 @@
 REPO_BASE_DIR="$(dirname "$(realpath "$(git rev-parse --git-dir)")")"
 
 link::rcs() {
-  echo "setting git"
   ln -fs "${REPO_BASE_DIR}/git/gitconfig" "${HOME}/.gitconfig"
   ln -fs "${REPO_BASE_DIR}/git/gitignore" "${HOME}/.gitignore"
 
