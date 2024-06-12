@@ -77,8 +77,7 @@ _verb "${TF_CLEAN}"
 
 TF_APPLY=$(_make_tf_cmd_name "apply")
 "${TF_APPLY}"() {
-  "${TERRAFORM_CMD}" apply "${DEFAULT_TF_PLAN_FILE}"
-  "${TF_CLEAN}"
+  "${TERRAFORM_CMD}" apply "${DEFAULT_TF_PLAN_FILE}" && "${TF_CLEAN}"
 }
 _verb "${TF_APPLY}"
 
