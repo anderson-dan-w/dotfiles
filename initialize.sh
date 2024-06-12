@@ -20,16 +20,14 @@ _announce() {
   echo -e "SETTING UP :: ${1}\n"
 }
 
-initialize-git () {
+init::git () {
   _announce git
-  ln -fs "${REPO_BASE_DIR}/git/gitconfig" "${HOME}/.gitconfig"
-  ln -fs "${REPO_BASE_DIR}/git/gitignore" "${HOME}/.gitignore"
   if [ ! -f "${HOME}/.git-prompt.sh" ]; then
     curl -LsSo "${HOME}/.git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
   fi
 }
 
-initialize-zsh () {
+init::zsh () {
   _announce zsh
   if [[ $PLATFORM == "${MAC}" ]]; then
     if [ ! -d "${HOME}/.zsh" ]; then
@@ -44,10 +42,9 @@ initialize-zsh () {
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
     wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
   fi
-  ln -fs "${REPO_BASE_DIR}/shell/zshrc" "${HOME}/.zshrc"
 }
 
-initialize-shell-programs () {
+init::shell-programs () {
   _announce shell-programs
   # NOTE: installs ag, fzf, tree, tmux
   # ag, aka silver-searcher, and others
@@ -57,7 +54,6 @@ initialize-shell-programs () {
   else
     sudo apt-get install silversearcher-ag tree jq
   fi
-  ln -fs "${REPO_BASE_DIR}/tmux/tmux.conf" "${HOME}/.tmux.conf"
 
   # fzf
   if [ ! -d "${HOME}/.fzf" ]; then
@@ -67,7 +63,7 @@ initialize-shell-programs () {
 
 }
 
-initialize-ssh () {
+init::ssh () {
   _announce ssh
   mkdir -p "${HOME}/.ssh"
   if [ ! -f "${HOME}/.ssh/id_ed25519" ]; then
@@ -79,7 +75,7 @@ initialize-ssh () {
   fi
 }
 
-initialize-vim () {
+init::vim () {
   _announce vim
 
   mkdir -p "${HOME}/.vim/autoload"
@@ -110,13 +106,9 @@ initialize-vim () {
       )
     fi
   done
-
-  ln -fs "${REPO_BASE_DIR}/vim/vimrc" "${HOME}/.vimrc"
-  mkdir -p "${HOME}/.vim/colors"
-  ln -fs "${REPO_BASE_DIR}/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
 }
 
-initialize-node () {
+init::node () {
   _announce node
   if [ ! -f "${HOME}/.nvm/nvm.sh" ]; then
     mkdir -p "${HOME}/.nvm"
@@ -136,7 +128,7 @@ initialize-node () {
   npm install --global yarn aws-cost-cli
 }
 
-initialize-docker () {
+init::docker () {
   _announce docker
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install docker docker-compose
@@ -151,7 +143,7 @@ initialize-docker () {
   fi
 }
 
-initialize-k8s () {
+init::k8s () {
   _announce k8s
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install kubectl kubectx
@@ -164,7 +156,7 @@ initialize-k8s () {
   fi
 }
 
-initialize-python () {
+init::python () {
   _announce python
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install pyenv
@@ -196,11 +188,9 @@ initialize-python () {
     pip install ipython
     hash -r
   fi
-
-  ln -sf "${REPO_BASE_DIR}/python/pythonstartup" "${HOME}/.pythonstartup"
 }
 
-initialize-terraform () {
+init::terraform () {
   _announce terraform
   if [[ $PLATFORM == "${MAC}" ]]; then
     if ! command -v terraform; then
@@ -214,14 +204,9 @@ initialize-terraform () {
     fi
   fi
   hash -r
-
-  PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
-  mkdir -p "${PLUGIN_CACHE_DIR}"
-  ln -sf "${REPO_BASE_DIR}/terraform/terraformrc" "${HOME}/.terraformrc"
-  # NOTE: rc needs to match this dir...
 }
 
-initialize-aws () {
+init::aws () {
   _announce awscli
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install awscli
@@ -241,68 +226,27 @@ initialize-aws () {
   fi
 }
 
-initialize-gcp () {
+init::gcp () {
   echo "TODO: install gcloud etc"
 }
 
-initialize-env-sources () {
-  _announce env-source-links
-  ENV_DIR="${HOME}/.env-sources"
-  if [ ! -d "${ENV_DIR}" ]; then
-    mkdir -p "${ENV_DIR}"
-  fi
-  STATIC_SOURCES=(
-    "shell/env.sh"
-    "git/env.sh"
-    "terraform/env.sh"
-    "python/env.sh"
-    "aws/account-helper.sh"
-    "aws/utils.sh"
-    "gcp/account-helper.sh"
-    "gcp/utils.sh"
-    "k8s/env.sh"
-  )
-  for SOURCE in "${STATIC_SOURCES[@]}"; do
-    RENAMED="${SOURCE/\//-}"
-    ln -sf "${REPO_BASE_DIR}/${SOURCE}" "${ENV_DIR}/${RENAMED}"
-    echo "(over)wrote ${RENAMED}"
-  done
-
-  DYNAMIC_SOURCES=(
-    "docker/env.sh"
-    "proxy-env.sh"
-  )
-  for SOURCE in "${DYNAMIC_SOURCES[@]}"; do
-    RENAMED="${SOURCE/\//-}"
-    if [ -f "${ENV_DIR}/${RENAMED}" ] ; then
-      echo "${RENAMED} already exists, so not overwriting"
-      echo "    if you want to update, manually run:"
-      echo "    cp ${REPO_BASE_DIR}/${SOURCE} ${ENV_DIR}/${RENAMED}"
-      echo "    and update as needed"
-    else
-      # copy since these require tweaking
-      cp "${REPO_BASE_DIR}/${SOURCE}" "${ENV_DIR}/${RENAMED}"
-      echo "installed ${RENAMED}, which requires updating"
-    fi
-  done
-
-}
-
-initialize-git
-initialize-zsh
-initialize-ssh
-initialize-vim
-initialize-node
-initialize-shell-programs
-initialize-python
-initialize-terraform
-initialize-aws
-initialize-gcp
-initialize-docker
-initialize-k8s
-initialize-env-sources
+init::git
+init::zsh
+init::ssh
+init::vim
+init::node
+init::shell-programs
+init::python
+init::terraform
+init::aws
+init::gcp
+init::docker
+init::k8s
 
 hash -r
+
+source "${REPO_BASE_DIR}/link_sources.zshrc"
+source ~/.zshrc
 
 echo "
 
