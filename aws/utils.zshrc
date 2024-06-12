@@ -1,7 +1,7 @@
 ################################################################################
 # AWS Billing
 #############
-aws::bills() {
+aws-bills() {
   AP="${1:-${AWS_PROFILE}}"
   THIS_MONTH=$( date  "+%Y-%m-01")
   LAST_MONTH=$(date -v-1m "+%Y-%m-01")
@@ -14,9 +14,9 @@ aws::bills() {
   echo "${LAST_MONTH} :: ${AP}: ${SPEND}"
 }
 
-aws::bills::all () {
-  for PROFILE in $(aws::profiles); do
-    aws::bills "${PROFILE}"
+aws-bills-all () {
+  for PROFILE in $(aws-profiles); do
+    aws-bills "${PROFILE}"
   done
 }
 
@@ -27,7 +27,7 @@ aws::bills::all () {
 # ec2 will query for ec2 instances by name, with trailing wildcard for convenience
 # returns tab-separated: instance-id, private-ip, name
 # eg: `ec2 dan` would SSM onto the "first" box named dan*, such as dan-dev-box
-aws::ec2 () {
+aws-ec2 () {
   aws ec2 describe-instances --filters="Name=tag:Name,Values=${1}*" | jq -r ' .Reservations[] .Instances[] | select(.State.Name == "running") | [.InstanceId, .PrivateIpAddress, (.Tags[]|select(.Key=="Name")|.Value)] | @tsv'
 }
 
@@ -45,7 +45,7 @@ ssm () {
   then
     instance="${1}"
   else
-    instance="$( aws::ec2 "${1}" | head -1 )"
+    instance="$( aws-ec2 "${1}" | head -1 )"
   fi
   echo "instance:${instance}"
   SSM_USER="${2:-ubuntu}"
@@ -57,7 +57,7 @@ ssm () {
 # AWS ELBv2
 #############
 
-aws::lb-health() {
+aws-lb-health() {
   for ARN in $(aws elbv2 describe-target-groups | jq -r '.TargetGroups[].TargetGroupArn' | ag "${1}"); do
     echo "$(basename $(dirname "${ARN}"))"
     aws elbv2 describe-target-health --target-group-arn "${ARN}" | jq -r '.TargetHealthDescriptions[] | [.Target.Id, .TargetHealth.State, .TargetHealth.Description] | @tsv'

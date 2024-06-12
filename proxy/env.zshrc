@@ -1,5 +1,5 @@
 # sets necessary proxy variables for being on a VPN
-proxy::set () {
+proxy-set () {
   export RSYNC_PROXY=$PROXY
   export http_proxy=http://$PROXY
   export HTTP_PROXY=$http_proxy
@@ -12,7 +12,7 @@ proxy::set () {
 }
 
 # unsets proxy variables, for use after disconnecting from VPN
-proxy::unset () {
+proxy-unset () {
   unset RSYNC_PROXY
   unset http_proxy
   unset HTTP_PROXY
@@ -24,10 +24,10 @@ proxy::unset () {
   unset NO_PROXY
 }
 
-proxy::toggle() {
+proxy-toggle() {
   if [ -z "${HTTP_PROXY}" ]; then
-    proxy::set
+    proxy-set
   else
-    proxy::unset
+    proxy-unset
   fi
 }

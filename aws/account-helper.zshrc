@@ -1,4 +1,4 @@
-aws::env-var-setup() {
+aws--account() {
   export AWS_PROFILE="${1}"
   # default is "e", which sets us-east-1; "w" sets us-west-2; anything else as-is
   REGION="${2:-e}"
@@ -22,7 +22,7 @@ aws::env-var-setup() {
   export AWS_ACCOUNT_ID="${ACCOUNT_ID}"
 }
 
-aws::profiles () {
+aws-profiles () {
   echo app-dev
   echo app-prod
   echo terraform
@@ -31,10 +31,10 @@ aws::profiles () {
   # add more as needed
 }
 
-aws::_::load-funcs () {
-  for PROFILE in $(aws::profiles); do
-    eval "aws::${PROFILE}() { aws::env-var-setup ${PROFILE} \${1}} "
+aws--load-funcs () {
+  for PROFILE in $(aws-profiles); do
+    eval "aws-${PROFILE}() { aws--account ${PROFILE} \${1}} "
   done
 }
 
-aws::_::load-funcs
+aws--load-funcs

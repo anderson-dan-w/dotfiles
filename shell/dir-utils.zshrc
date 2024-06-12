@@ -13,7 +13,7 @@ CODE_DIRS=(
 # eg `cd-dotfiles` will go to the right place,
 # and then source the venv if it exists
 # also, can subsequently be extended with other things (eg `nvm use`, etc)
-dir::_cd_with_venv() {
+dir--cd-with-venv() {
   DIR_NAME="${1}"
   BASE_DIR_NAME="${2}"
   VAR_NAME=$(echo ${DIR_NAME}_DIR | tr '[:lower:]' '[:upper:]' | tr '-' '_')
@@ -21,13 +21,13 @@ dir::_cd_with_venv() {
   export "${VAR_NAME}"="${FULL_PATH}"
 
   VENV_ACTIVATE="${VENV_ROOT}/${DIR_NAME}/bin/activate"
-  VENV_SOURCER="py::venv_src_${DIR_NAME}"
+  VENV_SOURCER="py-venv_src_${DIR_NAME}"
   alias "${VENV_SOURCER}"="if [[ -f ${VENV_ACTIVATE} ]]; then source ${VENV_ACTIVATE}; fi"
 
-  CD_VENV="cd::${DIR_NAME}"
+  CD_VENV="cd-${DIR_NAME}"
   alias "${CD_VENV}"="cd ${FULL_PATH} && ${VENV_SOURCER}"
 }
 
 for DIR in "${CODE_DIRS[@]}"; do
-  dir::_cd_with_venv "${DIR}" "${CODE_BASE_DIR}"
+  dir--cd-with-venv "${DIR}" "${CODE_BASE_DIR}"
 done

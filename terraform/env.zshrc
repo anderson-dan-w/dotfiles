@@ -26,7 +26,7 @@ if [[ "${1}" == "-v" ]]; then
 fi
 
 _verb () { if [[ "${VERBOSE}" ]]; then echo "$@" ; fi }
-_make_tf_cmd_name () { echo "${TF_ALIAS}::${1}"; }
+_make_tf_cmd_name () { echo "${TF_ALIAS}-${1}"; }
 
 TERRAFORM_CMD=$(which terraform)
 alias "${TF_ALIAS}"="${TERRAFORM_CMD}"
