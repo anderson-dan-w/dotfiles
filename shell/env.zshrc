@@ -26,10 +26,21 @@ bindkey -v
 
 # TODO: this has gotten out of control
 # NOTE: zsh-specific codes in this
-# [VPN] [aws: ] [gcp: ] <k8s: ::ns> venv:[] (git: )
-# time (pwd) resultstatus $
-setopt PROMPT_SUBST ; PS1='%F{red}${HTTP_PROXY:+[VPN] }%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] %F{red}[gcp:${GCP_ACTOR}]  %F{green}<k8s:$(basename $(k-tx -c))::$(k-ns -c)> %F{magenta}venv:$(virtualenv_prompt_info) %F{red}$(__git_ps1 "(git:%s)")
-%F{135}%* %F{yellow}(%c) %(?.%F{green}√.%F{red}?%?)%f %(!.#ROOT#.$) '
+setopt PROMPT_SUBST
+_VPN='%F{red}${HTTP_PROXY:+[VPN] }'
+_AWS='%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] '
+_GCP='%F{red}[gcp:${GCP_ACTOR}] '
+_K8S='%F{green}<k8s:$(basename $(k-tx -c))::$(k-ns -c)> '
+_PYTHON='%F{magenta}venv:$(virtualenv_prompt_info) '
+_GIT='%F{red}$(__git_ps1 "(git:%s)")'
+_TIME='%F{135}%* '
+_CURDIR='%F{yellow}(%c) '
+_SUCCESS='%(?.%F{green}√.%F{red}?%?)%f '
+_ROOT='%(!.#ROOT#.$) '
+
+PS1="${_VPN}${_AWS}${_GCP}${_K8S}
+${_PYTHON}${_GIT}
+${_TIME}${_CURDIR}${_SUCCESS}${_ROOT} "
 
 ## ag helpers
 _AG_ARGS="--hidden \
