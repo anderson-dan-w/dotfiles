@@ -37,10 +37,10 @@ aws-ec2 () {
 
 # SSMs into either an instance id OR the first instance return from an "ec2" listing
 # switches to supplied user (ubuntu default) and into $HOME dir for convenience
-#   ssm i-01234...   # specific instance
-#   ssm api-staging  # whichever api-staging machine ec2 returns first
-#   ssm dan-dev-box dan  # pops into /home/dan as user=dan
-ssm () {
+#   aws-ssm i-01234...   # specific instance
+#   aws-ssm api-staging  # whichever api-staging machine ec2 returns first
+#   aws-ssm dan-dev-box dan  # pops into /home/dan as user=dan
+aws-ssm () {
   if [[ "${1}" =~ i-0 ]]
   then
     instance="${1}"
