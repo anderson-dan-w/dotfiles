@@ -24,13 +24,14 @@ export LSCOLORS=gxGxbxDxCxEgEdxbxgxcxd
 alias v="vim"
 bindkey -v
 
-# TODO: this has gotten out of control
-# NOTE: zsh-specific codes in this
 setopt PROMPT_SUBST
 _VPN='%F{red}${HTTP_PROXY:+[VPN] }'
 _AWS='%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] '
+# TODO: this doesn't work yet; gcloud annoying
 _GCP='%F{red}[gcp:${GCP_ACTOR}] '
-_K8S='%F{green}<k8s:$(basename $(k-tx -c))::$(k-ns -c)> '
+# WHOA: you can put a command: $( basename ....) inside parameter manipulation ${...##*_}
+# NOTE: ${...##*_} removes everything _before_ the last underscore. GKE names are looooong
+_K8S='%F{green}<k8s:${$(basename $(k-tx -c))##*_}::$(k-ns -c)> '
 _PYTHON='%F{magenta}venv:$(virtualenv_prompt_info) '
 _GIT='%F{red}$(__git_ps1 "(git:%s)")'
 _TIME='%F{135}%* '
