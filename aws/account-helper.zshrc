@@ -3,11 +3,11 @@ aws--account() {
   # default is "e", which sets us-east-1; "w" sets us-west-2; anything else as-is
   REGION="${2:-e}"
   case "${REGION}" in
-    w)
-      REGION="us-west-2"
-      ;;
     e)
       REGION="us-east-1"
+      ;;
+    w)
+      REGION="us-west-2"
       ;;
   esac
 
