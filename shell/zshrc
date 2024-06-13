@@ -64,15 +64,26 @@ HIST_STAMPS="yyyy-mm-dd"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   docker
-  git
+  # git  # too many overlapping commands
   vi-mode
   virtualenv
+  z
+  zsh-autosuggestions
 )
+
+# FPATH needs to happen before source oh-my-zsh
+FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
 ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
 
+# load all the fun user-defined things built by dotfiles repo
 _ENV_SOURCE_DIR="${HOME}/.env-sources"
 for FILE in $( ls "${_ENV_SOURCE_DIR}" ); do
   source "${_ENV_SOURCE_DIR}/${FILE}"
 done
+
+# Autocompletion stuff, usually installed by the program itself
+[ -s "${HOME}/.bun/_bun" ] && source "${HOME}/.bun/_bun"
+if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then . "${HOME}/google-cloud-sdk/path.zsh.inc"; fi
+if [ -f "${HOME}/google-cloud-sdk/completion.zsh.inc" ]; then . "${HOME}/google-cloud-sdk/completion.zsh.inc"; fi

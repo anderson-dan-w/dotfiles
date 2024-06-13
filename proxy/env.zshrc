@@ -1,17 +1,14 @@
 # sets necessary proxy variables for being on a VPN
 proxy-set () {
-  PROXY="<PROXY-GOES-HERE>"
-  SPROXY="<SECURE-PROXY-GOES-HERE>"
-  NPROXY="<INTERNAL-COMMS-DN>"
   export RSYNC_PROXY=$PROXY
   export http_proxy=http://$PROXY
   export HTTP_PROXY=$http_proxy
-  export https_proxy=http://$SPROXY
+  export https_proxy=http://$SECURE_PROXY
   export HTTPS_PROXY=$https_proxy
   export ftp_proxy=$http_proxy
   export FTP_PROXY=$http_proxy
-  export no_proxy=$NPROXY
-  export NO_PROXY=$NPROXY
+  export no_proxy=$NOPROXY
+  export NO_PROXY=$no_proxy
 }
 
 # unsets proxy variables, for use after disconnecting from VPN

@@ -24,13 +24,23 @@ export LSCOLORS=gxGxbxDxCxEgEdxbxgxcxd
 alias v="vim"
 bindkey -v
 
-# This seems weird to mix-and-match $fg with $FG :shrug:. Looks like:
-# [venv] user@ip pwd (git) \
-# time $
-setopt PROMPT_SUBST ; PS1='$fg[red]${HTTP_PROXY:+[VPN] }$fg[cyan][${AWS_PROFILE}-${AWS_DEFAULT_REGION}] %{$fg[red]$(virtualenv_prompt_info) $fg[yellow]%n@%m $FG[075]%c$fg[green]$(__git_ps1 " (%s)")$reset_color%}
-$FG[134]%*$FG[255] \$ '
+setopt PROMPT_SUBST
+_VPN='%F{red}${HTTP_PROXY:+[VPN] }'
+_AWS='%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] '
+_GCP='%F{red}[gcp:${GCP_PROJECT}:${GCP_REGION}] '
+# WHOA: you can put a command: $( basename ....) inside parameter manipulation ${...##*_}
+# NOTE: ${...##*_} removes everything _before_ the last underscore. GKE names are looooong
+_K8S='%F{green}<k8s:${$(basename $(k-tx -c))##*_}::$(k-ns -c)> '
+_PYTHON='%F{magenta}venv:$(virtualenv_prompt_info) '
+_GIT='%F{red}$(__git_ps1 "(git:%s)")'
+_TIME='%F{135}%* '
+_CURDIR='%F{yellow}(%c) '
+_SUCCESS='%(?.%F{green}√.%F{red}?%?)%f '
+_ROOT='%(!.#ROOT#.$) '
 
-PATH="$HOME/bin:$PATH"
+PS1="${_VPN}${_AWS}${_GCP}${_K8S}
+${_PYTHON}${_GIT}
+${_TIME}${_CURDIR}${_SUCCESS}${_ROOT} "
 
 ## ag helpers
 _AG_ARGS="--hidden \
@@ -48,7 +58,12 @@ alias ag="ag -i $_AG_ARGS"
 
 # ... but occasionally i DO want case-sensitivity
 # shellcheck disable=SC2139
-alias AG="/usr/local/bin/ag $_AG_ARGS"
+alias AG="/opt/homebrew/bin/ag $_AG_ARGS"
+
+todo() {
+  TICKET="${1}" && shift
+  ag "TODO.ENG.${TICKET}" "$@"
+}
 
 ## fzf helpers
 export FZF_DEFAULT_COMMAND='ag --nocolor --hidden --ignore .git -g ""'
@@ -64,3 +79,5 @@ export FZF_DEFAULT_OPTS='
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+PATH="$HOME/bin:$PATH"

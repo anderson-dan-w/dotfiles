@@ -10,6 +10,7 @@ au BufRead,BufNewFile *.ms set filetype=mustache
 au BufRead,BufNewFile *pythonstartup set filetype=python
 au BufRead,BufNewFile *json set filetype=json
 au BufRead,BufNewFile *bashrc* set filetype=bash
+au BufRead,BufNewFile *zshrc* set filetype=zsh
 "" show matching brackets, and for how many deciseconds
 set showmatch
 set mat=2
@@ -23,13 +24,15 @@ set number
 set ai "" autoindent
 set si "smart indent
 set wrap "wrap lines
-"" sigopt uses indent=2 for everything
-set shiftwidth=2 softtabstop=2
-set tabstop=2 expandtab
+"" default python spacing
+set shiftwidth=4 softtabstop=4
+set tabstop=4 expandtab
 "" python screws up smartindent, so dont use it
 ""au! FileType python setlocal nosmartindent
-"" python wants to use 4 spaces; sigopt wants 2
-au FileType python setlocal shiftwidth=2 softtabstop=2 expandtab
+au FileType sh syn clear shCommandSub
+"" no eol at eof; dbnl-specific?
+set nofixeol
+set nofixendofline
 
 """""""""""""""""""""""""""
 "" search and display
@@ -65,7 +68,7 @@ augroup end
 "" highlight common typos that aren't always caught by linters
 augroup HighlightTypos
     autocmd!
-    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'langauge\|flase\|Flase\|jsut\|tempalte\|timestmap\|isntall', -1)
+    autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', 'langauge\|flase\|Flase\|jsut\|tempalte\|timestmap\|isntall\heml', -1)
 augroup end
 
 "" highlight literal tabs
@@ -193,7 +196,8 @@ let g:ale_lint_delay = 2000
 "" W503 = line break before binary operator (black prefers this)
 "" max-line-length: 120 rather than 80
 let g:ale_python_flake8_options = '--ignore E111,E114,E121,E123,E127,E128,E131,E302,E305,F401,F403,F405,W503,T001 --max-line-length=120'
-let g:ale_sh_shellcheck_options = '-e SC1091,SC3033'
+"" stop error-highlighting $() in sh scripts
+let g:ale_sh_shellcheck_options = '-e SC1090,SC1091,SC3033'
 
 let _all_fixers = ['remove_trailing_lines', 'trim_whitespace']
 let g:ale_fixers = {

@@ -21,12 +21,12 @@
   filename = green
 
 [user]
-  name = Dan W Anderson
-  email = anderson.dan.w@gmail.com
+  name = dan-dbnl
+  email = dan@distributional.com
 
 [core]
   editor = vim
-  excludesfile = /Users/dwanderson/.gitignore
+  excludesfile = ~/.gitignore
 
 [grep]
   lineNumber = True
@@ -76,12 +76,21 @@
   head = log --oneline origin..HEAD
 
   # hub-related
-  pr="!f() { \
-    BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD); \
-    git push -u origin $BRANCH_NAME; \
-    hub pull-request --no-edit -b main; \
-    hub pr show; \
-  };f "
+  #pr="!f() { \
+    #BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD); \
+    #git push -u origin $BRANCH_NAME; \
+    #hub pull-request --no-edit -b main; \
+    #hub pr show; \
+  #};f "
+
   ci = "!hub ci-status"
   ci-status = "!hub ci-status -v"
   ci-fail = "!hub ci-status -v | grep ✖ | cut -d' ' -f2"
+
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[credential]
+	helper = store

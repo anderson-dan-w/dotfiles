@@ -4,8 +4,7 @@ set -o pipefail
 
 : "${EMAIL_ADDRESS:?ERROR: set your email address}"
 
-REPO_BASE_DIR="$(dirname $(realpath $(git rev-parse --git-dir)))"
-RC_DIR="${REPO_BASE_DIR}/rcs"
+REPO_BASE_DIR="$(dirname "$(realpath "$(git rev-parse --git-dir)")")"
 
 MAC=mac
 UBUNTU=ubuntu
@@ -21,16 +20,14 @@ _announce() {
   echo -e "SETTING UP :: ${1}\n"
 }
 
-initialize-git () {
+init::git () {
   _announce git
-  ln -fs "${RC_DIR}/git/gitconfig" "${HOME}/.gitconfig"
-  ln -fs "${RC_DIR}/git/gitignore" "${HOME}/.gitignore"
   if [ ! -f "${HOME}/.git-prompt.sh" ]; then
     curl -LsSo "${HOME}/.git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
   fi
 }
 
-initialize-zsh () {
+init::zsh () {
   _announce zsh
   if [[ $PLATFORM == "${MAC}" ]]; then
     if [ ! -d "${HOME}/.zsh" ]; then
@@ -45,10 +42,9 @@ initialize-zsh () {
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
     wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
   fi
-  ln -fs "${RC_DIR}/shell/zshrc" "${HOME}/.zshrc"
 }
 
-initialize-shell-programs () {
+init::shell-programs () {
   _announce shell-programs
   # NOTE: installs ag, fzf, tree, tmux
   # ag, aka silver-searcher, and others
@@ -58,7 +54,6 @@ initialize-shell-programs () {
   else
     sudo apt-get install silversearcher-ag tree jq
   fi
-  ln -fs "${RC_DIR}/tmux/tmux.conf" "${HOME}/.tmux.conf"
 
   # fzf
   if [ ! -d "${HOME}/.fzf" ]; then
@@ -68,7 +63,7 @@ initialize-shell-programs () {
 
 }
 
-initialize-ssh () {
+init::ssh () {
   _announce ssh
   mkdir -p "${HOME}/.ssh"
   if [ ! -f "${HOME}/.ssh/id_ed25519" ]; then
@@ -76,11 +71,11 @@ initialize-ssh () {
   fi
   if [ ! -f "${HOME}/.ssh/config" ]; then
     # copy, since it needs to be changed with username, proxy
-    cp  "${RC_DIR}/ssh/config" "${HOME}/.ssh/config"
+    cp  "${REPO_BASE_DIR}/ssh/config" "${HOME}/.ssh/config"
   fi
 }
 
-initialize-vim () {
+init::vim () {
   _announce vim
 
   mkdir -p "${HOME}/.vim/autoload"
@@ -111,13 +106,9 @@ initialize-vim () {
       )
     fi
   done
-
-  ln -fs "${RC_DIR}/vim/vimrc" "${HOME}/.vimrc"
-  mkdir -p "${HOME}/.vim/colors"
-  ln -fs "${RC_DIR}/vim/colors/dwanderson-murphy.vim" "${HOME}/.vim/colors/dwanderson-murphy.vim"
 }
 
-initialize-node () {
+init::node () {
   _announce node
   if [ ! -f "${HOME}/.nvm/nvm.sh" ]; then
     mkdir -p "${HOME}/.nvm"
@@ -137,7 +128,7 @@ initialize-node () {
   npm install --global yarn aws-cost-cli
 }
 
-initialize-docker () {
+init::docker () {
   _announce docker
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install docker docker-compose
@@ -152,7 +143,20 @@ initialize-docker () {
   fi
 }
 
-initialize-python () {
+init::k8s () {
+  _announce k8s
+  if [[ $PLATFORM == "${MAC}" ]]; then
+    brew install kubectl kubectx
+  else
+    if ! command -v kubectl; then
+      echo "************************************************************"
+      echo "TODO - haven't bothered with this yet..."
+      echo "************************************************************"
+    fi
+  fi
+}
+
+init::python () {
   _announce python
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install pyenv
@@ -166,27 +170,27 @@ initialize-python () {
   # grabs most recent stable python 3.x.y version
   PY_VERSION=$(pyenv install --list | ag ' 3[.]\d+[.]\d+$' | tail -1 | tr -d '[:space:]')
   if ! [[ $( pyenv version ) =~ ${PY_VERSION} ]]; then
-    pyenv install "${PY_VERSION}"
-    pyenv shell "${PY_VERSION}"
-    pyenv global "${PY_VERSION}"
-    hash -r
+    echo "skipping pyenv setup, seems to be erroring weirdly?"
+  #  pyenv install "${PY_VERSION}"
+  #  pyenv shell "${PY_VERSION}"
+  #  pyenv global "${PY_VERSION}"
+  #  hash -r
   fi
 
   DEFAULT_VENV="default-venv"
   pip install virtualenv
-  mkdir -p "${HOME}/.venv"
-  if [ ! -d "${HOME}/.venv/${DEFAULT_VENV}" ]; then
-    virtualenv -p "$(which python)" "${HOME}/.venv/${DEFAULT_VENV}"
-    source "${HOME}/.venv/${DEFAULT_VENV}/bin/activate"
+  VENV_BASE="${HOME}/.venv"
+  mkdir -p "${VENV_BASE}"
+  if [ ! -d "${VENV_BASE}/${DEFAULT_VENV}" ]; then
+    virtualenv -p "$(which python)" "${VENV_BASE}/${DEFAULT_VENV}"
+    source "${VENV_BASE}/${DEFAULT_VENV}/bin/activate"
 
     pip install ipython
     hash -r
   fi
-
-  ln -sf "${RC_DIR}/python/pythonstartup" "${HOME}/.pythonstartup"
 }
 
-initialize-terraform () {
+init::terraform () {
   _announce terraform
   if [[ $PLATFORM == "${MAC}" ]]; then
     if ! command -v terraform; then
@@ -200,14 +204,9 @@ initialize-terraform () {
     fi
   fi
   hash -r
-
-  PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
-  mkdir -p "${PLUGIN_CACHE_DIR}"
-  ln -sf "${RC_DIR}/terraform/terraformrc" "${HOME}/.terraformrc"
-  # NOTE: rc needs to match this dir...
 }
 
-initialize-aws () {
+init::aws () {
   _announce awscli
   if [[ $PLATFORM == "${MAC}" ]]; then
     brew install awscli
@@ -227,36 +226,27 @@ initialize-aws () {
   fi
 }
 
-initialize-env-sources () {
-  _announce env-source-links
-  ENV_DIR="${HOME}/.env-sources"
-  if [ ! -d "${ENV_DIR}" ]; then
-    mkdir -p "${ENV_DIR}"
-    ln -sf "${RC_DIR}/shell/env.sh" "${ENV_DIR}/shell-env.sh"
-    ln -sf "${RC_DIR}/git/env.sh" "${ENV_DIR}/git-env.sh"
-    ln -sf "${RC_DIR}/terraform/env.sh" "${ENV_DIR}/terraform-env.sh"
-    ln -sf "${RC_DIR}/python/env.sh" "${ENV_DIR}/python-env.sh"
-    ln -sf "${RC_DIR}/aws/account-helper.sh" "${ENV_DIR}/aws-account-helper.sh"
-    ln -sf "${RC_DIR}/aws/utils.sh" "${ENV_DIR}/aws-utils.sh"
-    # copy since these require tweaking
-    cp "${RC_DIR}/docker/env.sh" "${ENV_DIR}/docker-env.sh"
-    cp "${RC_DIR}/proxy/env.sh" "${ENV_DIR}/proxy-env.sh"
-  fi
+init::gcp () {
+  echo "TODO: install gcloud etc"
 }
 
-initialize-git
-initialize-zsh
-initialize-ssh
-initialize-vim
-initialize-node
-initialize-shell-programs
-initialize-python
-initialize-terraform
-initialize-aws
-initialize-docker
-initialize-env-sources
+init::git
+init::zsh
+init::ssh
+init::vim
+init::node
+init::shell-programs
+init::python
+init::terraform
+init::aws
+init::gcp
+init::docker
+init::k8s
 
 hash -r
+
+source "${REPO_BASE_DIR}/link_sources.zshrc"
+source ~/.zshrc
 
 echo "
 
