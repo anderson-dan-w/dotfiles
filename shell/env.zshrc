@@ -40,7 +40,7 @@ _ROOT='%(!.#ROOT#.$) '
 
 PS1="${_VPN}${_AWS}${_GCP}${_K8S}
 ${_PYTHON}${_GIT}
-${_TIME}${_CURDIR}${_SUCCESS}${_ROOT} "
+${_TIME}${_CURDIR}${_SUCCESS}${_ROOT}"
 
 ## ag helpers
 _AG_ARGS="--hidden \
