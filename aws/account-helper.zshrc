@@ -1,5 +1,6 @@
 aws--account() {
   export AWS_PROFILE="${1}"
+  export AWS_DEFAULT_PROFILE="${1}"
   # default is "e", which sets us-east-1; "w" sets us-west-2; anything else as-is
   REGION="${2:-e}"
   case "${REGION}" in

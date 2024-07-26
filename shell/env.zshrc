@@ -27,7 +27,7 @@ bindkey -v
 setopt PROMPT_SUBST
 _VPN='%F{red}${HTTP_PROXY:+[VPN] }'
 _AWS='%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] '
-_GCP='%F{red}[gcp:${GCP_PROJECT}:${GCP_REGION}] '
+_GCP='%F{yellow}[gcp:${GCP_PROJECT}:${GCP_REGION}] '
 # WHOA: you can put a command: $( basename ....) inside parameter manipulation ${...##*_}
 # NOTE: ${...##*_} removes everything _before_ the last underscore. GKE names are looooong
 _K8S='%F{green}<k8s:${$(basename $(k-tx -c))##*_}::$(k-ns -c)> '
@@ -46,6 +46,7 @@ ${_TIME}${_CURDIR}${_SUCCESS}${_ROOT}"
 _AG_ARGS="--hidden \
   --ignore .git \
   --ignore .terraform \
+  --ignore 'terraform.tfstate*' \
   --ignore bootstrap \
   --ignore node_modules \
   --color-match '1;35' \

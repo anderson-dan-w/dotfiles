@@ -17,6 +17,6 @@ document.querySelectorAll('.js-reviewed-checkbox').forEach((elem) => {
   if (!elem.checked) { return }
   var clickEvent = new MouseEvent('click');
   elem.dispatchEvent(clickEvent);
-}))
+})
 EOF
 }

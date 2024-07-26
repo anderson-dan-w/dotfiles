@@ -64,9 +64,13 @@
   lg = log --pretty=format:'%C(yellow)%h %Cred%d %Creset%s (%Cgreen%an)' --graph
   ls = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen [%an]' --decorate
   mm = merge main
+  m- = merge -
+  mc = merge --continue
   pl = pull
   pt = push --tags
   pu = !git push -u origin $(git rev-parse --abbrev-ref HEAD)
+  rc = rebase --continue
+  ri = rebase -i
   sm = !git submodule sync && git submodule update
   tl = !git tag --sort=-v:refname -l | head -1
 
@@ -92,5 +96,6 @@
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
+
 [credential]
 	helper = store

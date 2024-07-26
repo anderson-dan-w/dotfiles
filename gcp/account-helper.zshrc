@@ -15,6 +15,6 @@ gcp-login-tool () {
 }
 
 gcp-login-both () {
-  gc-login
-  gc-login-tool
+  gcp-login
+  gcp-login-tool
 }

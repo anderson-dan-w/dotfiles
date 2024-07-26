@@ -47,6 +47,8 @@ _verb "${TF_VALIDATE}"
 TF_PLAN=$(_make_tf_cmd_name "plan")
 "${TF_PLAN}"() {
   "${TERRAFORM_CMD}" plan -no-color -out "${DEFAULT_TF_PLAN_FILE}" "$@" | tee "${DEFAULT_HUMAN_FILE}"
+  # NOTE: we want to capture the exit code of plan. zsh is `${pipestatus[1]}`, bash is `${PIPESTATUS[0]}`
+  test ${pipestatus[1]} -eq 0
 }
 _verb "${TF_PLAN}"
 
@@ -58,7 +60,7 @@ _verb "${TF_GREP}"
 
 TF_PREP=$(_make_tf_cmd_name "prep")
 "${TF_PREP}"() {
-  "${TF_PLAN}" && "${TF_GREP}"
+  "${TF_PLAN}" "$@" && "${TF_GREP}"
 }
 _verb "${TF_PREP}"
 

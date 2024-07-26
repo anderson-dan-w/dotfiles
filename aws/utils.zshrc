@@ -1,3 +1,17 @@
+AWS_DEFAULT_REGION="us-east-1"
+
+################################################################################
+# AWS ECR
+#############
+AWS_ECR_USER="AWS"
+ECR_USER="${AWS_ECR_USER}"
+
+aws--make-ecr-url() {
+  AWS_ACCOUNT_ID="${1:?AWS_ACCOUNT_ID required as first arg}"
+  AWS_REGION="${2:-${AWS_DEFAULT_REGION}}"
+  echo "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+}
+
 ################################################################################
 # AWS Billing
 #############
