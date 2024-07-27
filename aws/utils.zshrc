@@ -1,79 +1,81 @@
-AWS_DEFAULT_REGION="us-east-1"
-
-################################################################################
-# AWS ECR
-#############
-AWS_ECR_USER="AWS"
-ECR_USER="${AWS_ECR_USER}"
-
-aws--make-ecr-url() {
-  AWS_ACCOUNT_ID="${1:?AWS_ACCOUNT_ID required as first arg}"
-  AWS_REGION="${2:-${AWS_DEFAULT_REGION}}"
-  echo "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+-aws-cmd-name() {
+  _AWS_CMD_PREFIX="aws"
+  echo "${_AWS_CMD_PREFIX}-${1}"
 }
 
-################################################################################
-# AWS Billing
-#############
-aws-bills() {
-  AP="${1:-${AWS_PROFILE}}"
-  THIS_MONTH=$( date  "+%Y-%m-01")
-  LAST_MONTH=$(date -v-1m "+%Y-%m-01")
-  SPEND=$(aws ce get-cost-and-usage \
-    --profile "$AP" \
-    --time-period "Start=${LAST_MONTH},End=${THIS_MONTH}" \
-    --granularity MONTHLY \
-    --metrics "BlendedCost" | jq -r '.ResultsByTime[0].Total.BlendedCost.Amount | tonumber | floor'
-  )
-  echo "${LAST_MONTH} :: ${AP}: ${SPEND}"
+##############
+# AWS PROFILES
+##############
+
+_AWS_DEFAULT_REGION="us-east-1"
+AWS_DEFAULT_REGION="${_AWS_DEFAULT_REGION}"
+
+_AWS_PROFILES=(
+  app-dev
+  app-prod
+  terraform
+  monitoring-dev
+  # monitoring-prod
+  # networking
+  # add more as needed
+)
+
+# NOTE: zsh-specific, and assumes, eg, AWS_APP_DEV_ACCOUNT var exists
+-aws-account-id-by-name() {
+    VAR_NAME="AWS_${(U)${1/-/_}}_ACCOUNT"
+    echo "${(P)VAR_NAME}"
 }
 
-aws-bills-all () {
-  for PROFILE in $(aws-profiles); do
-    aws-bills "${PROFILE}"
-  done
-}
+_AWS_LOGIN="$(-aws-cmd-name -login)"
+"${_AWS_LOGIN}"() {
+  export AWS_PROFILE="${1}"
+  export AWS_DEFAULT_REGION="${2:-${_AWS_DEFAULT_REGION}}"
 
-################################################################################
-# AWS EC2
-#############
-
-# ec2 will query for ec2 instances by name, with trailing wildcard for convenience
-# returns tab-separated: instance-id, private-ip, name
-# eg: `ec2 dan` would SSM onto the "first" box named dan*, such as dan-dev-box
-aws-ec2 () {
-  aws ec2 describe-instances --filters="Name=tag:Name,Values=${1}*" | jq -r ' .Reservations[] .Instances[] | select(.State.Name == "running") | [.InstanceId, .PrivateIpAddress, (.Tags[]|select(.Key=="Name")|.Value)] | @tsv'
-}
-
-################################################################################
-# AWS SSM
-#############
-
-# SSMs into either an instance id OR the first instance return from an "ec2" listing
-# switches to supplied user (ubuntu default) and into $HOME dir for convenience
-#   aws-ssm i-01234...   # specific instance
-#   aws-ssm api-staging  # whichever api-staging machine ec2 returns first
-#   aws-ssm dan-dev-box dan  # pops into /home/dan as user=dan
-aws-ssm () {
-  if [[ "${1}" =~ i-0 ]]
-  then
-    instance="${1}"
+  if aws sts get-caller-identity > /dev/null 2>&1; then
+    echo already logged in to "${AWS_PROFILE}" in "${AWS_DEFAULT_REGION}"
   else
-    instance="$( aws-ec2 "${1}" | head -1 )"
+    aws sso login --profile "${AWS_PROFILE}"
   fi
-  echo "instance:${instance}"
-  SSM_USER="${2:-ubuntu}"
-  instance_id="$( echo "${instance}" | cut -f1 )"
-  aws ssm start-session --target "${instance_id}" --parameters "command=cd /home/${SSM_USER}; sudo su  ${SSM_USER}" --document-name "AWS-StartInteractiveCommand"
+  export AWS_ACCOUNT_ID=$( aws sts get-caller-identity | jq -r ".Account" )
 }
 
-################################################################################
-# AWS ELBv2
-#############
-
-aws-lb-health() {
-  for ARN in $(aws elbv2 describe-target-groups | jq -r '.TargetGroups[].TargetGroupArn' | ag "${1}"); do
-    echo "$(basename $(dirname "${ARN}"))"
-    aws elbv2 describe-target-health --target-group-arn "${ARN}" | jq -r '.TargetHealthDescriptions[] | [.Target.Id, .TargetHealth.State, .TargetHealth.Description] | @tsv'
+-aws-load-funcs () {
+  for _PROFILE in "${_AWS_PROFILES[@]}"; do
+      _CMD_NAME="$(-aws-cmd-name ${_PROFILE})"
+      eval "${_CMD_NAME}() { ${_AWS_LOGIN} ${_PROFILE} \${1}}"
   done
+}; -aws-load-funcs
+
+#########
+# AWS ECR
+#########
+
+AWS_ECR_USER="AWS"
+
+_AWS_ECR_PROFILES=(
+    app-dev
+    app-prod
+)
+
+-aws-ecr-url() {
+    _AWS_ACCOUNT="$(-aws-account-id-by-name ${1})"
+    echo "${_AWS_ACCOUNT}.dkr.ecr.${2:-${AWS_DEFAULT_REGION}}.amazonaws.com"
 }
+
+_AWS_ECR_LOGIN="$(-aws-cmd-name -ecr-login)"
+"${_AWS_ECR_LOGIN}"() {
+    _AWS_PROFILE="${1:-${AWS_PROFILE}}"
+    AWS_ECR_URL="$(-aws-ecr-url ${_AWS_PROFILE})"
+    echo "logging in to ${AWS_ECR_URL}"
+
+    AWS_ECR_TOKEN=$(aws ecr get-login-password --profile "${_AWS_PROFILE}" --region "${AWS_DEFAULT_REGION}")
+    echo "${AWS_ECR_TOKEN}" | docker login --username "${AWS_ECR_USER}" --password-stdin "${AWS_ECR_URL}"
+    echo "${AWS_ECR_TOKEN}" | pbcopy
+}
+
+-aws-load-ecr-funcs () {
+  for _AWS_ECR_PROFILE in "${_AWS_ECR_PROFILES[@]}"; do
+      _CMD_NAME="$(-aws-cmd-name ecr-${_AWS_ECR_PROFILE})"
+      eval "${_CMD_NAME}() { ${_AWS_ECR_LOGIN} ${_AWS_ECR_PROFILE}}"
+  done
+}; -aws-load-ecr-funcs

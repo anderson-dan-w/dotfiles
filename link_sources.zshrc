@@ -26,8 +26,8 @@ link::env_sources () {
     mkdir -p "${ENV_DIR}"
   fi
   STATIC_SOURCES=(
-    "aws/account-helper.zshrc"
     "aws/utils.zshrc"
+    "aws/old-utils.zshrc"
     "docker/env.zshrc"
     "gcp/account-helper.zshrc"
     "gcp/utils.zshrc"

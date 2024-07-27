@@ -44,6 +44,7 @@ ${_TIME}${_CURDIR}${_SUCCESS}${_ROOT}"
 
 ## ag helpers
 _AG_ARGS="--hidden \
+  --follow \
   --ignore .git \
   --ignore .terraform \
   --ignore 'terraform.tfstate*' \
