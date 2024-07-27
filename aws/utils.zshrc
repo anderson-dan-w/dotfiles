@@ -1,6 +1,7 @@
+_AWS_CMD="aws"
+
 -aws-cmd-name() {
-  _AWS_CMD_PREFIX="aws"
-  echo "${_AWS_CMD_PREFIX}-${1}"
+  echo "${_AWS_CMD}-${1}"
 }
 
 ##############
@@ -10,6 +11,7 @@
 _AWS_DEFAULT_REGION="us-east-1"
 AWS_DEFAULT_REGION="${_AWS_DEFAULT_REGION}"
 
+# AWS Profile names are not sensitive
 _AWS_PROFILES=(
   app-dev
   app-prod
@@ -43,9 +45,10 @@ _AWS_LOGIN="$(-aws-cmd-name -login)"
 }
 
 -aws-load-funcs () {
-  for _PROFILE in "${_AWS_PROFILES[@]}"; do
-      _CMD_NAME="$(-aws-cmd-name ${_PROFILE})"
-      eval "${_CMD_NAME}() { ${_AWS_LOGIN} ${_PROFILE} \${1}}"
+  for _AWS_PROFILE in "${_AWS_PROFILES[@]}"; do
+      _CMD_NAME="$(-aws-cmd-name login-${_AWS_PROFILE})"
+      eval "${_CMD_NAME}() { ${_AWS_LOGIN} ${_AWS_PROFILE} \${1}}"
+      echo made ${_CMD_NAME}
   done
 }; -aws-load-funcs
 
