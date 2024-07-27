@@ -20,6 +20,9 @@ _AWS_PROFILES=(
   # add more as needed
 )
 
+_AWS_DEFAULT_PROFILE="app-dev"
+AWS_PROFILE="${_AWS_DEFAULT_PROFILE}"
+
 # NOTE: zsh-specific, and assumes, eg, AWS_APP_DEV_ACCOUNT var exists
 -aws-account-id-by-name() {
     VAR_NAME="AWS_${(U)${1/-/_}}_ACCOUNT"
