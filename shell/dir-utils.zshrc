@@ -7,6 +7,7 @@ CODE_DIRS=(
   helm-charts
   terraform-google-dbnl
   terraform-aws-dbnl
+  hello-world-dbnl
 )
 
 PERSONAL_BASE_DIR="${HOME}/personal"
@@ -33,9 +34,16 @@ dir--cd-with-venv() {
   # dir-specific overrides, eg `cd-dotfiles` -> `cd-rc`
   if [[ "${CD_NAME}" == "dotfiles" ]]; then
     CD_NAME="rc"
+  elif [[ "${CD_NAME}" == "hello-world-dbnl" ]]; then
+    CD_NAME="world"
   fi
-  CD_VENV="cd-${CD_NAME}"
-  alias "${CD_VENV}"="cd ${FULL_PATH} && ${VENV_SOURCER}"
+
+  # TODO: getting clunky and unreadable...
+  CD_AND_VENV="cd-${CD_NAME}"
+  alias "${CD_AND_VENV}"="cd ${FULL_PATH} && ${VENV_SOURCER}"
+  if [[ "${CD_NAME}" == "dbnl-internal" ]]; then
+    alias "cd-dbnl"="${CD_AND_VENV}"
+  fi
 }
 
 for DIR in "${CODE_DIRS[@]}"; do
