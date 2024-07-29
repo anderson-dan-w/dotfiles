@@ -1,7 +1,8 @@
 _AWS_CMD="aws"
+_AWS_ALIAS="aws"
 
 -aws-cmd-name() {
-  echo "${_AWS_CMD}-${1}"
+  echo "${_AWS_ALIAS}-${1}"
 }
 
 ##############
@@ -26,6 +27,7 @@ _AWS_DEFAULT_PROFILE="app-dev"
 AWS_PROFILE="${_AWS_DEFAULT_PROFILE}"
 
 # NOTE: zsh-specific, and assumes, eg, AWS_APP_DEV_ACCOUNT var exists
+# could also do a loop-check on the _AWS_PROFILES var...
 -aws-account-id-by-name() {
     VAR_NAME="AWS_${(U)${1/-/_}}_ACCOUNT"
     echo "${(P)VAR_NAME}"
@@ -36,19 +38,18 @@ _AWS_LOGIN="$(-aws-cmd-name -login)"
   export AWS_PROFILE="${1}"
   export AWS_DEFAULT_REGION="${2:-${_AWS_DEFAULT_REGION}}"
 
-  if aws sts get-caller-identity > /dev/null 2>&1; then
+  if "${_AWS_CMD}" sts get-caller-identity > /dev/null 2>&1; then
     echo already logged in to "${AWS_PROFILE}" in "${AWS_DEFAULT_REGION}"
   else
-    aws sso login --profile "${AWS_PROFILE}"
+    "${_AWS_CMD}" sso login --profile "${AWS_PROFILE}"
   fi
-  export AWS_ACCOUNT_ID=$( aws sts get-caller-identity | jq -r ".Account" )
+  export AWS_ACCOUNT_ID=$( "${_AWS_CMD}" sts get-caller-identity | jq -r ".Account" )
 }
 
 -aws-load-funcs () {
   for _AWS_PROFILE in "${_AWS_PROFILES[@]}"; do
       _CMD_NAME="$(-aws-cmd-name login-${_AWS_PROFILE})"
       eval "${_CMD_NAME}() { ${_AWS_LOGIN} ${_AWS_PROFILE} \${1}}"
-      echo made ${_CMD_NAME}
   done
 }; -aws-load-funcs
 
@@ -74,7 +75,7 @@ _AWS_ECR_LOGIN="$(-aws-cmd-name -ecr-login)"
     AWS_ECR_URL="$(-aws-ecr-url ${_AWS_PROFILE})"
     echo "logging in to ${AWS_ECR_URL}"
 
-    AWS_ECR_TOKEN=$(aws ecr get-login-password --profile "${_AWS_PROFILE}" --region "${AWS_DEFAULT_REGION}")
+    AWS_ECR_TOKEN=$("${_AWS_CMD}" ecr get-login-password --profile "${_AWS_PROFILE}" --region "${AWS_DEFAULT_REGION}")
     echo "${AWS_ECR_TOKEN}" | docker login --username "${AWS_ECR_USER}" --password-stdin "${AWS_ECR_URL}"
     echo "${AWS_ECR_TOKEN}" | pbcopy
 }
@@ -85,3 +86,18 @@ _AWS_ECR_LOGIN="$(-aws-cmd-name -ecr-login)"
       eval "${_CMD_NAME}() { ${_AWS_ECR_LOGIN} ${_AWS_ECR_PROFILE}}"
   done
 }; -aws-load-ecr-funcs
+
+#########
+# AWS EKS
+#########
+
+_AWS_EKS_CLUSTERS_LIST="$(-aws-cmd-name eks-clusters)"
+"${_AWS_EKS_CLUSTERS_LIST}"() {
+    "${_AWS_CMD}" eks list-clusters "$@" | jq -r ".clusters[]"
+}
+
+_AWS_EKS_CONFIG="$(-aws-cmd-name eks-update-config)"
+"${_AWS_EKS_CONFIG}"() {
+    _CLUSTER_NAME="${1:?cluster name required}" && shift
+    "${_AWS_CMD}" eks update-kubeconfig --name "${_CLUSTER_NAME}" "$@"
+}

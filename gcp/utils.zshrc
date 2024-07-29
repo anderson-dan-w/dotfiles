@@ -68,13 +68,20 @@ _GCP_GCR_LOGIN="$(-gcloud-cmd-name -gcr-login)"
   for _GCP_GCR_PROJECT in "${_GCP_GCR_PROJECTS[@]}"; do
     _CMD_NAME="$(-gcloud-cmd-name gcr-login-${_GCP_GCR_PROJECT})"
     eval "${_CMD_NAME}() { ${_GCP_GCR_LOGIN} ${_GCP_GCR_PROJECT} }"
-    echo "made ${_CMD_NAME}"
   done
 }; -gcp-load-ecr-funcs
 
 #########
 # GCP GKE
 #########
-gcp-gke-creds() {
-  gcloud container clusters get-credentials --location "${GCP_REGION}" "$@"
+
+_GCP_GKE_CLUSTERS_LIST="$(-gcloud-cmd-name gke-clusters)"
+"${_GCP_GKE_CLUSTERS_LIST}"() {
+  "${_GCLOUD_CMD}" container clusters list --format="value(name,status)"
+}
+
+_GCP_GKE_CONFIG="$(-gcloud-cmd-name gke-config)"
+"${_GCP_GKE_CONFIG}"() {
+  _CLUSTER_NAME="${1:?cluster name required}" && shift
+  "${_GCLOUD_CMD}" container clusters get-credentials --location "${GCP_REGION}" "${_CLUSTER_NAME}"  "$@"
 }
