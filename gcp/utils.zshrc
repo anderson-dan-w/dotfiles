@@ -39,6 +39,18 @@ _GCLOUD_LOGIN="$(-gcloud-cmd-name login)"
   "${_GCLOUD_LOGIN_APP}"
 }
 
+_GCP_PROJECTS_LIST="$(-gcloud-cmd-name projects-list)"
+"${_GCP_PROJECTS_LIST}"() {
+  "${_GCLOUD_CMD}" projects list --format="value(projectId)"
+}
+
+_GCP_PROJECTS_SET="$(-gcloud-cmd-name projects-set)"
+"${_GCP_PROJECTS_SET}"() {
+  _PROJECT="${1:?project required}"
+  "${_GCLOUD_CMD}" config set project "${_PROJECT}"
+  "${_GCLOUD_CMD}" auth application-default set-quota-project "${_PROJECT}"
+}
+
 ##########
 # GCP GCR
 ##########
@@ -84,4 +96,22 @@ _GCP_GKE_CONFIG="$(-gcloud-cmd-name gke-config)"
 "${_GCP_GKE_CONFIG}"() {
   _CLUSTER_NAME="${1:?cluster name required}" && shift
   "${_GCLOUD_CMD}" container clusters get-credentials --location "${GCP_REGION}" "${_CLUSTER_NAME}"  "$@"
+}
+
+_GCP_SSL_STATUS="$(-gcloud-cmd-name ssl-status)"
+"${_GCP_SSL_STATUS}"() {
+    "${_GCLOUD_CMD}" compute ssl-certificates list --format="value(name,managed.domains,managed.status)"
+}
+
+_GCP_IP_STATUS="$(-gcloud-cmd-name ip-status)"
+"${_GCP_IP_STATUS}"() {
+    "${_GCLOUD_CMD}" compute addresses list --global --format="value(name,address,region,status)"
+}
+
+_GCP_GKE_HELP="$(-gcloud-cmd-name gke-help)"
+"${_GCP_GKE_HELP}"() {
+    echo "${_GCP_GKE_CLUSTERS_LIST}"
+    echo "${_GCP_GKE_CONFIG}"
+    echo "${_GCP_SSL_STATUS}"
+    echo "${_GCP_IP_STATUS}"
 }

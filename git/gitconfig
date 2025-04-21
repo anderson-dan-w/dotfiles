@@ -48,6 +48,7 @@
   c = commit
   d = diff
   h = rev-parse HEAD
+  m = merge
   p = push
   s = status
   t = tag

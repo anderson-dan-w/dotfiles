@@ -43,28 +43,58 @@ ${_PYTHON}${_GIT}
 ${_TIME}${_CURDIR}${_SUCCESS}${_ROOT}"
 
 ## ag helpers
-_AG_ARGS="--hidden \
-  --follow \
-  --ignore .git \
-  --ignore .terraform \
-  --ignore 'terraform.tfstate*' \
-  --ignore bootstrap \
-  --ignore node_modules \
-  --color-match '1;35' \
-  --pager='less -RXF' \
-"
+_AG_ARGS=(
+    "--color" \
+    "--hidden" \
+    "--ignore" ".git" \
+    "--ignore" ".terraform"  \
+    "--ignore" "terraform.tfstate*" \
+    "--ignore" "bootstrap" \
+    "--ignore" "node_modules" \
+    "--color-match" "1;35" \
+    "--pager=less -RXF" \
+)
+
+_ag() {
+    MY_ARGS=()
+    MAYBE_SORT=("tee")
+    while getopts "umtlor" opt 2>/dev/null; do
+        case "$opt" in
+            u)
+                MY_ARGS+=("--ignore" "ui") ;;
+            m)
+                MY_ARGS+=("--ignore" "src/distributional/migrations") ;;
+            t)
+                MY_ARGS+=("--ignore" "src/tests") ;;
+            l)
+                MY_ARGS+=("-l")
+                MAYBE_SORT=("sort" "-u") ;;
+            o)
+                MY_ARGS+=("--only-matching") ;;
+            r)
+                MY_ARGS+=("--ignore" "terraform") ;;
+            ?)
+                break ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+
+    /opt/homebrew/bin/ag "${MY_ARGS[@]}" "${_AG_ARGS[@]}" "$@" | "${MAYBE_SORT[@]}" | less -RXF
+}
 
 # case-insensitive by default...
-# shellcheck disable=SC2139
-alias ag="ag -i $_AG_ARGS"
+ag() {
+  _ag "$@" -i
+}
 
 # ... but occasionally i DO want case-sensitivity
-# shellcheck disable=SC2139
-alias AG="/opt/homebrew/bin/ag $_AG_ARGS"
+AG() {
+  _ag "$@"
+}
 
 todo() {
   TICKET="${1}" && shift
-  ag "TODO.ENG.${TICKET}" "$@"
+  AG "(TODO.)?ENG-${TICKET}" "$@"
 }
 
 ## fzf helpers

@@ -15,9 +15,12 @@ AWS_DEFAULT_REGION="${_AWS_DEFAULT_REGION}"
 # AWS Profile names are not sensitive
 _AWS_PROFILES=(
   app-dev
+  app-staging
   app-prod
-  terraform
+  app-prod-readonly
+  genai
   monitoring-dev
+  terraform
   # monitoring-prod
   # networking
   # add more as needed
@@ -42,6 +45,8 @@ _AWS_LOGIN="$(-aws-cmd-name -login)"
     echo already logged in to "${AWS_PROFILE}" in "${AWS_DEFAULT_REGION}"
   else
     "${_AWS_CMD}" sso login --profile "${AWS_PROFILE}"
+    echo
+    echo "logged in to ${AWS_PROFILE} in ${AWS_DEFAULT_REGION}"
   fi
   export AWS_ACCOUNT_ID=$( "${_AWS_CMD}" sts get-caller-identity | jq -r ".Account" )
 }
@@ -53,6 +58,12 @@ _AWS_LOGIN="$(-aws-cmd-name -login)"
   done
 }; -aws-load-funcs
 
+# convenience func because 1 login should handle all accounts (with shared SSO configuration)
+_AWS_SIMPLE_LOGIN="$(-aws-cmd-name login)"
+"${_AWS_SIMPLE_LOGIN}"() {
+    "${_AWS_LOGIN}" "${_AWS_DEFAULT_PROFILE}"
+}
+
 #########
 # AWS ECR
 #########
@@ -61,6 +72,7 @@ AWS_ECR_USER="AWS"
 
 _AWS_ECR_PROFILES=(
     app-dev
+    app-staging
     app-prod
 )
 
@@ -101,3 +113,17 @@ _AWS_EKS_CONFIG="$(-aws-cmd-name eks-update-config)"
     _CLUSTER_NAME="${1:?cluster name required}" && shift
     "${_AWS_CMD}" eks update-kubeconfig --name "${_CLUSTER_NAME}" "$@"
 }
+
+_AWS_EKS_DEFAULT_CLUSTER="$(-aws-cmd-name eks-default-cluster)"
+"${_AWS_EKS_DEFAULT_CLUSTER}"() {
+    PROFILE="${1:?profile name required}" && shift
+    "${_AWS_LOGIN}" "${PROFILE}"
+    "${_AWS_EKS_CONFIG}" "${PROFILE/-/-eks-}" "$@"
+}
+
+-aws-load-eks-clusters() {
+  for _AWS_EKS_PROFILE in "${_AWS_ECR_PROFILES[@]}"; do
+      _CMD_NAME="$(-aws-cmd-name eks-${_AWS_EKS_PROFILE})"
+      eval "${_CMD_NAME}() { ${_AWS_EKS_DEFAULT_CLUSTER} ${_AWS_EKS_PROFILE}}"
+  done
+}; -aws-load-eks-clusters

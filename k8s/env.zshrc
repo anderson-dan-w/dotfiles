@@ -39,8 +39,10 @@ k-registry-secret() {
 }
 
 k-registry-gcp() {
-  d-login-gcr
-  k-registry-secret "${GCR_URL}" "${GCR_USER}" "${GCR_TOKEN}" "$@"
+  # d-login-gcr
+  # TODO...
+  gcp-gcr-login-dbnlai
+  k-registry-secret "${GCP_GCR_URL}" "${GCP_GCR_USER}" "${GCP_GCR_TOKEN}" "$@"
 }
 
 k-registry-aws-dev() {
@@ -67,3 +69,5 @@ k-tls-secret() {
     --cert="${_CERT_FILE}" \
     --key="${_KEY_FILE}"
 }
+
+alias mk=minikube
