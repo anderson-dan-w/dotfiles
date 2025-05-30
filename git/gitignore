@@ -21,3 +21,7 @@
 
 ## editor settings
 *.zed*
+
+## my weird overrides
+.genplan
+.plans

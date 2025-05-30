@@ -69,6 +69,7 @@
   mc = merge --continue
   pl = pull
   pt = push --tags
+  pr = !gh pr create --title "$(git rev-parse --abbrev-ref HEAD)" --body-file .github/pull_request_template.md
   pu = !git push -u origin $(git rev-parse --abbrev-ref HEAD)
   rc = rebase --continue
   ri = rebase -i

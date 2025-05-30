@@ -11,6 +11,9 @@ PYTHONSTARTUP=$HOME/.pythonstartup
 PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PATH"
 
+# overspecified but, make my life easier
+export PYTHONPATH="$HOME/coding/dbnl-internal/src:$PYTHONPATH"
+
 VENV_ROOT="${HOME}/.venv"
 source "${VENV_ROOT}/${DEFAULT_VENV}/bin/activate"
 

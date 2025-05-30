@@ -19,8 +19,10 @@ _AWS_PROFILES=(
   app-prod
   app-prod-readonly
   genai
+  genai-user
   monitoring-dev
   terraform
+  sandbox-dan
   # monitoring-prod
   # networking
   # add more as needed
