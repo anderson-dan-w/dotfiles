@@ -31,9 +31,9 @@ aws-profiles () {
 aws--account-ids() {
   for _AWS_ACCOUNT in "${(@k)_AWS_ACCOUNTS[@]}"; do
       # capitalize; remove ", switch '-' with '_'
-      _NAME="${${(U)_AWS_ACCOUNT//\"/}/-/_}"
+      _NAME="${${(U)_AWS_ACCOUNT//\"/}//-/_}"
       _AWS_ACCOUNT_ID="${_AWS_ACCOUNTS[${_AWS_ACCOUNT}]}"
-      export "AWS_${_NAME}_ACCOUNT_ID"="${_AWS_ACCOUNT_ID}"
+      eval "export AWS_${_NAME}_ACCOUNT_ID=${_AWS_ACCOUNT_ID}"
   done
 }
 
