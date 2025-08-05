@@ -23,12 +23,9 @@ aws--account() {
 }
 
 aws-profiles () {
-  echo app-dev
-  echo app-prod
-  echo terraform
-  echo monitoring-dev
-  echo monitoring-prod
-  # add more as needed
+  for _AWS_ACCOUNT in "${(@k)_AWS_ACCOUNTS[@]}"; do
+      echo "${_AWS_ACCOUNT}" | tr -d '"'
+  done
 }
 
 aws--load-funcs () {
