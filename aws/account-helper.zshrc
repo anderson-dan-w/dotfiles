@@ -24,7 +24,16 @@ aws--account() {
 
 aws-profiles () {
   for _AWS_ACCOUNT in "${(@k)_AWS_ACCOUNTS[@]}"; do
-      echo "${_AWS_ACCOUNT}" | tr -d '"'
+      echo "${_AWS_ACCOUNT//\"/}"
+  done
+}
+
+aws--account-ids() {
+  for _AWS_ACCOUNT in "${(@k)_AWS_ACCOUNTS[@]}"; do
+      # capitalize; remove ", switch '-' with '_'
+      _NAME="${${(U)_AWS_ACCOUNT//\"/}/-/_}"
+      _AWS_ACCOUNT_ID="${_AWS_ACCOUNTS[${_AWS_ACCOUNT}]}"
+      export "AWS_${_NAME}_ACCOUNT_ID"="${_AWS_ACCOUNT_ID}"
   done
 }
 
@@ -35,3 +44,4 @@ aws--load-funcs () {
 }
 
 aws--load-funcs
+aws--account-ids
