@@ -61,7 +61,7 @@ _ag() {
     while getopts "umtlor" opt 2>/dev/null; do
         case "$opt" in
             u)
-                MY_ARGS+=("--ignore" "ui") ;;
+                MY_ARGS+=("--ignore" "ui" "--ignore" "web") ;;
             m)
                 MY_ARGS+=("--ignore" "src/distributional/migrations") ;;
             t)
