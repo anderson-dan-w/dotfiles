@@ -21,7 +21,7 @@
   filename = green
 
 [user]
-  name = dan-dbnl
+  name = dbnl-dan
   email = dan@distributional.com
 
 [core]
@@ -54,6 +54,7 @@
   t = tag
 
   ap = add -p
+  c- = checkout -
   co = checkout
   d1 = diff HEAD~1
   dc = diff --cached

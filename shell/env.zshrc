@@ -92,6 +92,12 @@ AG() {
   _ag "$@"
 }
 
+# can't do git commands in gitconfig that rely on the shell, since it creates a new one (when !-ing)
+g-acm() {
+  fc -s -2
+  fc -s -2  # since now, -1 is the previous fc command!
+}
+
 todo() {
   TICKET="${1}" && shift
   AG "(TODO.)?ENG-${TICKET}" "$@"
@@ -113,3 +119,5 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 PATH="$HOME/bin:$PATH"
+
+export GOBIN=${GOBIN:-$(go env GOPATH)/bin}

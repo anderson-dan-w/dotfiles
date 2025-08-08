@@ -20,6 +20,7 @@ _AWS_PROFILES=(
   app-prod-readonly
   genai
   genai-user
+  marketplace
   monitoring-dev
   terraform
   sandbox-dan

@@ -24,6 +24,15 @@ d-login-azr () {
   az acr login --name "${ACR_REGISTRY_NAME}"
 }
 
+d-login-ghcr () {
+  echo "Logging in to GitHub Container Registry"
+
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "NOT IMPLEMENTED"
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  # echo "${GHCR_PACKAGE_PAT}" | docker login ghcr.io -u "${GH_USERNAME}" --password-stdin
+}
+
 d-last-image () {
   docker images --format='{{.Tag}}' | head -1
 }

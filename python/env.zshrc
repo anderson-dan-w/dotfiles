@@ -4,17 +4,19 @@ else
   _FIND=find
 fi
 
-# NOTE: name needs to match that in initialize::python...
-DEFAULT_VENV="default-venv"
-
 PYTHONSTARTUP=$HOME/.pythonstartup
 PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PATH"
 
+export PYTHONPATH
 # overspecified but, make my life easier
-export PYTHONPATH="$HOME/coding/dbnl-internal/src:$PYTHONPATH"
+__DBNL_INTERNAL_DIR="${HOME}/coding/dbnl-internal"
+[[ ":${PYTHONPATH}:" != *":${__DBNL_INTERNAL_DIR}/src:"* ]] && \
+  PYTHONPATH="${__DBNL_INTERNAL_DIR}/src:${PYTHONPATH}"
 
 VENV_ROOT="${HOME}/.venv"
+# NOTE: name needs to match that in initialize::python...
+DEFAULT_VENV="default-venv"
 source "${VENV_ROOT}/${DEFAULT_VENV}/bin/activate"
 
 alias py-clean="${_FIND} -iregex '.*[.]pyc' -delete && ${_FIND} -iregex '.*[_-]pycache[_-].*' -delete"
@@ -34,15 +36,11 @@ py-mk-venv() {
   fi
 }
 
-# NOTE: 'q' for quiet, and typing `py-` is cumbersome
-pq-test() {
-    pytest "$@" --disable-warnings 2>/dev/null | tee /dev/null
-}
-
+# NOTE: 'a' for all, and typing `py-` is cumbersome
 pa-test() {
     pytest "$@" --disable-warnings
 }
-
+# NOTE: 'x' for.. distributed?
 px-test() {
     pytest -n auto "$@" --disable-warnings
 }
