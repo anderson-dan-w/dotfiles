@@ -81,7 +81,7 @@ _ag() {
     done
     shift $((OPTIND - 1))
 
-    /opt/homebrew/bin/ag "${MY_ARGS[@]}" "${_AG_ARGS[@]}" "$@" | "${MAYBE_SORT[@]}" | less -RXF
+    "$(brew --prefix)/bin/ag" "${MY_ARGS[@]}" "${_AG_ARGS[@]}" "$@" | "${MAYBE_SORT[@]}" | less -RXF
 }
 
 # case-insensitive by default...
