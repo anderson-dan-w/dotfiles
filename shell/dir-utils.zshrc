@@ -1,13 +1,11 @@
 # NOTE: could abstract a little more, but fine enough
-CODE_BASE_DIR="${HOME}/coding"
-CODE_DIRS=(
-  dbnl-internal
-  dbnl-demos
-  dbnl-sdk
-  helm-charts
-  terraform-google-dbnl
-  terraform-aws-dbnl
-)
+#CODE_BASE_DIR="${HOME}/coding"
+#CODE_DIRS=(
+#  dbnl-internal
+#  dbnl-sdk
+#  terraform-google-dbnl
+#  terraform-aws-dbnl
+#)
 
 # creates some helper aliases to enable quick-smart-switching
 # eg `cd-dotfiles` will go to the right place,
