@@ -2,6 +2,7 @@
 *__pycache__*
 .ipynb_checkpoints*
 *pyc
+.mypy_cache
 
 # terraform ephemeral files
 *.plan
@@ -17,3 +18,10 @@
 *swp
 *swap
 *bak
+
+## editor settings
+*.zed*
+
+## my weird overrides
+.genplan
+.plans

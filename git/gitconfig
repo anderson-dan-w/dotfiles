@@ -21,8 +21,8 @@
   filename = green
 
 [user]
-  name = dan-beyondai
-  email = dan.beyondai@gmail.com
+  name = anderson-dan-w
+  email = anderson.dan.w@gmail.com
 
 [core]
   editor = vim
@@ -48,11 +48,13 @@
   c = commit
   d = diff
   h = rev-parse HEAD
+  m = merge
   p = push
   s = status
   t = tag
 
   ap = add -p
+  c- = checkout -
   co = checkout
   d1 = diff HEAD~1
   dc = diff --cached
@@ -64,9 +66,14 @@
   lg = log --pretty=format:'%C(yellow)%h %Cred%d %Creset%s (%Cgreen%an)' --graph
   ls = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cgreen [%an]' --decorate
   mm = merge main
+  m- = merge -
+  mc = merge --continue
   pl = pull
   pt = push --tags
+  pr = !gh pr create --title "$(git rev-parse --abbrev-ref HEAD)" --body-file .github/pull_request_template.md
   pu = !git push -u origin $(git rev-parse --abbrev-ref HEAD)
+  rc = rebase --continue
+  ri = rebase -i
   sm = !git submodule sync && git submodule update
   tl = !git tag --sort=-v:refname -l | head -1
 
@@ -92,5 +99,6 @@
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
+
 [credential]
 	helper = store
