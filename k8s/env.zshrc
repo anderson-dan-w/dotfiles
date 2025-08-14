@@ -1,48 +1,73 @@
 alias k=kubectl
 alias k-tx=kubectx
+alias k-txs="kubectx | cat"
 alias k-ns=kubens
 alias k-nss="kubens | cat"
 
 alias h=helm
+
+k-gp() {
+  kubectl get pods "$@"
+}
 
 k-all() {
   kubectl api-resources --verbs=list --namespaced -o name  | xargs -n 1 kubectl get --show-kind --ignore-not-found  -n "${1}" | ag -v "^NAME" | cut -d' ' -f1 | ag -v '^\d+[smh]'
 }
 
 k-registry-secret() {
-  SECRET_NAME="dbnl-registry"
-  if [[ "${4}" == "--force" ]] ; then
-      kubectl delete secret "${SECRET_NAME}"
+  echo
+  _REGISTRY_SERVER="${1}" && shift
+  _REGISTRY_USER="${1}" && shift
+  _REGISTRY_TOKEN="${1}" && shift
+  if [[ "${1}" == "" ]] || [[ "${1}" == "--force" ]] ; then
+    echo "ERROR: failed to set secret for $(k-tx -c)"
+    echo "usage: k-registry-...  <secret-name> [--force]"
+    return
+  fi
+  _K8S_REGISTRY_SECRET_NAME="${1}"
+  if [[ "${2}" == "--force" ]] ; then
+      kubectl delete secret "${_K8S_REGISTRY_SECRET_NAME}"
+      echo
   fi
 
-  echo "storing secret for registry ${SECRET_NAME}"
-  kubectl create secret docker-registry "${SECRET_NAME}" \
-    --docker-server="${1}" \
-    --docker-username="${2}" \
-    --docker-password="${3}" \
+  echo "storing secret for registry ${_K8S_REGISTRY_SECRET_NAME}"
+  kubectl create secret docker-registry "${_K8S_REGISTRY_SECRET_NAME}" \
+    --docker-server="${_REGISTRY_SERVER}" \
+    --docker-username="${_REGISTRY_USER}" \
+    --docker-password="${_REGISTRY_TOKEN}" \
     --docker-email="dan@distributional.com"
 }
 
 k-registry-gcp() {
-  GCR_URL="us-docker.pkg.dev/dbnlai"
-  GCR_USER="oauth2accesstoken"
-  GCR_TOKEN=$(gcloud auth print-access-token)
-  k-registry-secret "${GCR_URL}" "${GCR_USER}" "${GCR_TOKEN}" "$@"
-}
-
-k-registry--aws() {
-  ECR_URL="${1}" && shift
-  ECR_USER="AWS"
-  ECR_TOKEN=$(aws --region="${AWS_DEFAULT_REGION}" ecr get-login-password)
-  k-registry-secret "${ECR_URL}" "${ECR_USER}" "${ECR_TOKEN}" "$@"
+  # d-login-gcr
+  # TODO...
+  gcp-gcr-login-dbnlai
+  k-registry-secret "${GCP_GCR_URL}" "${GCP_GCR_USER}" "${GCP_GCR_TOKEN}" "$@"
 }
 
 k-registry-aws-dev() {
-  ECR_URL="729505466205.dkr.ecr.us-east-1.amazonaws.com"
-  k-registry--aws "${ECR_URL}" "$@"
+  aws-ecr-app-dev
+  k-registry-secret "${AWS_ECR_URL}" "${AWS_ECR_USER}" "${AWS_ECR_TOKEN}" "$@"
 }
 
 k-registry-aws-prod() {
-  ECR_URL="203721542088.dkr.ecr.us-east-1.amazonaws.com"
-  k-registry--aws "${ECR_URL}" "$@"
+  aws-ecr-app-prod
+  k-registry-secret "${AWS_ECR_URL}" "${AWS_ECR_USER}" "${AWS_ECR_TOKEN}" "$@"
 }
+
+k-tls-secret() {
+  _K8S_TLS_SECRET_NAME="${1:-tls-secret}"
+  _CERT_FILE="${2:-${HOME}/.config/dbnl/tls/tls.crt}"
+  _KEY_FILE="${3:-${HOME}/.config/dbnl/tls/tls.key}"
+  # TODO: well this won't work right if 1 thru 3 are defaults and there is no 4...
+  if [[ "${4}" == "--force" ]] ; then
+      kubectl delete secret "${_K8S_TLS_SECRET_NAME}"
+  fi
+
+  echo "storing secret for tls ${_K8S_TLS_SECRET_NAME}"
+  kubectl create secret tls "${_K8S_TLS_SECRET_NAME}" \
+    --cert="${_CERT_FILE}" \
+    --key="${_KEY_FILE}"
+}
+
+alias mk=minikube
