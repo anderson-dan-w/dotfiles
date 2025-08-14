@@ -4,10 +4,12 @@ else
   _FIND=find
 fi
 
-DEFAULT_PYTHON_VERSION=$(pyenv shell)
+if command -v pyenv &>/dev/null; then eval "$(pyenv init -)"; fi
 
-# NOTE: name needs to match that in initialize::python...
-DEFAULT_VENV="default-venv"
+######################
+# env-vars
+######################
+DEFAULT_PYTHON_VERSION=$(pyenv global)
 
 PYTHONSTARTUP=$HOME/.pythonstartup
 PYENV_ROOT="$HOME/.pyenv"
@@ -19,13 +21,14 @@ __DBNL_INTERNAL_DIR="${HOME}/coding/dbnl-internal"
 [[ ":${PYTHONPATH}:" != *":${__DBNL_INTERNAL_DIR}/src:"* ]] && \
   PYTHONPATH="${__DBNL_INTERNAL_DIR}/src:${PYTHONPATH}"
 
+######################
+# venv
+######################
 VENV_ROOT="${HOME}/.venv"
+
 # NOTE: name needs to match that in initialize::python...
 DEFAULT_VENV="default-venv"
 source "${VENV_ROOT}/${DEFAULT_VENV}/bin/activate"
-
-alias py-clean="${_FIND} -iregex '.*[.]pyc' -delete && ${_FIND} -iregex '.*[_-]pycache[_-].*' -delete"
-if command -v pyenv &>/dev/null; then eval "$(pyenv init -)"; fi
 
 py-mk-venv() {
   DIR_NAME="${1}"
@@ -40,6 +43,11 @@ py-mk-venv() {
     echo "venv '${DIR_NAME}' already exists @ ${VENV_PATH}"
   fi
 }
+
+######################
+# helper funcs
+######################
+alias py-clean="${_FIND} -iregex '.*[.]pyc' -delete && ${_FIND} -iregex '.*[_-]pycache[_-].*' -delete"
 
 # NOTE: 'a' for all, and typing `py-` is cumbersome
 pa-test() {
