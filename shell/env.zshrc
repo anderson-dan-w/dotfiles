@@ -34,7 +34,7 @@ _GCP='%F{yellow}[gcp:${GCP_PROJECT}:${GCP_REGION}] '
 # TODO: no k8s means the above fails with no contexts
 _K8S='%F{green}<k8s:(none)> '
 _PYTHON='%F{magenta}venv:$(virtualenv_prompt_info) '
-_GIT='%F{red}$(__git_ps1 "(git:%s)") '
+_GIT='%F{red}$(__git_ps1 "(git:%s)")'
 _TIME='%F{135}%* '
 _CURDIR='%F{yellow}(%c) '
 _SUCCESS='%(?.%F{green}√.%F{red}?%?)%f '
