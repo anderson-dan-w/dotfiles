@@ -1,22 +1,4 @@
-# NOTE: could abstract a little more, but fine enough
-CODE_BASE_DIR="${HOME}/coding"
-CODE_DIRS=(
-  agentropy
-  dbnl-internal
-  dbnl-demos
-  dbnl-sdk
-  helm-charts
-  terraform-aws-dbnl
-  terraform-azurerm-dbnl
-  terraform-google-dbnl
-  examples
-  scratch
-)
-
-PERSONAL_BASE_DIR="${HOME}/personal"
-PERSONAL_DIRS=(
-  dotfiles
-)
+# NOTE: assumed CODE_DIRS / PERSONAL_DIRS set in sensitive-vars
 
 # creates some helper aliases to enable quick-smart-switching
 # eg `cd-dotfiles` will go to the right place,

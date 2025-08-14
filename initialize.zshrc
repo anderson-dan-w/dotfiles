@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 set -e
 set -o pipefail
 
@@ -170,11 +170,11 @@ init::python () {
   # grabs most recent stable python 3.x.y version
   PY_VERSION=$(pyenv install --list | ag ' 3[.]\d+[.]\d+$' | tail -1 | tr -d '[:space:]')
   if ! [[ $( pyenv version ) =~ ${PY_VERSION} ]]; then
-    echo "skipping pyenv setup, seems to be erroring weirdly?"
-  #  pyenv install "${PY_VERSION}"
-  #  pyenv shell "${PY_VERSION}"
-  #  pyenv global "${PY_VERSION}"
-  #  hash -r
+    #echo "skipping pyenv setup, seems to be erroring weirdly?"
+    pyenv install "${PY_VERSION}"
+    pyenv shell "${PY_VERSION}"
+    pyenv global "${PY_VERSION}"
+    hash -r
   fi
 
   DEFAULT_VENV="default-venv"

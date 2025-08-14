@@ -4,6 +4,11 @@ else
   _FIND=find
 fi
 
+DEFAULT_PYTHON_VERSION=$(pyenv shell)
+
+# NOTE: name needs to match that in initialize::python...
+DEFAULT_VENV="default-venv"
+
 PYTHONSTARTUP=$HOME/.pythonstartup
 PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PATH"
@@ -29,7 +34,7 @@ py-mk-venv() {
   fi
   VENV_PATH="${VENV_ROOT}/${DIR_NAME}"
   if [[ ! -d "${VENV_PATH}" ]]; then
-    virtualenv -p "$(which python3.12)" "${VENV_PATH}"
+    virtualenv -p "$(which python${DEFAULT_PYTHON_VERSION})" "${VENV_PATH}"
     echo "made venv '${DIR_NAME}' @ ${VENV_PATH}"
   else
     echo "venv '${DIR_NAME}' already exists @ ${VENV_PATH}"
@@ -38,7 +43,7 @@ py-mk-venv() {
 
 # NOTE: 'a' for all, and typing `py-` is cumbersome
 pa-test() {
-    pytest "$@" --disable-warnings
+    pytest -vv "$@" --disable-warnings
 }
 # NOTE: 'x' for.. distributed?
 px-test() {
