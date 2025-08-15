@@ -12,28 +12,24 @@ _AWS_ALIAS="aws"
 _AWS_DEFAULT_REGION="us-east-1"
 AWS_DEFAULT_REGION="${_AWS_DEFAULT_REGION}"
 
-# AWS Profile names are not sensitive
-_AWS_PROFILES=(
-  app-dev
-  app-staging
-  app-prod
-  app-prod-readonly
-  genai
-  genai-user
-  marketplace
-  monitoring-dev
-  terraform
-  sandbox-dan
-  # monitoring-prod
-  # networking
-  # add more as needed
-)
+--aws-profiles () {
+  for _AWS_ACCOUNT in "${(@k)_AWS_ACCOUNTS[@]}"; do
+      echo "${_AWS_ACCOUNT//\"/}"
+  done
+}
 
-_AWS_DEFAULT_PROFILE="app-dev"
+# expects _AWS_ACCOUNTS and _AWS_DEFAULT_PROFILE set in sensitive
 AWS_PROFILE="${_AWS_DEFAULT_PROFILE}"
 
-# NOTE: zsh-specific, and assumes, eg, AWS_APP_DEV_ACCOUNT var exists
-# could also do a loop-check on the _AWS_PROFILES var...
+-aws-account-ids() {
+  for _AWS_ACCOUNT in "${(@k)_AWS_ACCOUNTS[@]}"; do
+      # capitalize; remove ", switch '-' with '_'
+      _NAME="${${(U)_AWS_ACCOUNT//\"/}/-/_}"
+      _AWS_ACCOUNT_ID="${_AWS_ACCOUNTS[${_AWS_ACCOUNT}]}"
+      export "AWS_${_NAME}_ACCOUNT_ID"="${_AWS_ACCOUNT_ID}"
+  done
+}; -aws-account-ids
+
 -aws-account-id-by-name() {
     VAR_NAME="AWS_${(U)${1/-/_}}_ACCOUNT"
     echo "${(P)VAR_NAME}"
@@ -54,12 +50,13 @@ _AWS_LOGIN="$(-aws-cmd-name -login)"
   export AWS_ACCOUNT_ID=$( "${_AWS_CMD}" sts get-caller-identity | jq -r ".Account" )
 }
 
--aws-load-funcs () {
-  for _AWS_PROFILE in "${_AWS_PROFILES[@]}"; do
+-aws-load-login-funcs () {
+  for _AWS_ACCOUNT in "${(@k)_AWS_ACCOUNTS[@]}"; do
+      _AWS_PROFILE="${_AWS_ACCOUNT//\"/}"
       _CMD_NAME="$(-aws-cmd-name login-${_AWS_PROFILE})"
       eval "${_CMD_NAME}() { ${_AWS_LOGIN} ${_AWS_PROFILE} \${1}}"
   done
-}; -aws-load-funcs
+}; -aws-load-login-funcs
 
 # convenience func because 1 login should handle all accounts (with shared SSO configuration)
 _AWS_SIMPLE_LOGIN="$(-aws-cmd-name login)"
