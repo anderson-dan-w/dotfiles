@@ -58,7 +58,7 @@ HIST_STAMPS="yyyy-mm-dd"
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
 # Try to make autosuggestions a bit smoother...
-ZSH_AUTOSUGGEST_STRATEGY='history'
+#ZSH_AUTOSUGGEST_STRATEGY='history'
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -72,7 +72,7 @@ plugins=(
   virtualenv
   z
   # Whoa, slows down my personal comp a bit much...
-  zsh-autosuggestions
+  #zsh-autosuggestions
 )
 
 # FPATH needs to happen before source oh-my-zsh
@@ -83,6 +83,7 @@ source $ZSH/oh-my-zsh.sh
 
 # load all the fun user-defined things built by dotfiles repo
 _ENV_SOURCE_DIR="${HOME}/.env-sources"
+source "${_ENV_SOURCE_DIR}/sensitive-vars.zshrc"
 for FILE in $( ls "${_ENV_SOURCE_DIR}" ); do
   source "${_ENV_SOURCE_DIR}/${FILE}"
 done

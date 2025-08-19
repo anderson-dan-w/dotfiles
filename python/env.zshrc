@@ -10,6 +10,7 @@ if command -v pyenv &>/dev/null; then eval "$(pyenv init -)"; fi
 # env-vars
 ######################
 DEFAULT_PYTHON_VERSION=$(pyenv global)
+DEFAULT_PY_MINOR="${DEFAULT_PYTHON_VERSION%.*}"
 
 PYTHONSTARTUP=$HOME/.pythonstartup
 PYENV_ROOT="$HOME/.pyenv"
@@ -37,7 +38,7 @@ py-mk-venv() {
   fi
   VENV_PATH="${VENV_ROOT}/${DIR_NAME}"
   if [[ ! -d "${VENV_PATH}" ]]; then
-    virtualenv -p "$(which python${DEFAULT_PYTHON_VERSION})" "${VENV_PATH}"
+    virtualenv -p "$(which python${DEFAULT_PY_MINOR})" "${VENV_PATH}"
     echo "made venv '${DIR_NAME}' @ ${VENV_PATH}"
   else
     echo "venv '${DIR_NAME}' already exists @ ${VENV_PATH}"
