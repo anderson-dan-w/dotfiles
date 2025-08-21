@@ -49,7 +49,7 @@ init::shell-programs () {
   # NOTE: installs ag, fzf, tree, tmux
   # ag, aka silver-searcher, and others
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install the_silver_searcher tree jq tmux reattach-to-user-namespace
+    brew install the_silver_searcher tree jq tmux reattach-to-user-namespace findutils grep
   else
     sudo apt-get install silversearcher-ag tree jq tmux
   fi

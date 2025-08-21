@@ -1,7 +1,6 @@
-if [[ $(uname) == Darwin ]]; then
-  _FIND=gfind
-else
-  _FIND=find
+_FIND_TOOL=find
+if command -v gfind &>/dev/null; then
+  _FIND_TOOL=gfind
 fi
 
 if command -v pyenv &>/dev/null; then eval "$(pyenv init -)"; fi
@@ -48,7 +47,7 @@ py-mk-venv() {
 ######################
 # helper funcs
 ######################
-alias py-clean="${_FIND} -iregex '.*[.]pyc' -delete && ${_FIND} -iregex '.*[_-]pycache[_-].*' -delete"
+alias py-clean="${_FIND_TOOL} -iregex '.*[.]pyc' -delete && ${_FIND_TOOL} -iregex '.*[_-]pycache[_-].*' -delete"
 
 # NOTE: 'a' for all, and typing `py-` is cumbersome
 pa-test() {
