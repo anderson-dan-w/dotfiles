@@ -76,7 +76,7 @@ plugins=(
 )
 
 # FPATH needs to happen before source oh-my-zsh
-FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+# FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
 ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh

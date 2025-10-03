@@ -27,7 +27,6 @@ link::env_sources () {
   fi
   STATIC_SOURCES=(
     "aws/utils.zshrc"
-    "aws/old-utils.zshrc"
     "docker/env.zshrc"
     "gcp/utils.zshrc"
     "git/env.zshrc"

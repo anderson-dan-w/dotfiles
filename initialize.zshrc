@@ -168,24 +168,25 @@ init::python () {
   fi
   export PATH="$HOME/.pyenv/bin:$PATH"
   # grabs most recent stable python 3.x.y version
-  PY_VERSION=$(pyenv install --list | ag ' 3[.]\d+[.]\d+$' | tail -1 | tr -d '[:space:]')
+  #PY_VERSION=$(pyenv install --list | ag ' 3[.]\d+[.]\d+$' | tail -1 | tr -d '[:space:]')
+  PY_VERSION=3.10.14
   if ! [[ $( pyenv version ) =~ ${PY_VERSION} ]]; then
     #echo "skipping pyenv setup, seems to be erroring weirdly?"
     pyenv install "${PY_VERSION}"
-    pyenv shell "${PY_VERSION}"
     pyenv global "${PY_VERSION}"
+    # pyenv shell "${PY_VERSION}"
     hash -r
   fi
 
   DEFAULT_VENV="default-venv"
-  pip install virtualenv
+  pip3 install virtualenv
   VENV_BASE="${HOME}/.venv"
   mkdir -p "${VENV_BASE}"
   if [ ! -d "${VENV_BASE}/${DEFAULT_VENV}" ]; then
     virtualenv -p "$(which python)" "${VENV_BASE}/${DEFAULT_VENV}"
     source "${VENV_BASE}/${DEFAULT_VENV}/bin/activate"
 
-    pip install ipython
+    pip3 install ipython
     hash -r
   fi
 }
@@ -237,11 +238,11 @@ init::vim
 init::node
 init::shell-programs
 init::python
-init::terraform
-init::aws
-init::gcp
-init::docker
-init::k8s
+#init::terraform
+#init::aws
+#init::gcp
+#init::docker
+#init::k8s
 
 hash -r
 

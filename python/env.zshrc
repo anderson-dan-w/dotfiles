@@ -4,14 +4,14 @@ else
   _FIND=find
 fi
 
-DEFAULT_PYTHON_VERSION=$(pyenv shell)
-
-# NOTE: name needs to match that in initialize::python...
-DEFAULT_VENV="default-venv"
-
 PYTHONSTARTUP=$HOME/.pythonstartup
 PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PATH"
+
+DEFAULT_PYTHON_VERSION=$(pyenv global)
+
+# NOTE: name needs to match that in initialize::python...
+DEFAULT_VENV="default-venv"
 
 export PYTHONPATH
 # overspecified but, make my life easier
