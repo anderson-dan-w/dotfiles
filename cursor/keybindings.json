@@ -1,0 +1,127 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "cmd+i",
+        "command": "composerMode.agent"
+    },
+    // Pane splitting (Tmux-like)
+    {
+        "key": "cmd+\\",
+        "command": "workbench.action.splitEditor"
+    },
+    {
+        "key": "cmd+shift+\\",
+        "command": "workbench.action.splitEditorOrthogonal"
+    },
+
+    // Pane navigation (Vim-like)
+    {
+        "key": "ctrl+h",
+        "command": "workbench.action.focusLeftGroup"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.focusRightGroup"
+    },
+    {
+        "key": "ctrl+k",
+        "command": "workbench.action.focusAboveGroup"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "workbench.action.focusBelowGroup"
+    },
+
+    // Quick panel/sidebar toggle
+    {
+        "key": "cmd+b",
+        "command": "workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "cmd+j",
+        "command": "workbench.action.togglePanel"
+    },
+
+    // Terminal management
+    {
+        "key": "cmd+`",
+        "command": "workbench.action.terminal.toggleTerminal"
+    },
+    {
+        "key": "cmd+up",
+        "command": "workbench.action.focusActiveEditorGroup",
+    },
+    {
+        "key": "cmd+down",
+        "command": "workbench.action.terminal.focus",
+    },
+    {
+        "key": "cmd+shift+`",
+        "command": "workbench.action.terminal.new"
+    },
+    {
+        "key": "cmd+f",
+        "command": "actions.find"
+    },
+    {
+        "key": "cmd+f",
+        "command": "editor.action.nextMatchFindAction",
+        "when": "findInputFocussed"
+    },
+    {
+        "key": "cmd+shift+f",
+        "command": "editor.action.previousMatchFindAction",
+        "when": "findInputFocussed"
+    },
+    {
+        "key": "cmd+]",
+        "command": "workbench.action.terminal.focusNext"
+    },
+    {
+        "key": "cmd+[",
+        "command": "workbench.action.terminal.focusPrevious"
+    },
+    // Code Navigation
+    {
+        "key": "cmd+right",
+        "command": "workbench.action.nextEditor"
+    },
+    {
+        "key": "cmd+left",
+        "command": "workbench.action.previousEditor"
+    },
+    {
+        "key": "cmd+shift+right",
+        "command": "editor.action.goToReferences"
+    },
+    {
+        "key": "cmd+shift+left",
+        "command": "editor.action.revealDefinition"
+    },
+    // Pane resizing
+    {
+        "key": "cmd+shift+h",
+        "command": "workbench.action.decreaseViewWidth"
+    },
+    {
+        "key": "cmd+shift+l",
+        "command": "workbench.action.increaseViewWidth"
+    },
+    {
+        "key": "cmd+shift+k",
+        "command": "workbench.action.decreaseViewHeight"
+    },
+    {
+        "key": "cmd+shift+j",
+        "command": "workbench.action.increaseViewHeight"
+    },
+    // Quick pane operations
+    {
+        "key": "cmd+shift+x",
+        "command": "workbench.action.closeEditorsInGroup"
+    },
+    {
+        "key": "cmd+shift+o",
+        "command": "workbench.action.closeOtherEditors"
+    }
+]

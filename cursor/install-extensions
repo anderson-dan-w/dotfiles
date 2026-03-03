@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# install missing from manifest
+while read -r ext; do
+  [ -n "$ext" ] && cursor --install-extension "$ext"
+done < ./extensions.txt
