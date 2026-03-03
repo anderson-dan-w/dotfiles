@@ -1,0 +1,10 @@
+anysphere.cursorpyright
+charliermarsh.ruff
+dbaeumer.vscode-eslint
+esbenp.prettier-vscode
+hashicorp.terraform
+ms-python.black-formatter
+ms-python.debugpy
+ms-python.mypy-type-checker
+ms-python.python
+vscodevim.vim

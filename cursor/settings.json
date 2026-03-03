@@ -1,0 +1,98 @@
+{
+    "workbench.colorTheme": "Default Dark Modern",
+    "editor.cursorStyle": "block",
+    "files.exclude": {
+        "**/.terraform*": true
+    },
+    "workbench.startupEditor": "none",
+    "security.workspace.trust.untrustedFiles": "open",
+    "workbench.colorCustomizations": {
+        "editorError.foreground": "#ff000088",
+        "editorWarning.foreground": "#ffe60033",
+        "editorInfo.foreground": "#00ff0088"
+    },
+    "git.openRepositoryInParentFolders": "always",
+    "vim.hlsearch": true,
+    "vim.vimrc.enable": true,
+    "redhat.telemetry.enabled": false,
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "files.autoSave": "afterDelay",
+    "editor.dropIntoEditor.preferences": [
+
+    ],
+    "editor.foldingImportsByDefault": true,
+    "editor.hover.hidingDelay": 500,
+    "editor.indentSize": "tabSize",
+    "editor.lightbulb.enabled": "onCode",
+    "editor.occurrencesHighlight": "multiFile",
+    "editor.unfoldOnClickAfterEndOfLine": true,
+    "editor.wordWrapColumn": 100,
+    "diffEditor.hideUnchangedRegions.enabled": true,
+    "editor.inlineSuggest.syntaxHighlightingEnabled": true,
+    "editor.quickSuggestions": {
+        "comments": "inline"
+    },
+    "window.autoDetectColorScheme": true,
+    "window.closeWhenEmpty": true,
+    "editor.gotoLocation.alternativeImplementationCommand": "editor.action.goToReferences",
+    "editor.gotoLocation.alternativeReferenceCommand": "editor.action.goToTypeDefinition",
+    "editor.mouseWheelScrollSensitivity": 2,
+    "vim.leader": "<space>",
+    "vim.useSystemClipboard": true,
+    "vim.incsearch": true,
+    "vim.easymotion": true,
+    "vim.surround": true,
+    "vim.useCtrlKeys": true,
+    "vim.handleKeys": {
+        "<C-d>": true,
+        "<C-u>": true,
+        "<C-f>": true,
+        "<C-b>": true
+    },
+    "editor.lineNumbers": "relative",
+    "editor.cursorSurround": "line",
+    "editor.cursorBlinking": "solid",
+    "editor.scrollBeyondLastLine": true,
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.enableMultiLinePasteWarning": false,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.tabSize": 4
+    },
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "files.trimTrailingWhitespace": true,
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "python.testing.pytestArgs": ["-s", "src"],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "jest.runMode": {"type": "on-demand"},
+    "jest.jestCommandLine": "bun run test",
+    "jest.rootPath": "ui/",
+    "autoDocstring.docstringFormat": "sphinx-notypes",
+    "github.copilot.enable": {
+        "markdown": true
+    },
+    "extensions.ignoreRecommendations": true,
+    "explorer.confirmDelete": false
+}
