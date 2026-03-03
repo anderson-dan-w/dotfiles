@@ -27,10 +27,7 @@ d-login-azr () {
 d-login-ghcr () {
   echo "Logging in to GitHub Container Registry"
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "NOT IMPLEMENTED"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # echo "${GHCR_PACKAGE_PAT}" | docker login ghcr.io -u "${GH_USERNAME}" --password-stdin
+  echo "${GH_PAT}" | docker login ghcr.io -u "${GH_USERNAME}" --password-stdin
 }
 
 d-last-image () {

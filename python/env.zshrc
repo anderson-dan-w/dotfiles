@@ -48,5 +48,5 @@ pa-test() {
 }
 # NOTE: 'x' for.. distributed?
 px-test() {
-    pytest -n auto "$@" --disable-warnings
+    pytest -n auto -m "not benchmark and not slow" --disable-warnings "$@"
 }
