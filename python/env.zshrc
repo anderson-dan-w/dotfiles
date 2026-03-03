@@ -1,4 +1,4 @@
-if [[ $(uname) == Darwin ]]; then
+if command -v gfind &>/dev/null; then
   _FIND=gfind
 else
   _FIND=find
@@ -13,10 +13,6 @@ PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PATH"
 
 export PYTHONPATH
-# overspecified but, make my life easier
-__DBNL_INTERNAL_DIR="${HOME}/coding/dbnl-internal"
-[[ ":${PYTHONPATH}:" != *":${__DBNL_INTERNAL_DIR}/src:"* ]] && \
-  PYTHONPATH="${__DBNL_INTERNAL_DIR}/src:${PYTHONPATH}"
 
 VENV_ROOT="${HOME}/.venv"
 # NOTE: name needs to match that in initialize::python...

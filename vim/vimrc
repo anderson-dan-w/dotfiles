@@ -196,7 +196,7 @@ let g:ale_python_flake8_options = '--ignore E127,E128,E131,W503,T001 --max-line-
 let g:ale_python_ruff_options = '--ignore FIX002,I001'
 "" let g:ale_python_mypy_options = '--untyped-calls-exclude=pd.Dataframe.to_parquet'
 "" stop error-highlighting $() in sh scripts
-let g:ale_sh_shellcheck_options = '-e SC1090,SC1091,SC3033'
+let g:ale_sh_shellcheck_options = '--shell=bash -e SC1090,SC1091,SC3033'
 
 let _all_fixers = ['remove_trailing_lines', 'trim_whitespace']
 "" \   'javascript': ['eslint', 'prettier'] + _all_fixers,
