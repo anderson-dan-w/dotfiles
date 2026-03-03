@@ -30,9 +30,9 @@ _AWS='%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] '
 _GCP='%F{yellow}[gcp:${GCP_PROJECT}:${GCP_REGION}] '
 # WHOA: you can put a command: $( basename ....) inside parameter manipulation ${...##*_}
 # NOTE: ${...##*_} removes everything _before_ the last underscore. GKE names are looooong
-#_K8S='%F{green}<k8s:${$(basename $(k-tx -c))##*_}::$(k-ns -c)> '
+_K8S='%F{green}<k8s:${$(basename $(k-tx -c))##*_}::$(k-ns -c)> '
 # TODO: no k8s means the above fails with no contexts
-_K8S='%F{green}<k8s:(none)> '
+#_K8S='%F{green}<k8s:(none)> '
 _PYTHON='%F{magenta}venv:$(virtualenv_prompt_info) '
 _GIT='%F{red}$(__git_ps1 "(git:%s)")'
 _TIME='%F{135}%* '
@@ -53,6 +53,7 @@ _AG_ARGS=(
     "--ignore" "terraform.tfstate*" \
     "--ignore" "bootstrap" \
     "--ignore" "node_modules" \
+    "--ignore" ".next" \
     "--color-match" "1;35" \
     "--pager=less -RXF" \
 )
@@ -60,14 +61,18 @@ _AG_ARGS=(
 _ag() {
     MY_ARGS=()
     MAYBE_SORT=("tee")
-    while getopts "umtlor" opt 2>/dev/null; do
+    while getopts "lmortu" opt 2>/dev/null; do
         case "$opt" in
             u)
-                MY_ARGS+=("--ignore" "ui" "--ignore" "web") ;;
+                MY_ARGS+=("--ignore" "ui")
+                MY_ARGS+=("--ignore" "web")
+                ;;
+            t)
+                MY_ARGS+=("--ignore" "src/tests")
+                MY_ARGS+=("--ignore" "integration_tests")
+                ;;
             m)
                 MY_ARGS+=("--ignore" "src/distributional/migrations") ;;
-            t)
-                MY_ARGS+=("--ignore" "src/tests") ;;
             l)
                 MY_ARGS+=("-l")
                 MAYBE_SORT=("sort" "-u") ;;

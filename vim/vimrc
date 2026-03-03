@@ -77,6 +77,14 @@ augroup LiteralTabs
     "" autocmd WinEnter,VimEnter * :silent! call matchadd('Todo', '\t')
 augroup end
 
+" --- Python folding ---
+augroup python_folding
+  autocmd!
+  autocmd FileType python setlocal foldmethod=indent
+  autocmd FileType python setlocal foldnestmax=3
+  autocmd FileType python setlocal nofoldenable   " Start unfolded
+augroup END
+
 """""""""""""""""""""""""""
 "" Navigate
 """""""""""""""""""""""""""
@@ -191,9 +199,9 @@ let g:ale_python_ruff_options = '--ignore FIX002,I001'
 let g:ale_sh_shellcheck_options = '-e SC1090,SC1091,SC3033'
 
 let _all_fixers = ['remove_trailing_lines', 'trim_whitespace']
+"" \   'javascript': ['eslint', 'prettier'] + _all_fixers,
 let g:ale_fixers = {
 \   '*': _all_fixers,
-\   'javascript': ['eslint', 'prettier'] + _all_fixers,
 \   'python': [] + _all_fixers,
 \   'terraform': ['terraform'] + _all_fixers,
 \   'yaml': _all_fixers,

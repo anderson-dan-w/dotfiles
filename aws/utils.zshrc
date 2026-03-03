@@ -99,6 +99,9 @@ _AWS_ECR_LOGIN="$(-aws-cmd-name -ecr-login)"
   for _AWS_ECR_PROFILE in "${_AWS_ECR_PROFILES[@]}"; do
       _CMD_NAME="$(-aws-cmd-name ecr-${_AWS_ECR_PROFILE})"
       eval "${_CMD_NAME}() { ${_AWS_ECR_LOGIN} ${_AWS_ECR_PROFILE}}"
+      # alternative: d-login
+      _D_LOGIN_CMD_NAME="d-login-aws-${_AWS_ECR_PROFILE}"
+      eval "${_D_LOGIN_CMD_NAME}() { ${_AWS_ECR_LOGIN} ${_AWS_ECR_PROFILE}}"
   done
 }; -aws-load-ecr-funcs
 

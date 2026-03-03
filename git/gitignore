@@ -25,3 +25,6 @@
 ## my weird overrides
 .genplan
 .plans
+
+# huggingface...
+hf-models

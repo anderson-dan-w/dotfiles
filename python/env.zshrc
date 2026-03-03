@@ -4,7 +4,6 @@ else
   _FIND=find
 fi
 
-DEFAULT_PYTHON_VERSION=$(pyenv shell)
 
 # NOTE: name needs to match that in initialize::python...
 DEFAULT_VENV="default-venv"
@@ -27,6 +26,8 @@ source "${VENV_ROOT}/${DEFAULT_VENV}/bin/activate"
 alias py-clean="${_FIND} -iregex '.*[.]pyc' -delete && ${_FIND} -iregex '.*[_-]pycache[_-].*' -delete"
 if command -v pyenv &>/dev/null; then eval "$(pyenv init -)"; fi
 
+DEFAULT_PYTHON_VERSION=$(pyenv global)
+
 py-mk-venv() {
   DIR_NAME="${1}"
   if [[ -z "${DIR_NAME}" ]]; then
@@ -47,5 +48,5 @@ pa-test() {
 }
 # NOTE: 'x' for.. distributed?
 px-test() {
-    pytest -n auto "$@" --disable-warnings
+    pytest -n auto -m "not benchmark and not slow" --disable-warnings "$@"
 }
