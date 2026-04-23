@@ -55,6 +55,11 @@ k-registry-aws-prod() {
   k-registry-secret "${AWS_ECR_URL}" "${AWS_ECR_USER}" "${AWS_ECR_TOKEN}" "$@"
 }
 
+k-registry-ghcr() {
+  d-login-ghcr
+  k-registry-secret "ghcr.io" "${GH_USERNAME}" "${GH_PAT}" "$@"
+}
+
 k-tls-secret() {
   _K8S_TLS_SECRET_NAME="${1:-tls-secret}"
   _CERT_FILE="${2:-${HOME}/.config/dbnl/tls/tls.crt}"

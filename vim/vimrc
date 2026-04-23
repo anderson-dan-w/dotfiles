@@ -212,7 +212,7 @@ let g:ale_linters_ignore = {
 \}
 
 " Set this variable to 1 to fix files when you save them.
-let g:ale_fix_on_save = 1
+"let g:ale_fix_on_save = 1
 
 "" convenience for toggling on/off linters
 cnoreabbrev SS cclose
