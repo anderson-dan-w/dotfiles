@@ -159,7 +159,9 @@ init::k8s () {
 init::python () {
   _announce python
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install pyenv
+        if ! command -v pyenv; then
+            brew install pyenv
+        fi
   else
     sudo apt-get install build-essential zlib1g-dev libffi-dev libssl-dev libsqlite3-dev liblzma-dev libreadline-dev
     if [ ! -d "${HOME}/.pyenv" ]; then
@@ -172,8 +174,8 @@ init::python () {
   if ! [[ $( pyenv version ) =~ ${PY_VERSION} ]]; then
     #echo "skipping pyenv setup, seems to be erroring weirdly?"
     pyenv install "${PY_VERSION}"
-    pyenv shell "${PY_VERSION}"
     pyenv global "${PY_VERSION}"
+    pyenv shell "${PY_VERSION}"
     hash -r
   fi
 
@@ -194,6 +196,8 @@ init::terraform () {
   _announce terraform
   if [[ $PLATFORM == "${MAC}" ]]; then
     if ! command -v terraform; then
+      brew untap hashicorp/tap 2>/dev/null
+      brew tap hashicorp/tap
       brew install terraform
     fi
   else
