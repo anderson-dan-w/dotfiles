@@ -41,7 +41,7 @@ k-registry-secret() {
 k-registry-gcp() {
   # d-login-gcr
   # TODO...
-  gcp-gcr-login-dbnlai
+  # gcp-gcr-login ...
   k-registry-secret "${GCP_GCR_URL}" "${GCP_GCR_USER}" "${GCP_GCR_TOKEN}" "$@"
 }
 
@@ -57,8 +57,9 @@ k-registry-aws-prod() {
 
 k-tls-secret() {
   _K8S_TLS_SECRET_NAME="${1:-tls-secret}"
-  _CERT_FILE="${2:-${HOME}/.config/dbnl/tls/tls.crt}"
-  _KEY_FILE="${3:-${HOME}/.config/dbnl/tls/tls.key}"
+  # TODO: over-specified
+  # _CERT_FILE="${2:-${HOME}/.config/dbnl/tls/tls.crt}"
+  # _KEY_FILE="${3:-${HOME}/.config/dbnl/tls/tls.key}"
   # TODO: well this won't work right if 1 thru 3 are defaults and there is no 4...
   if [[ "${4}" == "--force" ]] ; then
       kubectl delete secret "${_K8S_TLS_SECRET_NAME}"

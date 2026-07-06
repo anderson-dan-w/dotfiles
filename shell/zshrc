@@ -71,12 +71,15 @@ plugins=(
   vi-mode
   virtualenv
   z
-  # Whoa, slows down my personal comp a bit much...
   zsh-autosuggestions
 )
 
 # FPATH needs to happen before source oh-my-zsh
-FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+if command -v brew &> /dev/null; then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+else
+  FPATH="/usr/share/zsh/functions/Completion:${FPATH}"
+fi
 
 ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
@@ -103,5 +106,12 @@ export PATH="$GOPATH/bin:$PATH"
 # bun completions
 [ -s "/Users/dan/.bun/_bun" ] && source "/Users/dan/.bun/_bun"
 
-# Created by `pipx` on 2025-09-15 15:37:45
-export PATH="$PATH:/Users/dan/.local/bin"
+# Created by `pipx`
+export PATH="$PATH:${HOME}/.local/bin"
+
+# added by sim-dev-tools on 2026-08-14
+source /Users/daniel.anderson/.torc/access-token.env
+export TORC_EMAIL=daniel.anderson@torc.ai
+
+# added by sim-dev-tools on 2026-09-21
+alias simdev-env='source $HOME/.torc/access-token.env'

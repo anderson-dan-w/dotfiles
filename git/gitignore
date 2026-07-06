@@ -3,6 +3,8 @@
 .ipynb_checkpoints*
 *pyc
 .mypy_cache
+# should be ok, i hate IDEs
+stubs
 
 # terraform ephemeral files
 *.plan
@@ -28,3 +30,7 @@
 
 # huggingface...
 hf-models
+
+# IDEs and such
+.vscode
+.claude

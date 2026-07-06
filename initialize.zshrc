@@ -42,15 +42,15 @@ init::zsh () {
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
     wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
   fi
+  git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 }
 
 init::shell-programs () {
   _announce shell-programs
   # NOTE: installs ag, fzf, tree, tmux
   # ag, aka silver-searcher, and others
-  # tmux already installed? or being weird?
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install the_silver_searcher tree jq
+    brew install the_silver_searcher tree jq tmux reattach-to-user-namespace
   else
     sudo apt-get install silversearcher-ag tree jq
   fi
@@ -159,7 +159,9 @@ init::k8s () {
 init::python () {
   _announce python
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install pyenv
+        if ! command -v pyenv; then
+            brew install pyenv
+        fi
   else
     sudo apt-get install build-essential zlib1g-dev libffi-dev libssl-dev libsqlite3-dev liblzma-dev libreadline-dev
     if [ ! -d "${HOME}/.pyenv" ]; then
@@ -172,8 +174,8 @@ init::python () {
   if ! [[ $( pyenv version ) =~ ${PY_VERSION} ]]; then
     #echo "skipping pyenv setup, seems to be erroring weirdly?"
     pyenv install "${PY_VERSION}"
-    pyenv shell "${PY_VERSION}"
     pyenv global "${PY_VERSION}"
+    pyenv shell "${PY_VERSION}"
     hash -r
   fi
 
@@ -194,6 +196,8 @@ init::terraform () {
   _announce terraform
   if [[ $PLATFORM == "${MAC}" ]]; then
     if ! command -v terraform; then
+      brew untap hashicorp/tap 2>/dev/null
+      brew tap hashicorp/tap
       brew install terraform
     fi
   else

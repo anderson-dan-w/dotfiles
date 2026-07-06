@@ -58,7 +58,7 @@ _GCP_PROJECTS_SET="$(-gcloud-cmd-name projects-set)"
 GCP_ECR_USER="oauth2accesstoken"
 
 _GCP_GCR_PROJECTS=(
-    dbnlai
+    # ...
 )
 
 -gcp-gcr-url() {
