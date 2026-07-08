@@ -48,9 +48,8 @@ init::shell-programs () {
   _announce shell-programs
   # NOTE: installs ag, fzf, tree, tmux
   # ag, aka silver-searcher, and others
-  # tmux already installed? or being weird?
   if [[ $PLATFORM == "${MAC}" ]]; then
-    brew install the_silver_searcher tree jq
+    brew install the_silver_searcher tree jq tmux reattach-to-user-namespace
   else
     sudo apt-get install silversearcher-ag tree jq
   fi

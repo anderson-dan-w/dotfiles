@@ -1,40 +1,21 @@
+################################################################################
+# assumes the following in sensitive:
+# _AWS_PROFILES
+# _AWS_ECR_PROFILES
+# _AWS_DEFAULT_PROFILE
+# _AWS_DEFAULT_REGION
+# all AWS_<ACCOUNT_NAME>_ACCOUNT=<account id>
+################################################################################
+
 _AWS_CMD="aws"
 _AWS_ALIAS="aws"
-
 -aws-cmd-name() {
   echo "${_AWS_ALIAS}-${1}"
 }
 
-##############
-# AWS PROFILES
-##############
-
-_AWS_DEFAULT_REGION="us-east-1"
-AWS_DEFAULT_REGION="${_AWS_DEFAULT_REGION}"
-
-# AWS Profile names are not sensitive
-_AWS_PROFILES=(
-  app-dev
-  app-staging
-  app-prod
-  app-prod-readonly
-  genai
-  genai-user
-  marketplace
-  monitoring-dev
-  terraform
-  sandbox-dan
-  # monitoring-prod
-  # networking
-  # add more as needed
-)
-
-_AWS_DEFAULT_PROFILE="app-dev"
-AWS_PROFILE="${_AWS_DEFAULT_PROFILE}"
-
-# NOTE: zsh-specific, and assumes, eg, AWS_APP_DEV_ACCOUNT var exists
-# could also do a loop-check on the _AWS_PROFILES var...
--aws-account-id-by-name() {
+# NOTE: zsh-specific, and assumes, eg, AWS_FOO_BAR_ACCOUNT var exists, can do "{func-name} foo-bar" to get ID
+_AWS_ACCT_ID_BY_NAME="$(-aws-cmd-name acct-id-by-name)"
+"${_AWS_ACCT_ID_BY_NAME}"() {
     VAR_NAME="AWS_${(U)${1/-/_}}_ACCOUNT"
     echo "${(P)VAR_NAME}"
 }
@@ -54,12 +35,12 @@ _AWS_LOGIN="$(-aws-cmd-name -login)"
   export AWS_ACCOUNT_ID=$( "${_AWS_CMD}" sts get-caller-identity | jq -r ".Account" )
 }
 
--aws-load-funcs () {
+-aws-load-login-funcs () {
   for _AWS_PROFILE in "${_AWS_PROFILES[@]}"; do
       _CMD_NAME="$(-aws-cmd-name login-${_AWS_PROFILE})"
       eval "${_CMD_NAME}() { ${_AWS_LOGIN} ${_AWS_PROFILE} \${1}}"
   done
-}; -aws-load-funcs
+}; -aws-load-login-funcs
 
 # convenience func because 1 login should handle all accounts (with shared SSO configuration)
 _AWS_SIMPLE_LOGIN="$(-aws-cmd-name login)"
@@ -73,14 +54,8 @@ _AWS_SIMPLE_LOGIN="$(-aws-cmd-name login)"
 
 AWS_ECR_USER="AWS"
 
-_AWS_ECR_PROFILES=(
-    app-dev
-    app-staging
-    app-prod
-)
-
 -aws-ecr-url() {
-    _AWS_ACCOUNT="$(-aws-account-id-by-name ${1})"
+    _AWS_ACCOUNT="$(${_AWS_ACCT_ID_BY_NAME} ${1})"
     echo "${_AWS_ACCOUNT}.dkr.ecr.${2:-${AWS_DEFAULT_REGION}}.amazonaws.com"
 }
 
@@ -133,3 +108,39 @@ _AWS_EKS_DEFAULT_CLUSTER="$(-aws-cmd-name eks-default-cluster)"
       eval "${_CMD_NAME}() { ${_AWS_EKS_DEFAULT_CLUSTER} ${_AWS_EKS_PROFILE}}"
   done
 }; -aws-load-eks-clusters
+
+_AWS_EC2_DESCRIBE="$(-aws-cmd-name ec2-describe)"
+"${_AWS_EC2_DESCRIBE}"() {
+  "${_AWS_CMD}" ec2 describe-instances --filters="Name=tag:Name,Values=${1}*" | \
+      jq -r ' .Reservations[] .Instances[]
+        | [.InstanceId, .PrivateIpAddress, .InstanceType, .State.Name]
+        | @tsv
+      '
+}
+
+#######################################################################
+# SSM
+#######################################################################
+
+# SSMs into either an instance id OR the first instance return from an "ec2" listing
+# switches to supplied user (ubuntu default) and into $HOME dir for convenience
+#   -aws-ssm i-01234...   # specific instance
+#   -aws-ssm api-staging  # whichever api-staging machine ec2 returns first
+#   -aws-ssm dan-dev-box dan  # pops into /home/dan as user=dan
+_AWS_SSM="$(-aws-cmd-name ssm)"
+-aws-ssm () {
+  _DEFAULT_SSM_USER="ubuntu"
+  if [[ "${1}" =~ i-0 ]]
+  then
+    _AWS_INSTANCE_ID="${1}"
+  else
+    _AWS_INSTANCE_INFO="$( ${_AWS_EC2_DESCRIBE} "${1}" | head -1 )"
+  fi
+  echo "INSTANCE:${_AWS_INSTANCE_INFO}"
+  _AWS_SSM_USER="${2:-${_DEFAULT_SSM_USER}}"
+  _AWS_INSTANCE_ID="$( echo "${_AWS_INSTANCE_INFO}" | cut -f1 )"
+  "${_AWS_CMD}" ssm start-session \
+      --target "${_AWS_INSTANCE_ID}" \
+      --document-name "AWS-StartInteractiveCommand" \
+      --parameters "command=cd /home/${_AWS_SSM_USER}; sudo su  ${_AWS_SSM_USER}"
+}

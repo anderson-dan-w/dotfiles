@@ -107,7 +107,8 @@ g-acm() {
 
 todo() {
   TICKET="${1}" && shift
-  AG "(TODO.)?ENG-${TICKET}" "$@"
+  # NOTE: "JIRA" isn't right, but w/e for now
+  AG "(TODO.)?JIRA-${TICKET}" "$@"
 }
 
 ## fzf helpers

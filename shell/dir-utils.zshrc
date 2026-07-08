@@ -1,4 +1,10 @@
-# NOTE: assumed CODE_DIRS / PERSONAL_DIRS set in sensitive-vars
+################################################################################
+# assumes the following in sensitive:
+#   CODE_BASE_DIR
+#   CODE_DIRS
+#   PERSONAL_BASE_DIR
+#   PERSONAL_DIRS
+################################################################################
 
 # creates some helper aliases to enable quick-smart-switching
 # eg `cd-dotfiles` will go to the right place,
@@ -16,17 +22,18 @@ dir--cd-with-venv() {
   alias "${VENV_SOURCER}"="if [[ -f ${VENV_ACTIVATE} ]]; then source ${VENV_ACTIVATE}; fi"
 
   CD_NAME="${DIR_NAME}"
+  # NOTE: to use a different name INSTEAD:
   # dir-specific overrides, eg `cd-dotfiles` -> `cd-rc`
-  if [[ "${CD_NAME}" == "dotfiles" ]]; then
-    CD_NAME="rc"
-  fi
+  #if [[ "${CD_NAME}" == "dotfiles" ]]; then
+  #  CD_NAME="rc"
+  #fi
 
-  # TODO: getting clunky and unreadable...
   CD_AND_VENV="cd-${CD_NAME}"
   alias "${CD_AND_VENV}"="cd ${FULL_PATH} && ${VENV_SOURCER}"
-  if [[ "${CD_NAME}" == "dbnl-internal" ]]; then
-    alias "cd-dbnl"="${CD_AND_VENV}"
-  fi
+  # NOTE: to add an alias as well
+  # if [[ "${CD_NAME}" == "dbnl-internal" ]]; then
+  #   alias "cd-dbnl"="${CD_AND_VENV}"
+  # fi
 }
 
 for DIR in "${CODE_DIRS[@]}"; do
