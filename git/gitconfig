@@ -25,9 +25,11 @@
   b = branch
   c = commit
   d = diff
+  f = fetch
   h = rev-parse HEAD
   m = merge
   p = push
+  r = restore
   s = status
   t = tag
 
@@ -35,6 +37,7 @@
   # NOTE: git split "checkout" into "switch" (branches) and "restore" (files)
   c- = switch -
   co = switch
+  sw = switch
   d1 = diff HEAD~1
   dc = diff --cached
   dh = diff origin/HEAD HEAD
@@ -51,6 +54,7 @@
   pl = pull
   pt = push --tags
   pu = !git push -u origin $(git rev-parse --abbrev-ref HEAD)
+  r- = restore -- .
   rc = rebase --continue
   ri = rebase -i
   sm = !git submodule sync && git submodule update
@@ -58,6 +62,7 @@
 
   com = !git switch $(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's@^origin/@@') && git fetch --all --prune
   rom = !git rebase origin/HEAD
+  sw- = switch -
 
   ## GH CLI
   pr = !gh pr create --title "$(git rev-parse --abbrev-ref HEAD)" --body-file .github/pull_request_template.md
@@ -94,7 +99,7 @@
   patternType = perl
 
 [filter "lfs"]
-	required = true
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process

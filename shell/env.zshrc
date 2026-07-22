@@ -121,6 +121,9 @@ export FZF_DEFAULT_OPTS='
 '
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+## gpg
+export GPG_TTY=$(tty)
+
 # node / nvm - may get stubbed into zshrc too though
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm

@@ -118,6 +118,56 @@ _AWS_EC2_DESCRIBE="$(-aws-cmd-name ec2-describe)"
       '
 }
 
+_AWS_EC2_OPEN_TUNNEL="$(-aws-cmd-name ec2-open-tunnel)"
+"${_AWS_EC2_OPEN_TUNNEL}"() {
+  _INSTANCE_ID=
+  _PROFILE="${AWS_PROFILE}"
+  _LOCAL_PORT="8022"
+  _REGION="us-east-1"
+
+  _EXTRA_ARGS=()
+
+  while [[ $# -gt 0 ]]; do
+    case "${1}" in
+      -i|--instance-id)
+        _INSTANCE_ID="${2:?instance id required after ${1}}"
+        shift 2
+      ;;
+      -l|--local-port)
+        _LOCAL_PORT="${2:?local port required after ${1}}"
+        shift 2
+      ;;
+      -r|--region)
+        _REGION="${2:?region required after ${1}}"
+        shift 2
+      ;;
+      -p|--profile)
+        _PROFILE="${2:?profile required after ${1}}"
+        shift 2
+      ;;
+      --)
+        shift
+        _EXTRA_ARGS+=("$@")
+        break
+      ;;
+      *)
+        _EXTRA_ARGS+=("${1}")
+        shift
+      ;;
+    esac
+  done
+
+  _CMD=("${_AWS_CMD}" ec2-instance-connect open-tunnel)
+  _CMD+=(--instance-id "${_INSTANCE_ID}")
+  _CMD+=(--local-port "${_LOCAL_PORT}")
+  _CMD+=(--region "${_REGION}")
+  [[ -n "${_PROFILE}" ]] && _CMD+=(--profile "${_PROFILE}")
+  _CMD+=("${_EXTRA_ARGS[@]}")
+
+  echo "Opening tunnel to ${_INSTANCE_ID}::${_LOCAL_PORT} (${_REGION}) as ${_PROFILE}"
+  "${_CMD[@]}"
+}
+
 #######################################################################
 # SSM
 #######################################################################
@@ -128,7 +178,7 @@ _AWS_EC2_DESCRIBE="$(-aws-cmd-name ec2-describe)"
 #   -aws-ssm api-staging  # whichever api-staging machine ec2 returns first
 #   -aws-ssm dan-dev-box dan  # pops into /home/dan as user=dan
 _AWS_SSM="$(-aws-cmd-name ssm)"
--aws-ssm () {
+"${_AWS_SSM}"() {
   _DEFAULT_SSM_USER="ubuntu"
   if [[ "${1}" =~ i-0 ]]
   then
