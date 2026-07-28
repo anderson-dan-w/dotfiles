@@ -48,7 +48,7 @@ ${_TIME}${_CURDIR}${_SUCCESS}${_ROOT}"
 _AG_ARGS=(
     "--color" \
     "--hidden" \
-    "--ignore" ".git" \
+    "--ignore" ".git/" \
     "--ignore" ".terraform"  \
     "--ignore" "terraform.tfstate*" \
     "--ignore" "bootstrap" \
