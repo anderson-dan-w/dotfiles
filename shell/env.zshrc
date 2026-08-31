@@ -48,7 +48,7 @@ _ROOT='%(!.#ROOT#.$) '
 PS1="${_TIME} ${_GIT} ${_CURDIR}${_SUCCESS}${_ROOT}"
 
 ## ag helpers
-_AG="$( type -a ag | grep -v 'ag: shell function' | head -n 1 | cut -d ' ' -f 3 )"
+export _AG="$( type -a ag | grep -v 'ag.*shell function' | head -n 1 | cut -d ' ' -f 3 )"
 _AG_ARGS=(
     "--color" \
     "--hidden" \
