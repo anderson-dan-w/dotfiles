@@ -108,7 +108,3 @@ export PATH="$GOPATH/bin:$PATH"
 
 # Created by `pipx`
 export PATH="$PATH:${HOME}/.local/bin"
-
-# added by sim-dev-tools on 2026-08-14
-source /Users/daniel.anderson/.torc/access-token.env
-export TORC_EMAIL=daniel.anderson@torc.ai
