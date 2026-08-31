@@ -136,4 +136,6 @@ export NVM_DIR="$HOME/.nvm"
 
 PATH="$HOME/bin:$PATH"
 
-export GOBIN=${GOBIN:-$(go env GOPATH)/bin}
+if command -v go >/dev/null 2>&1; then
+    export GOBIN=${GOBIN:-$(go env GOPATH)/bin}
+fi
