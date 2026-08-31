@@ -34,10 +34,6 @@
   t = tag
 
   ap = add -p
-  # NOTE: git split "checkout" into "switch" (branches) and "restore" (files)
-  c- = switch -
-  co = switch
-  sw = switch
   d1 = diff HEAD~1
   dc = diff --cached
   dh = diff origin/HEAD HEAD
@@ -57,12 +53,14 @@
   r- = restore -- .
   rc = rebase --continue
   ri = rebase -i
-  sm = !git submodule sync && git submodule update
+  s- = switch -
+  sc = switch -c
+  sm = !git switch $(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's@^origin/@@') && git fetch --all --prune
+  ss = switch
+  sw = switch
   tl = !git tag --sort=-v:refname -l | head -1
 
-  com = !git switch $(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's@^origin/@@') && git fetch --all --prune
   rom = !git rebase origin/HEAD
-  sw- = switch -
 
   ## GH CLI
   pr = !gh pr create --title "$(git rev-parse --abbrev-ref HEAD)" --body-file .github/pull_request_template.md
@@ -103,3 +101,14 @@
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[user]
+	email = daniel.anderson@torc.ai
+	name = "Daniel Anderson "

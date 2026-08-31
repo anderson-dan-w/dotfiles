@@ -26,9 +26,8 @@ bindkey -v
 
 setopt PROMPT_SUBST
 _VPN='%F{red}${HTTP_PROXY:+[VPN] }'
-_AWS='%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] '
+_AWS_PROMPT='%F{cyan}[aws:${AWS_PROFILE}::${AWS_DEFAULT_REGION}] '
 _GCP='%F{yellow}[gcp:${GCP_PROJECT}:${GCP_REGION}] '
-# WHOA: you can put a command: $( basename ....) inside parameter manipulation ${...##*_}
 # NOTE: ${...##*_} removes everything _before_ the last underscore. GKE names are looooong
 #_K8S='%F{green}<k8s:${$(basename $(k-tx -c))##*_}::$(k-ns -c)> '
 # TODO: no k8s means the above fails with no contexts
@@ -40,9 +39,13 @@ _CURDIR='%F{yellow}(%c) '
 _SUCCESS='%(?.%F{green}√.%F{red}?%?)%f '
 _ROOT='%(!.#ROOT#.$) '
 
-PS1="${_VPN}${_AWS}${_GCP}${_K8S}
-${_PYTHON}${_GIT}
-${_TIME}${_CURDIR}${_SUCCESS}${_ROOT}"
+# NOTE: original:
+# PS1="${_VPN}${_AWS_PROMPT}${_GCP}${_K8S}
+# ${_PYTHON}${_GIT}
+# ${_TIME}${_CURDIR}${_SUCCESS}${_ROOT}"
+
+# NOTE: new: no k8s, no gcp, uv over venv, aws uses --profile
+PS1="${_TIME} ${_GIT} ${_CURDIR}${_SUCCESS}${_ROOT}"
 
 ## ag helpers
 _AG_ARGS=(
@@ -68,8 +71,8 @@ _ag() {
                 MY_ARGS+=("--ignore" "web")
                 ;;
             t)
-                MY_ARGS+=("--ignore" "src/tests")
-                MY_ARGS+=("--ignore" "integration_tests")
+                MY_ARGS+=("--ignore" "*tests/")
+                MY_ARGS+=("--ignore" "*integration_tests/")
                 ;;
             m)
                 MY_ARGS+=("--ignore" "src/distributional/migrations") ;;

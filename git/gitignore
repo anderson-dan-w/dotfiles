@@ -28,3 +28,5 @@
 
 # huggingface...
 hf-models
+
+.claude

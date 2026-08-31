@@ -1,4 +1,4 @@
-if [[ $(uname) == Darwin ]]; then
+if command -v gfind &>/dev/null; then
   _FIND=gfind
 else
   _FIND=find

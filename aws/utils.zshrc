@@ -1,7 +1,5 @@
 ################################################################################
 # assumes the following in sensitive:
-# _AWS_PROFILES
-# _AWS_ECR_PROFILES
 # _AWS_DEFAULT_PROFILE
 # _AWS_DEFAULT_REGION
 # all AWS_<ACCOUNT_NAME>_ACCOUNT=<account id>
@@ -9,20 +7,23 @@
 
 _AWS_CMD="aws"
 _AWS_ALIAS="aws"
--aws-cmd-name() {
-  echo "${_AWS_ALIAS}-${1}"
+-aws-cmd-name() { echo "${_AWS_ALIAS}-${1}" }
+
+_AWS_PROFILES="$(-aws-cmd-name profiles)"
+"${_AWS_PROFILES}"() {
+  "${_AWS_CMD}" configure list-profiles
 }
 
-# NOTE: zsh-specific, and assumes, eg, AWS_FOO_BAR_ACCOUNT var exists, can do "{func-name} foo-bar" to get ID
+# profile name in aws configs; check $_AWS_PROFILES for available profiles
 _AWS_ACCT_ID_BY_NAME="$(-aws-cmd-name acct-id-by-name)"
 "${_AWS_ACCT_ID_BY_NAME}"() {
-    VAR_NAME="AWS_${(U)${1/-/_}}_ACCOUNT"
-    echo "${(P)VAR_NAME}"
+    _AWS_PROFILE="${1:${_AWS_DEFAULT_PROFILE}}"
+    ${_AWS_CMD} configure get sso_account_id --profile "${_AWS_PROFILE}"
 }
 
 _AWS_LOGIN="$(-aws-cmd-name -login)"
 "${_AWS_LOGIN}"() {
-  export AWS_PROFILE="${1}"
+  export AWS_PROFILE="${1:?profile name required}"
   export AWS_DEFAULT_REGION="${2:-${_AWS_DEFAULT_REGION}}"
 
   if "${_AWS_CMD}" sts get-caller-identity > /dev/null 2>&1; then
@@ -36,15 +37,16 @@ _AWS_LOGIN="$(-aws-cmd-name -login)"
 }
 
 -aws-load-login-funcs () {
-  for _AWS_PROFILE in "${_AWS_PROFILES[@]}"; do
+    for _AWS_PROFILE in $( "${_AWS_PROFILES}" ); do
       _CMD_NAME="$(-aws-cmd-name login-${_AWS_PROFILE})"
       eval "${_CMD_NAME}() { ${_AWS_LOGIN} ${_AWS_PROFILE} \${1}}"
   done
 }; -aws-load-login-funcs
 
-# convenience func because 1 login should handle all accounts (with shared SSO configuration)
+# no-arg will login to default profile, setting AWS_PROFILE
 _AWS_SIMPLE_LOGIN="$(-aws-cmd-name login)"
 "${_AWS_SIMPLE_LOGIN}"() {
+    _AWS_DEFAULT_PROFILE="${1:-${_AWS_DEFAULT_PROFILE}}"
     "${_AWS_LOGIN}" "${_AWS_DEFAULT_PROFILE}"
 }
 
@@ -52,7 +54,7 @@ _AWS_SIMPLE_LOGIN="$(-aws-cmd-name login)"
 # AWS ECR
 #########
 
-AWS_ECR_USER="AWS"
+_AWS_ECR_USER="AWS"
 
 -aws-ecr-url() {
     _AWS_ACCOUNT="$(${_AWS_ACCT_ID_BY_NAME} ${1})"
@@ -66,12 +68,12 @@ _AWS_ECR_LOGIN="$(-aws-cmd-name -ecr-login)"
     echo "logging in to ${AWS_ECR_URL}"
 
     AWS_ECR_TOKEN=$("${_AWS_CMD}" ecr get-login-password --profile "${_AWS_PROFILE}" --region "${AWS_DEFAULT_REGION}")
-    echo "${AWS_ECR_TOKEN}" | docker login --username "${AWS_ECR_USER}" --password-stdin "${AWS_ECR_URL}"
+    echo "${AWS_ECR_TOKEN}" | docker login --username "${_AWS_ECR_USER}" --password-stdin "${AWS_ECR_URL}"
     echo "${AWS_ECR_TOKEN}" | pbcopy
 }
 
 -aws-load-ecr-funcs () {
-  for _AWS_ECR_PROFILE in "${_AWS_ECR_PROFILES[@]}"; do
+  for _AWS_ECR_PROFILE in $( "${_AWS_PROFILES}" ); do
       _CMD_NAME="$(-aws-cmd-name ecr-${_AWS_ECR_PROFILE})"
       eval "${_CMD_NAME}() { ${_AWS_ECR_LOGIN} ${_AWS_ECR_PROFILE}}"
       # alternative: d-login
@@ -103,7 +105,7 @@ _AWS_EKS_DEFAULT_CLUSTER="$(-aws-cmd-name eks-default-cluster)"
 }
 
 -aws-load-eks-clusters() {
-  for _AWS_EKS_PROFILE in "${_AWS_ECR_PROFILES[@]}"; do
+  for _AWS_ECR_PROFILE in $( "${_AWS_PROFILES}" ); do
       _CMD_NAME="$(-aws-cmd-name eks-${_AWS_EKS_PROFILE})"
       eval "${_CMD_NAME}() { ${_AWS_EKS_DEFAULT_CLUSTER} ${_AWS_EKS_PROFILE}}"
   done
@@ -193,4 +195,11 @@ _AWS_SSM="$(-aws-cmd-name ssm)"
       --target "${_AWS_INSTANCE_ID}" \
       --document-name "AWS-StartInteractiveCommand" \
       --parameters "command=cd /home/${_AWS_SSM_USER}; sudo su  ${_AWS_SSM_USER}"
+}
+
+_AWS_SET_CREDS="$(-aws-cmd-name set-creds)"
+"${_AWS_SET_CREDS}"() {
+  _AWS_PROFILE="${1:?profile name required}" && shift
+  _AWS_REGION="${1:-${AWS_DEFAULT_REGION}}"
+  eval "$($_AWS_CMD configure export-credentials --profile $_AWS_PROFILE --format env)"
 }
