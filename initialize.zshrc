@@ -42,6 +42,7 @@ init::zsh () {
   if [ ! -d "${HOME}/.oh-my-zsh" ]; then
     wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
   fi
+  git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 }
 
 init::shell-programs () {
